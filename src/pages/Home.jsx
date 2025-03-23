@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div>
       <HeroBanner />
-      <div className='h-[3000px] bg-blue-500'>Home</div>
+      <div></div>
     </div>
     
   )
