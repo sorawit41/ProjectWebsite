@@ -1,0 +1,46 @@
+https://ui.shadcn.com/docs/components/tabs
+
+npx shadcn@latest add tabs
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+
+
+const [roomType,setRoomType] = useState('all')
+
+const [filteredRooms,setFilteredRooms] = useState([])
+
+useEffect(()=>{
+const filtered = rooms.data?.filter((room)=>{
+return roomType === 'all' ? rooms : roomType === room.attributes.type;
+});
+
+setFilteredRooms(filtered)
+
+},[roomType])
+
+<Tabs defaultValue="all" className="w-[240px] lg:w-[540px] lg:h-auto mb-8 mx-auto">
+  <TabsList className="w-full h-full lg:h-[46px] flex flex-col lg:flex-row">
+    <TabsTrigger className="w-full h-full" value="all" onClick={()=>setRoomType('')}>All</TabsTrigger>
+    <TabsTrigger className="w-full h-full" value="single" onClick={()=>setRoomType('single')}>Single</TabsTrigger>
+    <TabsTrigger className="w-full h-full" value="double" onClick={()=>setRoomType('double')}>Double</TabsTrigger>
+    <TabsTrigger className="w-full h-full" value="extended" onClick={()=>setRoomType('extended')}>Extended</TabsTrigger>
+  </TabsList>
+
+</Tabs>
+
+<div classname='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+{filteredRooms.map((room)=>{
+
+return (
+<div key={}>
+<Link to={'/room/${id}'}>
+<div className='relative w-full h-[300px] overflow-hidden mb-6'>
+<img className="object-cover"/>
+</div>
+</Link>
+</div>
+);
+
+})}
+</div>

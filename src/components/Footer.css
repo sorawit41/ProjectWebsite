@@ -1,0 +1,37 @@
+.footer {
+    background-color: black;
+    color: white;
+    padding: 20px 0;
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .footer-text {
+    font-size: 14px;
+  }
+  
+  .footer-icons {
+    display: flex;
+  }
+  
+  .footer-icon {
+    margin: 0 10px;
+  }
+  
+  .footer-icon img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .footer-privacy {
+    font-size: 14px;
+    text-decoration: none;
+    color: white;
+  }
