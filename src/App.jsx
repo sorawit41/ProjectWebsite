@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import DefaultLayout from './layout/DefaultLayout'
 import {Home, About, Access, Cast, Media, NewsAndEvent, Vip,Menu,Contact} from "./pages"
 
+
 const Layout = () => {
   return (
     <DefaultLayout>

@@ -1,12 +1,11 @@
 import React from 'react';
-import { HeroBanner, Featured } from '../components';
+import { HeroBanner } from '../components';
 
 const Home = () => {
   return (
     <div>
       <HeroBanner />
-      <Featured />
-      <div></div>
+      <div className='h-[3000px]'>Home</div>
     </div>
   );
 };

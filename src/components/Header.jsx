@@ -33,7 +33,7 @@ const Header = () => {
   }, [lastScrollY]);
 
   return (
-    <header
+    <header 
       className={`w-full h-[60px] md:h-[80px] bg-white flex items-center justify-between z-20 sticky top-0 transition-transform duration-300 ${show}`}
     >
       <div className='container mx-auto flex items-center justify-between px-4 md:px-8'>

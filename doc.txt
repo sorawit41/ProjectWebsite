@@ -1,46 +1,63 @@
-https://ui.shadcn.com/docs/components/tabs
+https://www.npmjs.com/package/react-cookie-consent
+https://dev.to/sagarmuchhal/how-to-use-cookie-consent-in-a-react-app-with-react-cookie-consent-3j8n
+https://dev.to/tumee/how-to-add-cookie-notice-banner-to-react-app-9e3
 
-npx shadcn@latest add tabs
+-------BackToTopBtn.jsx------
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {FaChevronUp} from 'react-icons/fa
 
+import {Link} from 'react-scroll'
 
-
-const [roomType,setRoomType] = useState('all')
-
-const [filteredRooms,setFilteredRooms] = useState([])
+const [isActive, setIsActive] = useState(false)
 
 useEffect(()=>{
-const filtered = rooms.data?.filter((room)=>{
-return roomType === 'all' ? rooms : roomType === room.attributes.type;
-});
 
-setFilteredRooms(filtered)
+const handleScroll = ()=>{
+if(window.scrollY > 400){
+setIsActive(true)
+}else{
+setIsActive(false)
+}
+};
 
-},[roomType])
+window.addEventListener('scroll',handleScroll);
 
-<Tabs defaultValue="all" className="w-[240px] lg:w-[540px] lg:h-auto mb-8 mx-auto">
-  <TabsList className="w-full h-full lg:h-[46px] flex flex-col lg:flex-row">
-    <TabsTrigger className="w-full h-full" value="all" onClick={()=>setRoomType('')}>All</TabsTrigger>
-    <TabsTrigger className="w-full h-full" value="single" onClick={()=>setRoomType('single')}>Single</TabsTrigger>
-    <TabsTrigger className="w-full h-full" value="double" onClick={()=>setRoomType('double')}>Double</TabsTrigger>
-    <TabsTrigger className="w-full h-full" value="extended" onClick={()=>setRoomType('extended')}>Extended</TabsTrigger>
-  </TabsList>
+return ()=>{
+window.removeEventListener('scroll',handleScroll)
+}
 
-</Tabs>
+},[])
 
-<div classname='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-{filteredRooms.map((room)=>{
 
-return (
-<div key={}>
-<Link to={'/room/${id}'}>
-<div className='relative w-full h-[300px] overflow-hidden mb-6'>
-<img className="object-cover"/>
-</div>
-</Link>
-</div>
-);
+return <Link to='home' smooth={true} className={'${!isActive && 'hidden'} fixed bg-accent hover:bg-accent-hover w-12 h-12 right-16 bottom-11 z-10 cursor-pointer flex justify-center items-center text-white border-2 border-white }'>
 
-})}
-</div>
+<FaChevronUp/>
+</Link> 
+
+
+------------------
+"react-player": "^2.16.0",
+
+https://www.npmjs.com/package/react-player
+npm i react-player
+
+import ReactPlayer from "react-player/lazy";
+
+                <div className="w-full">
+                  <ReactPlayer
+                    controls={true}
+                    url={`${mediaUrl}${item?.video}`}
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
+
+                <div className="ww-full">
+                  <ReactPlayer
+                    controls={true}
+                    url={`${item?.url}`}
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
+------------
