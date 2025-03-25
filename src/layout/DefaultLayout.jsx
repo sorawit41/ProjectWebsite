@@ -1,43 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header, Footer, BackToTopBtn } from '../components';
-import CookieConsent from 'react-cookie-consent';
+import { FaCookieBite } from 'react-icons/fa';
 
 const DefaultLayout = ({ children }) => {
-  const [showCookieConsent, setShowCookieConsent] = useState(true);  // ใช้สถานะในการแสดงปุ่ม
+  const [showCookieConsent, setShowCookieConsent] = useState(false);
+
+  useEffect(() => {
+    const consent = localStorage.getItem('cookieConsent');
+    if (!consent) {
+      setShowCookieConsent(true);
+    }
+  }, []);
 
   const handleAccept = () => {
-    setShowCookieConsent(false);  // เมื่อคลิก Accept, ซ่อนปุ่ม
-    
+    localStorage.setItem('cookieConsent', 'accepted');
+    setShowCookieConsent(false);
   };
 
   const handleDecline = () => {
-    setShowCookieConsent(false);  // เมื่อคลิก Decline, ซ่อนปุ่ม
-    
+    localStorage.setItem('cookieConsent', 'declined');
+    setShowCookieConsent(false);
   };
 
   return (
-    <div id="myHeader">
+    <div className="flex flex-col min-h-screen" id="myHeader">
       <Header />
-      <div>
-        {children}
-      </div>       
-      <Footer />
+      <div className="flex-grow">{children}</div>
       <BackToTopBtn />
-
+      
       {showCookieConsent && (
         <div 
-          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-xl w-[90%] md:w-[400px] z-50 flex items-center justify-between"
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white p-6 rounded-lg shadow-xl w-[90%] md:w-[400px] z-50 flex items-center gap-4 border border-gray-700 transition-all duration-500 ease-in-out"
         >
-          <div className="flex flex-col">
-            <p className="text-sm mb-4 text-center">
-            ฟังก์ชันนี้ใช้เก็บข้อมูลการยอมรับหรือปฏิเสธคุกกี้ของผู้ใช้ใน Cookie เพื่อไม่ให้แสดงป๊อปอัพซ้ำเมื่อผู้ใช้เคยยอมรับแล้ว ช่วยให้เว็บไซต์ติดตามสถานะของผู้ใช้ได้.
+          <FaCookieBite className="text-yellow-400 text-3xl animate-bounce" />
+          <div className="flex flex-col flex-1">
+            <p className="text-sm text-center">
+              We use cookies to enhance your experience on our website. Please accept to continue using our site seamlessly.
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-4 mt-4">
               <button
                 onClick={handleAccept}
                 className="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition duration-300"
               >
-                Accept All
+                Accept
               </button>
               <button
                 onClick={handleDecline}
@@ -49,6 +54,7 @@ const DefaultLayout = ({ children }) => {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 };

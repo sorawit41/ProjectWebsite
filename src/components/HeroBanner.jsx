@@ -15,10 +15,6 @@ const HeroBanner = () => {
       infiniteLoop={true}
       showThumbs={false}
       showIndicators={true}
-      
-      
-    
-
       >
         {/* img - 1  */}
         <div>
