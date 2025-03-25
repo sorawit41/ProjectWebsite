@@ -40,19 +40,9 @@ const newsAndEvents = [
 ];
 
 const NewsAndEvent = () => {
-  const [expanded, setExpanded] = useState(null); // Track expanded news
   const [activeMonth, setActiveMonth] = useState("March"); // Active month
-  const [, setScrollPosition] = useState(0); // Track the scroll position
   const [opacity, setOpacity] = useState(0); // For animation
-
-  // Function to toggle description
-  const toggleDescription = (id) => {
-    if (expanded === id) {
-      setExpanded(null);
-    } else {
-      setExpanded(id);
-    }
-  };
+  const [expandedEvents, setExpandedEvents] = useState({}); // To track which events are expanded
 
   // Group events by month
   const groupEventsByMonth = (events) => {
@@ -75,10 +65,18 @@ const NewsAndEvent = () => {
   // Get the events for the active month
   const eventsForMonth = groupedEvents[activeMonth] || [];
 
-  // Scroll to the top when the month changes
+  // Scroll to the top when the month changes (removed scroll position tracking)
   const handleMonthChange = (month) => {
     setActiveMonth(month);
-    setScrollPosition(0); // Reset scroll position on month change
+    // Removed setScrollPosition(0);
+  };
+
+  // Toggle the expanded state of an event
+  const toggleExpand = (eventId) => {
+    setExpandedEvents(prevState => ({
+      ...prevState,
+      [eventId]: !prevState[eventId]
+    }));
   };
 
   // UseEffect to trigger opacity change when the component mounts or the activeMonth changes
@@ -106,48 +104,49 @@ const NewsAndEvent = () => {
         ))}
       </div>
 
-      {/* Scrollable Events Container for Active Month */}
-      <div className="overflow-y-auto max-h-[500px]">
-        <div className="space-y-8">
-          {eventsForMonth.length > 0 ? (
-            eventsForMonth.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-all duration-300"
-                style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }} // Adding opacity transition
-              >
-                {/* Image Section */}
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className="w-full h-60 object-cover rounded-lg mb-4"
-                />
+      {/* Events Container for Active Month (removed scrollable container) */}
+      <div className="space-y-8">
+        {eventsForMonth.length > 0 ? (
+          eventsForMonth.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-all duration-300"
+              style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }} // Adding opacity transition
+            >
+              {/* Image Section */}
+              <img
+                src={item.imageUrl}
+                alt={item.title}
+                className="w-full h-auto object-cover rounded-lg mb-4" // Modified className
+              />
 
-                {/* Title and Date */}
-                <h2 className="text-2xl font-bold text-gray-800">{item.title}</h2>
-                <p className="text-sm text-gray-500 mb-4">{new Date(item.date).toLocaleDateString()}</p>
+              {/* Title and Date */}
+              <h2 className="text-2xl font-bold text-gray-800">{item.title}</h2>
+              <p className="text-sm text-gray-500 mb-4">{new Date(item.date).toLocaleDateString()}</p>
 
-                {/* Short Description */}
-                <p className="text-gray-700 mb-4">{item.shortDescription}</p>
+              {/* Short Description */}
+              <p className="text-gray-700 mb-4">{item.shortDescription}</p>
 
-                {/* Full Description (Toggle on click) */}
-                {expanded === item.id && (
-                  <p className="text-gray-700 mb-4">{item.fullDescription}</p>
-                )}
+              {/* Full Description with Read More */}
+              {expandedEvents[item.id] ? (
+                <p className="text-gray-700">{item.fullDescription}</p>
+              ) : (
+                <p className="text-gray-700">{item.fullDescription.substring(0, 100)}... </p> // Show first 100 chars
+              )}
 
-                {/* Toggle Button */}
+              {item.fullDescription.length > 100 && (
                 <button
-                  className="text-blue-500 hover:underline"
-                  onClick={() => toggleDescription(item.id)}
+                  className="text-blue-500 hover:underline focus:outline-none"
+                  onClick={() => toggleExpand(item.id)}
                 >
-                  {expanded === item.id ? 'Show Less' : 'Read More'}
+                  {expandedEvents[item.id] ? "Read Less" : "Read More"}
                 </button>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No events for this month.</p>
-          )}
-        </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No events for this month.</p>
+        )}
       </div>
     </div>
   );

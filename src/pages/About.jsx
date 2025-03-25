@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaStore, FaHeart, FaInfoCircle } from 'react-icons/fa'; // ใช้ไอคอนจาก react-icons
+import { FaCoffee, FaHeart, FaInfoCircle, FaUtensils } from 'react-icons/fa';
 
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -7,7 +7,7 @@ const About = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 500); // ใช้ time delay สำหรับการแสดงเนื้อหาหลังจากโหลดเสร็จ
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -49,22 +49,26 @@ const About = () => {
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>
-        <FaStore size={50} style={iconStyle} />
-        <h1>Welcome to Our Med Store</h1>
+        <FaCoffee size={50} style={iconStyle} />
+        <h1>Welcome to BlackNeko</h1>
       </div>
       <div style={textStyle}>
         <p>
-          We provide a wide range of medical products designed to meet the needs
-          of our customers. Whether you're looking for over-the-counter medicine,
-          prescription drugs, or health supplements, we've got you covered!
+          Step into a world of delightful service and charming atmosphere at
+          [ชื่อ Maid Cafe]! We offer a unique experience where our friendly
+          maids are here to make your visit special.
         </p>
         <p>
-          <FaHeart /> Your health is our priority, and we're committed to providing
-          the best products with fast and reliable service.
+          <FaUtensils /> Enjoy a variety of delicious drinks, light meals, and
+          sweets served with a touch of kawaii.
         </p>
         <p>
-          <FaInfoCircle /> Visit our store for more information or check out our
-          latest offers.
+          <FaHeart /> We are dedicated to providing a fun and heartwarming
+          experience for all our guests.
+        </p>
+        <p>
+          <FaInfoCircle /> Visit us to relax, unwind, and enjoy the company of
+          our lovely maids. Check out our menu and special events!
         </p>
       </div>
     </div>
