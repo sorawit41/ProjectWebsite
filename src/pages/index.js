@@ -9,5 +9,7 @@ import Menu from "./Menu";
 import Contact from "./Contact";
 import Schedule from "./Schedule";
 import Receive from "./Receive"
-import Idol from "./Idol";
-export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive,Idol};
+import Shop from "./Shop";
+import Idol from "./Shop"
+
+export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive, Shop,Idol};

@@ -30,7 +30,7 @@ const Menu = () => {
 
   const availableTypes = [
     'All', 'Appetizer', 'Main', 'Dessert', 'Food', 'Drink', 'SoftDrink', 'Coffee', 'Ice cream',
-    'Cocktail', 'Mocktail', 'Beer', 'Champagne', 'Soju', 'Promotion', 'Like show', 'Chame'
+    'Cocktail', 'Mocktail', 'Beer', 'Champagne', 'Soju', 'Promotion', 'Live show', 'Chame'
   ];
 
   // Effect to filter menus based on type and search term

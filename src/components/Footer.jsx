@@ -8,13 +8,13 @@ const Footer = () => {
       <div style={styles.footerContainer}>
         <p style={styles.footerText}>&copy; {new Date().getFullYear()} Black Neko</p>
         <div style={styles.footerIcons}>
-          <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a href="https://www.facebook.com/BLACKNEKOMBK" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
             <FaFacebook style={styles.icon} />
           </a>
           <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
             <FaXTwitter style={styles.icon} />
           </a>
-          <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a href="https://www.instagram.com/blackneko.mbk/" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
             <FaInstagram style={styles.icon} />
           </a>
           <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">

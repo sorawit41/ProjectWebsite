@@ -10,7 +10,7 @@ const Menus = [
   { id: 6, name: "Media", url: "/media" },
   { id: 7, name: "Menu&Item", url: "/Menu" },
   { id: 8, name: "Cast", url :"/Cast" },
-  { id: 9, name: "CastIdol", url: "/idol" },
+  { id: 9, name: "Shop", url: "/Idol" },
   { id: 10, name: "Contact", url: "/Contact" },
 ];
 

@@ -5,7 +5,7 @@ const rMenus = [
     { id: 1, name: "Media", url: "/media" },
     { id: 2, name: "Menu / Item", url: "/Menu" },
     { id: 3, name: "Cast", url :"/Cast" },
-    { id: 4, name: "CastIdol", url: "/idol" },
+    { id: 4, name: "Shop", url: "/Idol" },
     { id: 5, name: "Contact", url: "/Contact" },
 
   ];
