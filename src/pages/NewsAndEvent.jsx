@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { FaChevronDown } from 'react-icons/fa'; // Import the down arrow icon
 
 const newsAndEvents = [
   {
@@ -39,12 +41,12 @@ const newsAndEvents = [
   },
 ];
 
-const NewsAndEvent = () => {
-  const [activeMonth, setActiveMonth] = useState("March"); // Active month
-  const [opacity, setOpacity] = useState(0); // For animation
-  const [expandedEvents, setExpandedEvents] = useState({}); // To track which events are expanded
+const NewsAndEventNavBar = () => {
+  const [activeMonth, setActiveMonth] = useState("March");
+  const [opacity, setOpacity] = useState(0);
+  const [expandedEvents, setExpandedEvents] = useState({});
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Group events by month
   const groupEventsByMonth = (events) => {
     const grouped = events.reduce((acc, event) => {
       if (!acc[event.month]) acc[event.month] = [];
@@ -54,24 +56,17 @@ const NewsAndEvent = () => {
     return grouped;
   };
 
-  // Grouped events
   const groupedEvents = groupEventsByMonth(newsAndEvents);
-
-  // List of all months in a year
   const allMonths = [
     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
   ];
-
-  // Get the events for the active month
   const eventsForMonth = groupedEvents[activeMonth] || [];
 
-  // Scroll to the top when the month changes (removed scroll position tracking)
   const handleMonthChange = (month) => {
     setActiveMonth(month);
-    // Removed setScrollPosition(0);
+    setIsDropdownOpen(false); // Close dropdown after selecting a month
   };
 
-  // Toggle the expanded state of an event
   const toggleExpand = (eventId) => {
     setExpandedEvents(prevState => ({
       ...prevState,
@@ -79,77 +74,86 @@ const NewsAndEvent = () => {
     }));
   };
 
-  // UseEffect to trigger opacity change when the component mounts or the activeMonth changes
   useEffect(() => {
-    setOpacity(0); // Reset opacity to 0 first
+    setOpacity(0);
     setTimeout(() => {
-      setOpacity(1); // Fade in the content after a short delay
-    }, 100); // Delay of 100ms
+      setOpacity(1);
+    }, 100);
   }, [activeMonth]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-semibold text-center mb-6">News and Events</h1>
-
-      {/* Month Navigation */}
-      <div className="flex justify-center gap-4 mb-6">
-        {allMonths.map((month) => (
-          <button
-            key={month}
-            className={`text-lg font-medium ${activeMonth === month ? 'text-blue-500' : 'text-gray-600'} hover:text-blue-500`}
-            onClick={() => handleMonthChange(month)}
-          >
-            {month}
-          </button>
-        ))}
+    <div className="bg-white shadow-md">
+      <div className="container mx-auto px-4 py-6">
+        <nav className="flex items-center justify-between">
+          <div className="text-xl font-semibold">News & Events</div>
+          <div className="relative">
+            <button
+              className="flex items-center gap-2 focus:outline-none"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              Month: <span className="font-bold">{activeMonth}</span> <FaChevronDown />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-md z-10">
+                {allMonths.map((month) => (
+                  <button
+                    key={month}
+                    className={`block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left ${activeMonth === month ? 'bg-gray-100' : ''}`}
+                    onClick={() => handleMonthChange(month)}
+                  >
+                    {month}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </nav>
       </div>
 
-      {/* Events Container for Active Month (removed scrollable container) */}
-      <div className="space-y-8">
-        {eventsForMonth.length > 0 ? (
-          eventsForMonth.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-all duration-300"
-              style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }} // Adding opacity transition
-            >
-              {/* Image Section */}
-              <img
-                src={item.imageUrl}
-                alt={item.title}
-                className="w-full h-auto object-cover rounded-lg mb-4" // Modified className
-              />
-
-              {/* Title and Date */}
-              <h2 className="text-2xl font-bold text-gray-800">{item.title}</h2>
-              <p className="text-sm text-gray-500 mb-4">{new Date(item.date).toLocaleDateString()}</p>
-
-              {/* Short Description */}
-              <p className="text-gray-700 mb-4">{item.shortDescription}</p>
-
-              {/* Full Description with Read More */}
-              {expandedEvents[item.id] ? (
-                <p className="text-gray-700">{item.fullDescription}</p>
-              ) : (
-                <p className="text-gray-700">{item.fullDescription.substring(0, 100)}... </p> // Show first 100 chars
-              )}
-
-              {item.fullDescription.length > 100 && (
-                <button
-                  className="text-blue-500 hover:underline focus:outline-none"
-                  onClick={() => toggleExpand(item.id)}
-                >
-                  {expandedEvents[item.id] ? "Read Less" : "Read More"}
-                </button>
-              )}
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">No events for this month.</p>
-        )}
+      {/* Events Container */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          {eventsForMonth.length > 0 ? (
+            eventsForMonth.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row gap-6"
+                style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }}
+              >
+                <div className="md:w-1/3">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-full h-auto object-cover rounded-lg mb-4 md:mb-0"
+                  />
+                </div>
+                <div className="md:w-2/3">
+                  <h2 className="text-2xl font-bold text-gray-800">{item.title}</h2>
+                  <p className="text-sm text-gray-500 mb-4">{new Date(item.date).toLocaleDateString()}</p>
+                  <p className="text-gray-700 mb-4">{item.shortDescription}</p>
+                  {expandedEvents[item.id] ? (
+                    <p className="text-gray-700">{item.fullDescription}</p>
+                  ) : (
+                    <p className="text-gray-700">{item.fullDescription.substring(0, 100)}... </p>
+                  )}
+                  {item.fullDescription.length > 100 && (
+                    <button
+                      className="text-blue-500 hover:underline focus:outline-none"
+                      onClick={() => toggleExpand(item.id)}
+                    >
+                      {expandedEvents[item.id] ? "Read Less" : "Read More"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No events for this month.</p>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default NewsAndEvent;
+export default NewsAndEventNavBar;

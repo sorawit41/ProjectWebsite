@@ -6,7 +6,7 @@ const Schedule = () => {
 
   // This effect runs once when the component mounts, setting the image source
   useEffect(() => {
-    const image = '/src/assets/Schedule/Snapinsta.app_486252035_17915992827083277_5825818490902706197_n_1080.jpg';
+    const image = '/src/assets/Schedule/Schedule.png';
     setImageSrc(image);
   }, []); // Empty dependency array to run only once after mount
 

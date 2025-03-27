@@ -20,18 +20,17 @@ const Rules = () => {
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">กฎข้อห้าม</h2>
         <ul className="list-disc pl-6">
-          <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามกระทำการใดๆที่เป็นการรบกวน เจ้านายและน้องแมวท่านอื่น</li>
-          <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามเจ้านายและน้องแมวสัมผัสตัวน้องแมว</li>
+          <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามกระทำการใดๆที่เป็นการรบกวน มนุษย์และน้องแมวท่านอื่น</li>
+          <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามมนุษย์และน้องแมวสัมผัสตัวน้องแมว</li>
           <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามถามข้อมูลส่วนตัวของน้องแมวโดยเด็ดขาด เช่น ประวัติ หรือช่องทางการติดต่อส่วนตัว</li>
           <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามชักชวนไปทำงานหรือกิจกรรมอื่นๆ และคบเป็นแฟนกับน้องแมวในโลกแห่งความจริง</li>
           <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามดักรอที่ทางเข้า-ออก</li>
-          <li><FaExclamationCircle className="inline-block text-red-500 mr-2" />ห้ามแพ้tekken 8</li>
         </ul>
 
         <h2 className="text-2xl font-semibold mt-6">ข้อควรระวัง</h2>
         <div className="flex items-center">
           <FaInfoCircle className="text-blue-500 mr-2" />
-          <p>ร้านblacknekoมีความตั้งใจที่จะสร้างบรรยากาศในร้านให้น้องแมวและเจ้านายมีความสุขที่สุด ดังนั้นทางเราจึงขอความร่วมมือให้น้องแมวและเจ้านายทุกท่านสร้างบรรยากาศดีๆร่วมกัน หากเกิดความเสียหายต่อทรัพย์สินภายในร้านจะเรียกเก็บค่าเสียหายจริง</p>
+          <p>เราจึงขอความร่วมมือให้น้องแมวและมนุษย์ทุกท่านสร้างบรรยากาศดีๆร่วมกัน หากเกิดความเสียหายต่อทรัพย์สินภายในร้านจะเรียกเก็บค่าเสียหายจริง</p>
         </div>
         <div className="flex items-center mt-2">
           <FaInfoCircle className="text-blue-500 mr-2" />
@@ -51,7 +50,7 @@ const Rules = () => {
           <div className="mt-4 bg-gray-100 p-4 rounded-lg">
             <h3 className="font-semibold">ข้อมูลเพิ่มเติม</h3>
             <ul className="list-disc pl-6 mt-2">
-              <li>ห้ามเจ้านายและน้องแมวที่ยังไม่บรรลุนิติภาวะดื่มแอลกอฮอล์</li>
+              <li>ห้ามมนุษย์และน้องแมวที่ยังไม่บรรลุนิติภาวะดื่มแอลกอฮอล์</li>
               <li>สามารถถ่ายภาพได้เฉพาะอาหาร และถ้าต้องการถ่ายภาพกรุณาเรียกน้องแมวที่ใกล้ๆ เพื่อถ่ายให้</li>
             </ul>
           </div>
