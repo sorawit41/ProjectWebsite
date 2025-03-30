@@ -1,12 +1,12 @@
 import React from 'react';
-import { FaEnvelope } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // เพิ่ม import Link
+import { CiMail } from "react-icons/ci"; // เปลี่ยน import เป็น CiMail
+import { Link } from 'react-router-dom';
 
 const ContactNav = () => {
   return (
     <div>
-      <Link to="/Contact"> {/* ใช้ Link เพื่อเชื่อมไปยัง Contact.jsx */}
-        <FaEnvelope size="1.5em" />
+      <Link to="/Contact">
+        <CiMail size="1.5em" /> {/* เปลี่ยน Component เป็น CiMail */}
       </Link>
     </div>
   )

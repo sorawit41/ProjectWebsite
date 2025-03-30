@@ -3,5 +3,5 @@ import Footer from "./Footer";
 import HeroBanner from "./HeroBanner";
 import Featured from "./Featured"
 import BackToTopBtn from "./BackToTopBtn"
-
-export { Header, Footer, HeroBanner,Featured,BackToTopBtn };
+import Message from "./Message"
+export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Message };

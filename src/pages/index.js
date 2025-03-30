@@ -11,5 +11,5 @@ import Schedule from "./Schedule";
 import Receive from "./Receive"
 import Shop from "./Shop";
 import Idol from "./Shop"
-
-export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive, Shop,Idol};
+import Privacy from "./Privacy";
+export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive, Shop,Idol,Privacy};

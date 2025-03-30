@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { FaFilter, FaTimes } from 'react-icons/fa'; // Import icons
 
-import cast_1 from "../assets/menu/blackneko-icon.png";
+import narin from "../assets/cast/image.png";
+import icezu from "../assets/cast/image copy.png"
+import cast_2 from "../assets/imgs/blackneko-icon.png";
 
 // Data with ranks updated to Trainee, Regular, Master, Manager, Leader, Angel
 const cast = [
-  { id: 1, image: cast_1, name: "Yui Hirasawa", rank: "regular" },
-  { id: 2, image: cast_1, name: "Angel Beats", rank: "angel" },
-  { id: 3, image: cast_1, name: "Shiro senpai", rank: "master" },
-  { id: 4, image: cast_1, name: "Ayano Aishi", rank: "trainee" },
-  { id: 5, image: cast_1, name: "Prince VegetaIV", rank: "leader" },
-  { id: 6, image: cast_1, name: "Conan Edogawa", rank: "manager" },
+  { id: 1, image: narin, name: "Narin Blackneko", rank: "regular" },
+  { id: 2, image: icezu, name: "Icezu Blackneko", rank: "regular" },
+  { id: 3, image: cast_2, name: "Shiro senpai", rank: "master" },
+  { id: 4, image: cast_2, name: "Ayano Aishi", rank: "trainee" },
+  { id: 5, image: cast_2, name: "Prince VegetaIV", rank: "leader" },
+  { id: 6, image: cast_2, name: "Conan Edogawa", rank: "manager" },
 ];
 
 // Rank filter options
@@ -125,8 +127,8 @@ const Cast = () => {
                 transition: 'all 0.5s ease', // Smooth transition for both opacity and transform
               }}
             >
-              <div className="relative w-full h-[200px] overflow-hidden mb-4">
-                <img src={user.image} alt={user.name} className="object-cover w-full h-full transition-transform duration-500 hover:scale-110" />
+              <div className="relative w-full h-[275px] overflow-hidden mb-4">
+              <img src={user.image} alt={user.name} className="object-cover w-full h-full transition-transform duration-500 hover:scale-110 object-mid" />
               </div>
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">{user.name}</h3>

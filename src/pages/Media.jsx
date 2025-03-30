@@ -4,20 +4,21 @@ import ReactPlayer from 'react-player/lazy';
 const youtubes = [
   {
     id: 1,
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // เปลี่ยน url เป็น url ที่ใช้งานได้
+    url: 'https://www.youtube.com/watch?v=9f1TJG4cRTI&pp=ygUJYmxhY2tuZWtv', // เปลี่ยน url เป็น url ที่ใช้งานได้
   },
   {
     id: 2,
-    url: 'https://www.youtube.com/watch?v=VIDEO_ID_2', // เปลี่ยน url เป็น url ที่ใช้งานได้
+    url: 'https://www.youtube.com/watch?v=9f1TJG4cRTI&pp=ygUJYmxhY2tuZWtv', // เปลี่ยน url เป็น url ที่ใช้งานได้
   },
   {
     id: 3,
-    url: 'https://www.youtube.com/watch?v=VIDEO_ID_3', // เปลี่ยน url เป็น url ที่ใช้งานได้
+    url: 'https://www.youtube.com/watch?v=9f1TJG4cRTI&pp=ygUJYmxhY2tuZWtv', // เปลี่ยน url เป็น url ที่ใช้งานได้
   },
   {
     id: 4,
-    url: 'https://www.youtube.com/watch?v=VIDEO_ID_4', // เปลี่ยน url เป็น url ที่ใช้งานได้
+    url: 'https://www.youtube.com/watch?v=9f1TJG4cRTI&pp=ygUJYmxhY2tuZWtv', // เปลี่ยน url เป็น url ที่ใช้งานได้
   },
+
 ];
 
 const Media = () => {

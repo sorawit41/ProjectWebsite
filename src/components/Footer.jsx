@@ -1,30 +1,62 @@
 import React from 'react';
 import { FaFacebook, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import { FaXTwitter } from "react-icons/fa6";
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+
 
 const Footer = () => {
   return (
     <footer style={styles.footer}>
       <div style={styles.footerContainer}>
-        <p style={styles.footerText}>&copy; {new Date().getFullYear()} Black Neko</p>
+        <p style={styles.footerText}>© {new Date().getFullYear()} Black Neko</p>
         <div style={styles.footerIcons}>
-          <a href="https://www.facebook.com/BLACKNEKOMBK" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://www.facebook.com/BLACKNEKOMBK"
+            style={styles.footerIcon}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+          >
             <FaFacebook style={styles.icon} />
           </a>
-          <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://twitter.com/YOUR_TWITTER_HANDLE" // Replace with your Twitter handle
+            style={styles.footerIcon}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="X (Twitter)"
+          >
             <FaXTwitter style={styles.icon} />
           </a>
-          <a href="https://www.instagram.com/blackneko.mbk/" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://www.instagram.com/blackneko.mbk/"
+            style={styles.footerIcon}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
             <FaInstagram style={styles.icon} />
           </a>
-          <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://www.youtube.com/YOUR_YOUTUBE_CHANNEL" // Replace with your YouTube channel
+            style={styles.footerIcon}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+          >
             <FaYoutube style={styles.icon} />
           </a>
-          <a href="#" style={styles.footerIcon} target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://www.tiktok.com/@blackneko.mbk" // Replace with your TikTok handle
+            style={styles.footerIcon}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+          >
             <FaTiktok style={styles.icon} />
           </a>
         </div>
-        <a href="#" style={styles.footerPrivacy}>Privacy Policy</a>
+        <Link to ="./Privacy" style={styles.footerPrivacy}>Privacy Policy</Link>
       </div>
     </footer>
   );

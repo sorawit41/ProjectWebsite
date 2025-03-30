@@ -193,3 +193,32 @@
         </div>
     </body>
 </html>
+news&events -> image+text
+
+type -> id,typeName,typeDescrition
+new_events -> id,typeID,photo,dateEvent,title,description,createdAt
+
+
+
+sch.... -> image+text
+
+sch.. ->id,photo,createdAt
+
+media--> video
+
+media -> id,file,desciption,createdAt
+
+
+menus --> image + text
+
+categories -> id,title
+menus -> id,categoryID,menuName,description,photo,price
+
+
+cast(member) ->  image + text
+range ->id,rangeName
+cast -> id,photo,rangeID
+
+product ->  image + text
+categories -> id,title
+products -> id,categoryID,productName,description,photo,price

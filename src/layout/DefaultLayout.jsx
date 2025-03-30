@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Header, Footer, BackToTopBtn } from '../components';
+import { Header, Footer, BackToTopBtn,Message } from '../components';
 import { FaCookieBite } from 'react-icons/fa';
-
 const DefaultLayout = ({ children }) => {
   const [showCookieConsent, setShowCookieConsent] = useState(false);
 
@@ -54,8 +53,10 @@ const DefaultLayout = ({ children }) => {
           </div>
         </div>
       )}
+      <Message />
       <Footer />
     </div>
+  
   );
 };
 

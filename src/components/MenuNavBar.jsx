@@ -13,7 +13,7 @@ const Menus = [
   { id: 4, name: "Schedule", url: "/Schedule" },
   { id: 5, name: "Receive", url: "/Receive" },
   { id: 6, name: "Media", url: "/media" },
-  { id: 7, name: "Menu&Item", url: "/Menu" },
+  { id: 7, name: "Menu / Item", url: "/Menu" },
   { id: 8, name: "Cast", url :"/Cast" },
   { id: 9, name: "Shop", url: "/Idol" },
   { id: 10, name: "Contact", url: "/Contact" },
@@ -130,6 +130,7 @@ const MenuNavBar = () => {
         </ul>
       </div>
     </div>
+
   );
 };
 

@@ -3,8 +3,8 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from "react-responsive-carousel";
 
 import Slide_1 from "../assets/promotion/image.png"
-import Slide_2 from "../assets/promotion/image.png"
-import Slide_3 from "../assets/promotion/image.png"
+import Slide_2 from "../assets/promotion/image4.png"
+import Slide_3 from "../assets/promotion/image3.png"
 
 import { BiArrowBack } from "react-icons/bi";
 const promotion = () => {

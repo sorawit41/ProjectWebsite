@@ -23,6 +23,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.30.0",
     "react-scroll": "^1.9.3",
+    "react-tiktok-embed": "^1.0.0",
     "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
