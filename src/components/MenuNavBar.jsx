@@ -7,16 +7,16 @@ import { FaTimes } from 'react-icons/fa'; // Import the close icon
 import logo from '../assets/imgs/blackneko-icon.png'; // Replace './your-logo.png' with the actual path to your logo
 
 const Menus = [
-  { id: 1, name: "News / Events", url: "/NewsAndEvent" },
-  { id: 2, name: "About", url: "/About" },
-  { id: 3, name: "Rules", url:"/Rules" },
-  { id: 4, name: "Schedule", url: "/Schedule" },
-  { id: 5, name: "Receive", url: "/Receive" },
-  { id: 6, name: "Media", url: "/media" },
-  { id: 7, name: "Menu / Item", url: "/Menu" },
-  { id: 8, name: "Cast", url :"/Cast" },
-  { id: 9, name: "Shop", url: "/Idol" },
-  { id: 10, name: "Contact", url: "/Contact" },
+  { id: 1, name: "News & Events", url: "/NewsAndEvent" },
+  { id: 2, name: "ตารางกะน้องแมว", url: "/schedule" },
+  { id: 3, name: "เมณู & ไอเทม", url: "/Menu" },
+  { id: 4, name: "รายชื่อน้องแมว", url: "/cast" },  
+  { id: 5, name: "วิดีโอเกี่ยวกับร้าน", url: "/media" },
+  { id: 6, name: "กฎระเบียบการใช้บริการ", url: "/rules" },
+  { id: 7, name: "ร้านค้า", url: "/Idol" },
+  { id: 8, name: "คอนเซปร้าน", url: "/about" },
+  { id: 9, name: "รับสมัครน้องแมว", url: "/receive" },
+  { id: 10, name: "ติดต่อ", url: "/contact" },
 ];
 
 const MenuNavBar = () => {

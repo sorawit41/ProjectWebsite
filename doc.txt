@@ -1,470 +1,103 @@
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+import React, { useState, useEffect } from 'react';
+import { FaCat, FaHeart, FaUtensils, FaInfoCircle } from 'react-icons/fa';
+
+const About = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const containerStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    background: 'linear-gradient(to bottom, #f4f4f9, #e0e0e0)',
+    transition: 'opacity 1s ease-in-out',
+    opacity: isVisible ? 1 : 0,
+    padding: '40px 20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  };
+
+  const headerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '30px',
+    fontSize: '2.5rem',
+    fontWeight: '700',
+    color: '#333',
+    textAlign: 'center',
+    letterSpacing: '1px',
+    lineHeight: '1.4',
+  };
+
+  const iconStyle = {
+    marginRight: '15px',
+    color: '#4CAF50',
+    transition: 'transform 0.3s ease',
+  };
+
+  const iconHoverStyle = {
+    transform: 'scale(1.1)',
+  };
+
+  const contentStyle = {
+    width: '80%',
+    maxWidth: '800px',
+    textAlign: 'center',
+  };
+
+  const paragraphStyle = {
+    fontSize: '1.2rem',
+    color: '#555',
+    textAlign: 'left',
+    marginBottom: '20px',
+    lineHeight: '1.6',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'color 0.3s ease',
+  };
+
+  const paragraphIconStyle = {
+    marginRight: '15px',
+    color: '#4CAF50',
+    fontSize: '1.6rem',
+    transition: 'color 0.3s ease',
+  };
+
+  return (
+    <div style={containerStyle}>
+      <div style={headerStyle}>
+        <FaCat size={50} style={{ ...iconStyle, ':hover': iconHoverStyle }} />
+        <span>
+          ณ อาณาจักรแมว พระราชาแมวดำผู้ปกครองอาณาจักร ต้องการให้มนุษย์มีความสุข จึงมอบหมายภารกิจให้เหล่าแมวน้อยนำความสุขมาสู่มนุษย์ เหล่าแมวน้อยจึงเดินทางมายังโลกมนุษย์ และก่อตั้งอาณาจักร Black Neko เพื่อเป็นสถานที่ให้มนุษย์และทาสแมวได้มาเล่นสนุก คลายความทุกข์ หากแมวตัวใดทำภารกิจไม่สำเร็จ จะต้องกลายเป็นทรายแมวที่มีกลิ่นเหม็นไปตลอดกาล เมี้ยว!
+        </span>
+      </div>
+      <div style={contentStyle}>
+        <p style={paragraphStyle}>
+          <FaHeart style={paragraphIconStyle} />
+          พวกเราเหล่าแมวน้อยพร้อมมอบความรักและความสุขให้คุณ
+        </p>
+        <p style={paragraphStyle}>
+          <FaUtensils style={paragraphIconStyle} />
+          เรามีอาหารและเครื่องดื่มอร่อยๆ ไว้คอยบริการ
+        </p>
+        <p style={paragraphStyle}>
+          <FaInfoCircle style={paragraphIconStyle} />
+          ติดตามข่าวสารและกิจกรรมของเราได้ที่นี่
+        </p>
+      </div>
+    </div>
+  );
+};
 
-include '../DbConnect.php';
-require_once '../utiles.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-// $target_dir = "../../assets/locations/";
-$target_dir = "../assets/collection/"; //video
-$target_file_thumbnail = $target_dir . 'thumbnail/';
-
-//armset
-//arms
-//armSetID
-
-
-$title = $_POST["title"];
-$description = $_POST["description"];
-// $price = $_POST["price"];
-$backgroupGroupID = $_POST["backgroupGroupID"];
-// arm_sets id,collectionID,title,description,photo
-//collection
-//collection_photo
-//collectionphoto
-//collection_equipment
-//collectionequipment
-//package_service
-//packageservice
-// products
-//animal_service
-//animalservice
-if (!empty($_FILES["fileToUpload"]["name"])) {
-    $file = $_FILES['fileToUpload'];
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $photo = time() . '_' . randomPassword() . '.' . $ext;
-    upload_image($target_dir, $target_file_thumbnail, $file, $photo, 0.5, 0.3);
-    // arm_sets id,collectionID,title,description,photo
-    $sql = "INSERT INTO collection_background(title,description,photo,backgroupGroupID) ";
-    $sql .= " VALUES(?,?,?,?)";
-    // $sql .= " ,picture) ";
-
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $photo, $backgroupGroupID])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-} else {
-    // arm_sets id,collectionID,title,description,photo
-    $sql = "INSERT INTO collection_background(title,description,backgroupGroupID) ";
-    $sql .= " VALUES(?,?,?)";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $backgroupGroupID])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-
-}
-?>
-
----------------------
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-include '../DbConnect.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-// advert id,title,description,companyTypeID,photo,proviceID,created_at
-$sql = "DELETE FROM collection_background WHERE id = ?";
-$path = explode('/', $_SERVER['REQUEST_URI']);
-
-
-$stmt = $conn->prepare($sql);
-// $stmt->bindParam(':id', $path[3]);
-
-if ($stmt->execute([$path[4]])) {
-    $response = ['status' => 1, 'message' => 'Record deleted successfully.'];
-} else {
-    $response = ['status' => 0, 'message' => 'Failed to delete record.'];
-}
-echo json_encode($response);
-?>
-----------------
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-include '../DbConnect.php';
-require_once '../utiles.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-// $target_dir = "../../assets/locations/";
-$target_dir = "../assets/collection/"; //video
-$target_file_thumbnail = $target_dir . 'thumbnail/';
-
-$id = $_POST["id"];
-$title = $_POST["title"];
-$description = $_POST["description"];
-
-// $price = $_POST["price"];
-$backgroupGroupID = $_POST["backgroupGroupID"];
-
-// arm_sets id,collectionID,title,description,photo
-
-if (!empty($_FILES["fileToUpload"]["name"])) {
-    $file = $_FILES['fileToUpload'];
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $photo = time() . '_' . randomPassword() . '.' . $ext;
-    upload_image($target_dir, $target_file_thumbnail, $file, $photo, 0.5, 0.3);
-    // advert id,title,description,companyTypeID,photo,proviceID,created_at
-    $sql = "UPDATE collection_background SET title=?,description=?,photo=?,backgroupGroupID=? ";
-    $sql .= "  WHERE id=?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $photo, $backgroupGroupID, $id])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-} else {
-    // advert id,title,description,companyTypeID,photo,proviceID,created_at
-    $sql = "UPDATE collection_background SET title=?,description=?,backgroupGroupID=? ";
-    $sql .= "  WHERE id=?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $backgroupGroupID, $id])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-
-}
-?>
-----------------------------
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-include '../DbConnect.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-
-$path = explode('/', $_SERVER['REQUEST_URI']);
-
-//driver
-$sql = "SELECT * FROM collection_background ORDER BY id ASC";
-$stmt = $conn->prepare($sql);
-
-// $stmt->execute();
-$stmt->execute();
-$row_count = $stmt->rowCount();
-if ($row_count > 0) {
-    http_response_code(200);
-    $response = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} else {
-    http_response_code(202);
-    $response = [];
-}
-echo json_encode($response);
-
-?>
-====================
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-include '../DbConnect.php';
-require_once '../utiles.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-// $target_dir = "../../assets/locations/";
-$target_dir = "../assets/collection/"; //video
-$target_file_thumbnail = $target_dir . 'thumbnail/';
-
-$title = $_POST["title"];
-$description = $_POST["description"];
-//collection
-//collection_photo
-//collectionphoto
-//company_owner
-//companyowner
-
-if (!empty($_FILES["fileToUpload"]["name"])) {
-    $file = $_FILES['fileToUpload'];
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $photo = time() . '_' . randomPassword() . '.' . $ext;
-    upload_image($target_dir, $target_file_thumbnail, $file, $photo, 0.5, 0.3);
-    // advert id,title,description,companyTypeID,photo,proviceID,created_at
-    $sql = "INSERT INTO background_group(title,description,photo) ";
-    $sql .= " VALUES(?,?,?)";
-    // $sql .= " ,picture) ";
-
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $photo])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-} else {
-    // advert id,title,description,companyTypeID,photo,proviceID,created_at
-    $sql = "INSERT INTO background_group(title,description) ";
-    $sql .= " VALUES(?,?)";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-
-}
-?>
-------------------------------------
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-include '../DbConnect.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-// advert id,title,description,companyTypeID,photo,proviceID,created_at
-$sql = "DELETE FROM background_group WHERE id = ?";
-$path = explode('/', $_SERVER['REQUEST_URI']);
-
-
-$stmt = $conn->prepare($sql);
-// $stmt->bindParam(':id', $path[3]);
-
-if ($stmt->execute([$path[4]])) {
-    $response = ['status' => 1, 'message' => 'Record deleted successfully.'];
-} else {
-    $response = ['status' => 0, 'message' => 'Failed to delete record.'];
-}
-echo json_encode($response);
-?>
----------------------------
-
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-include '../DbConnect.php';
-require_once '../utiles.php';
-$objDb = new DbConnect;
-$conn = $objDb->connect();
-
-$method = $_SERVER['REQUEST_METHOD'];
-// $target_dir = "../../assets/locations/";
-$target_dir = "../assets/collection/"; //video
-$target_file_thumbnail = $target_dir . 'thumbnail/';
-
-$id = $_POST["id"];
-$title = $_POST["title"];
-$description = $_POST["description"];
-
-
-if (!empty($_FILES["fileToUpload"]["name"])) {
-    $file = $_FILES['fileToUpload'];
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $photo = time() . '_' . randomPassword() . '.' . $ext;
-    upload_image($target_dir, $target_file_thumbnail, $file, $photo, 0.5, 0.3);
-    // advert id,title,description,companyTypeID,photo,proviceID,created_at
-    $sql = "UPDATE background_group SET title=?,description=?,photo=? ";
-    $sql .= "  WHERE id=?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $photo, $id])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-} else {
-    // advert id,title,description,companyTypeID,photo,proviceID,created_at
-    $sql = "UPDATE background_group SET title=?,description=?";
-    $sql .= "  WHERE id=?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt->execute([$title, $description, $id])) {
-        $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-        $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-
-}
-?>
--------------------------------
-+++++++++++++++ utiles.php ++++++++++++++++++++++++
-<?php
-    function imageResize($targetWidth,$targetHeight,$imageResourceId,$width,$height) {
-
-        $targetLayer=imagecreatetruecolor($targetWidth,$targetHeight);
-        imagecopyresampled($targetLayer,$imageResourceId,0,0,0,0,$targetWidth,$targetHeight, $width,$height);
-
-        return $targetLayer;
-    }
-
-/*     public function getImageResized($image, int $newWidth, int $newHeight) {
-        $newImg = imagecreatetruecolor($newWidth, $newHeight);     
-        imagealphablending($newImg, false);
-        imagesavealpha($newImg, true);
-        $transparent = imagecolorallocatealpha($newImg, 255, 255, 255, 127);
-        imagefilledrectangle($newImg, 0, 0, $newWidth, $newHeight, $transparent);
-        $src_w = imagesx($image);
-        $src_h = imagesy($image);
-        imagecopyresampled($newImg, $image, 0, 0, 0, 0, $newWidth, $newHeight, $src_w, $src_h);
-        return $newImg;
-    } */
-
-    function getImageResized($targetWidth,$targetHeight,$imageResourceId,$width,$height) {
-        //$image, int $newWidth, int $newHeight
-
-        $newImg=imagecreatetruecolor($targetWidth,$targetHeight);
-        imagealphablending($newImg, false);
-        imagesavealpha($newImg, true);
-        $transparent = imagecolorallocatealpha($newImg, 255, 255, 255, 127);
-        imagefilledrectangle($newImg, 0, 0, $targetWidth,$targetHeight, $transparent);
-
-        imagecopyresampled($newImg,$imageResourceId,0,0,0,0,$targetWidth,$targetHeight, $width,$height);
-
-        return $newImg;
-
-    }
-
-    function upload_image($path,$path_thumbnail,$filename,$fileNewName,$perc,$thumbnail_perc){
-
-        if(is_array($_FILES)) {
-            
-            $file = $filename['tmp_name']; 
-            $sourceProperties = getimagesize($file);
-            $imageType = $sourceProperties[2];
-
-            list($width, $height, $type) = getimagesize($file);
-            $rwidth = ceil($width * $perc);
-            $rheight = ceil($height * $perc);
-            $tbrwidth = ceil($width * $thumbnail_perc);
-            $tbrheight = ceil($height * $thumbnail_perc);
-
-            switch ($imageType) {
-                case IMAGETYPE_PNG:
-/*                     $imageResourceId = imagecreatefrompng($file); // $img = imagecreatefrompng($file); 
-                    $targetLayer = imageResize($rwidth,$rheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    $targetLayer_thumbnail = imageResize($tbrwidth,$tbrheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    imagepng($targetLayer,$path . basename($fileNewName));
-                    imagepng($targetLayer_thumbnail,$path_thumbnail . basename($fileNewName));
-                    break; */
-
-                    $imageResourceId = imagecreatefrompng($file); // $img = imagecreatefrompng($file); 
-
-                    $targetLayer = getImageResized($rwidth,$rheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    $targetLayer_thumbnail = getImageResized($tbrwidth,$tbrheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    imagepng($targetLayer,$path . basename($fileNewName));
-                    imagepng($targetLayer_thumbnail,$path_thumbnail . basename($fileNewName));
-                    break;
-
-
-                case IMAGETYPE_GIF:
-                    $imageResourceId = imagecreatefromgif($file); 
-                    $targetLayer = imageResize($rwidth,$rheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    $targetLayer_thumbnail = imageResize($tbrwidth,$tbrheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    imagegif($targetLayer,$path . basename($fileNewName));
-                    imagegif($targetLayer_thumbnail,$path_thumbnail . basename($fileNewName));
-                    break;
-
-                case IMAGETYPE_JPEG:
-                    $imageResourceId = imagecreatefromjpeg($file); 
-                    $targetLayer = imageResize($rwidth,$rheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    $targetLayer_thumbnail = imageResize($tbrwidth,$tbrheight,$imageResourceId,$sourceProperties[0],$sourceProperties[1]);
-                    imagejpeg($targetLayer,$path . basename($fileNewName));
-                    imagejpeg($targetLayer_thumbnail,$path_thumbnail . basename($fileNewName));
-                    break;
-
-                default:
-                    // echo "Invalid Image type.";
-                    exit;
-                    break;
-            }
-
-            // move_uploaded_file($file, $folderPath. $fileNewName. ".". $ext);
-            // move_uploaded_file($file, $folderPath. basename($fileNewName));
-            // echo "Image Resize Successfully.";
-        }
-    }
-?>
-----------------------------------
-
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
-</IfModule>
-
----------------------
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
-</IfModule>
-
-.htaccess
-
-----------------------------------
+export default About;

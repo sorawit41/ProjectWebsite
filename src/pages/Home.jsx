@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HeroBanner } from '../components';
-
+import { Media, NewsAndEvent } from "../pages"
 const Home = () => {
   const [fadeIn, setFadeIn] = useState(false);
 
@@ -18,6 +18,9 @@ const Home = () => {
       {/* Add the Featured component here with animation */}
       <div style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 1s ease-in-out', marginTop: '20px' }}>
       </div>
+      <NewsAndEvent />
+      <Media />
+      
     </div>
   );
 };

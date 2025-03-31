@@ -2,7 +2,7 @@ import Home from "./Home";
 import About from "./About";
 import Access from "./Access";
 import Cast from "./Cast";
-import Media from "./Media";
+import Media from "./media";
 import NewsAndEvent from "./NewsAndEvent";
 import Rules from "./Rules" ;
 import Menu from "./Menu";

@@ -136,7 +136,7 @@ const Shop = () => {
               className="bg-gray-100 text-gray-500 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 flex items-center shadow-sm"
             >
               <FaShoppingCart className="mr-2" />
-              Cart ({cart.reduce((total, item) => total + item.quantity, 0)})
+              ตะกร้าสินค้า ({cart.reduce((total, item) => total + item.quantity, 0)})
             </button>
           </div>
 

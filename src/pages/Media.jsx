@@ -37,7 +37,7 @@ const Media = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h2 className="text-3xl font-semibold text-center mb-8">Media Gallery</h2>
+      <h2 className="text-3xl font-semibold text-center mb-8">วิดีโอเกี่ยวกับร้าน</h2>
 
       {/* Apply animation on the grid */}
       <div

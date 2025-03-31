@@ -67,7 +67,7 @@ const NewsAndEventNavBar = () => {
     <div className="bg-white shadow-md">
       <div className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
-          <div className="text-xl font-semibold">News & Events</div>
+          <div className="text-xl font-semibold">งานอีเว้นท์หรือกิจกรรมต่างๆของร้าน</div>
           <div className="relative">
             <button
               className="flex items-center gap-2 focus:outline-none"
@@ -130,7 +130,7 @@ const NewsAndEventNavBar = () => {
               </div>
             ))
           ) : (
-            <p className="text-gray-500">No events for this month.</p>
+            <p className="text-gray-500">ยังไม่มีกิจกรรมน้านุ้ด.</p>
           )}
         </div>
       </div>
