@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Header, Footer, BackToTopBtn, Message } from '../components';
+import { Header, Footer, BackToTopBtn, Message,Navbar2 } from '../components';
 import { FaCookieBite } from 'react-icons/fa';
+import Map from '../components/Map'; // สมมติว่า Map component อยู่ในโฟลเดอร์ components
 
 const DefaultLayout = ({ children }) => {
   const [showCookieConsent, setShowCookieConsent] = useState(false);
@@ -26,12 +27,14 @@ const DefaultLayout = ({ children }) => {
     <div
       className="flex flex-col min-h-screen"
       id="myHeader"
-      
+
     >
+     
       <Header />
+      
       <div className="flex-grow">{children}</div>
       <BackToTopBtn />
-
+      
       {showCookieConsent && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white p-6 rounded-lg shadow-xl w-[90%] md:w-[400px] z-50 flex items-center gap-4 border border-gray-700 transition-all duration-500 ease-in-out">
           <FaCookieBite className="text-yellow-400 text-3xl animate-bounce" />
@@ -56,7 +59,14 @@ const DefaultLayout = ({ children }) => {
           </div>
         </div>
       )}
+      {/* เพิ่ม Map component ตรงนี้ */}
+      <div className="container mx-auto mt-8">
+        
+      </div>
+
       <Message />
+      <Media />
+      <Navbar2 />
       <Footer />
     </div>
   );

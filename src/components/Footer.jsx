@@ -20,15 +20,6 @@ const Footer = () => {
             <FaFacebook style={styles.icon} />
           </a>
           <a
-            href="https://twitter.com/YOUR_TWITTER_HANDLE" // Replace with your Twitter handle
-            style={styles.footerIcon}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="X (Twitter)"
-          >
-            <FaXTwitter style={styles.icon} />
-          </a>
-          <a
             href="https://www.instagram.com/blackneko.mbk/"
             style={styles.footerIcon}
             target="_blank"
@@ -36,15 +27,6 @@ const Footer = () => {
             aria-label="Instagram"
           >
             <FaInstagram style={styles.icon} />
-          </a>
-          <a
-            href="https://www.youtube.com/YOUR_YOUTUBE_CHANNEL" // Replace with your YouTube channel
-            style={styles.footerIcon}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="YouTube"
-          >
-            <FaYoutube style={styles.icon} />
           </a>
           <a
             href="https://www.tiktok.com/@blackneko.mbk" // Replace with your TikTok handle

@@ -4,4 +4,6 @@ import HeroBanner from "./HeroBanner";
 import Featured from "./Featured"
 import BackToTopBtn from "./BackToTopBtn"
 import Message from "./Message"
-export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Message };
+import Map from "./Map"
+import Navbar2 from "./Navbar2"
+export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Message,Map,Navbar2 };

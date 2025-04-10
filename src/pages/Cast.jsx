@@ -3,20 +3,16 @@ import { FaFilter, FaTimes } from 'react-icons/fa'; // Import icons
 
 import narin from "../assets/cast/image.png";
 import icezu from "../assets/cast/image copy.png"
-import cast_2 from "../assets/imgs/blackneko-icon.png";
+
 
 // Data with ranks updated to Trainee, Regular, Master, Manager, Leader, Angel
 const cast = [
-  { id: 1, image: narin, name: "Narin Blackneko", rank: "regular" },
-  { id: 2, image: icezu, name: "Icezu Blackneko", rank: "regular" },
-  { id: 3, image: cast_2, name: "Shiro senpai", rank: "master" },
-  { id: 4, image: cast_2, name: "Ayano Aishi", rank: "trainee" },
-  { id: 5, image: cast_2, name: "Prince VegetaIV", rank: "leader" },
-  { id: 6, image: cast_2, name: "Conan Edogawa", rank: "manager" },
+  { id: 1, image: narin, name: "Narin Blackneko", rank: "kitten" },
+  { id: 2, image: icezu, name: "Icezu Blackneko", rank: "kitten" },
 ];
 
 // Rank filter options
-const availableRanks = ['All', 'Trainee', 'Regular', 'Master', 'Manager', 'Leader', 'Angel'];
+const availableRanks = ['All', 'Trainee', 'kitten','Angel'];
 
 const Cast = () => {
   const [rank, setRank] = useState('All');

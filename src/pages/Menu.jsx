@@ -145,7 +145,7 @@ const Menu = () => {
           <div className="mb-6">
             <input
               type="text"
-              placeholder="Search menu name or type..."
+              placeholder="ค้นหาเมนู..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="p-3 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:border-blue-500"

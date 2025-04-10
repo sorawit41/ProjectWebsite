@@ -9,7 +9,7 @@ import logo from '../assets/imgs/blackneko-icon.png'; // Replace './your-logo.pn
 const Menus = [
   { id: 1, name: "News & Events", url: "/NewsAndEvent" },
   { id: 2, name: "ตารางกะน้องแมว", url: "/schedule" },
-  { id: 3, name: "เมณู & ไอเทม", url: "/Menu" },
+  { id: 3, name: "เมนู & ไอเทม", url: "/Menu" },
   { id: 4, name: "รายชื่อน้องแมว", url: "/cast" },  
   { id: 5, name: "วิดีโอเกี่ยวกับร้าน", url: "/media" },
   { id: 6, name: "กฎระเบียบการใช้บริการ", url: "/rules" },
@@ -21,10 +21,12 @@ const Menus = [
 
 const MenuNavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [iconColor, setIconColor] = useState('#374151'); // State to manage the color of the hamburger icon
   const menuRef = useRef(null);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+    setIconColor(menuOpen ? '#374151' : '#ffffff'); // Change icon color when menu opens or closes
   };
 
   // Close the menu when clicking outside (for overlay behavior)
@@ -32,6 +34,7 @@ const MenuNavBar = () => {
     const handleClickOutside = (event) => {
       if (menuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false);
+        setIconColor('#374151'); // Reset icon color when menu is closed
       }
     };
 
@@ -42,7 +45,7 @@ const MenuNavBar = () => {
   }, [menuOpen, menuRef]);
 
   return (
-    <div className="relative">
+    <div className="relative ">
       {/* Hamburger menu button */}
       <button
         className="hamburger p-2 focus:outline-none"
@@ -56,7 +59,7 @@ const MenuNavBar = () => {
           outline: 'none',
         }}
       >
-        <HiOutlineMenuAlt2 className="text-2xl text-gray-800" style={{ fontSize: '1.5rem', color: '#374151' }} />
+        <HiOutlineMenuAlt2 className="text-2xl" style={{ fontSize: '1.5rem', color: iconColor }} />
       </button>
 
       {/* Side Navbar */}
@@ -75,10 +78,12 @@ const MenuNavBar = () => {
           transition: 'transform 0.3s ease-in-out',
           zIndex: 50, // Ensure it's above other content
         }}
-      >
+      >     
         {/* Logo container */}
         <div className="flex items-center justify-center py-4" style={{ padding: '1rem' }}>
-          <img src={logo} alt="Logo" className="h-12" style={{ height: '5rem' }} /> {/* Increased height here */}
+          <Link to="/">
+            <img src={logo} alt="Logo" className="h-12 cursor-pointer" style={{ height: '5rem' }} /> {/* Increased height here */}
+          </Link> 
         </div>
 
         {/* Close button for the side navbar */}
@@ -130,7 +135,6 @@ const MenuNavBar = () => {
         </ul>
       </div>
     </div>
-
   );
 };
 

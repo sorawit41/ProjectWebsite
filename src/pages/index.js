@@ -12,4 +12,5 @@ import Receive from "./Receive"
 import Shop from "./Shop";
 import Idol from "./Shop"
 import Privacy from "./Privacy";
+
 export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive, Shop,Idol,Privacy};

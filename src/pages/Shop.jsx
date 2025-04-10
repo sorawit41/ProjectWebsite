@@ -11,16 +11,16 @@ import Product5 from '../assets/menu/blackneko-icon.png';
 
 // Define your product data
 const myProducts = [
-  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 10, cast: 'Neko' },
-  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 25, cast: 'Neko' },
-  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 15, cast: 'Neko' },
-  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 20, cast: 'Neko' },
-  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 30, cast: 'Neko' },
-  { id: 6, image: Product1, name: 'Cheki Photo 2', type: 'Cheki', price: 10, cast: 'Aki' },
-  { id: 7, image: Product2, name: 'Promotion Bundle', type: 'Promotion', price: 40, cast: 'Aki' },
-  { id: 8, image: Product3, name: 'Picture 4x6 - Set B', type: '4x6picture', price: 15, cast: 'Aki' },
-  { id: 9, image: Product4, name: 'Tapestry B', type: 'Tapestry', price: 25, cast: 'Aki' },
-  { id: 10, image: Product5, name: 'Picture 8x12 - C', type: '8x12picture', price: 20, cast: 'Aki' },
+  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 10, cast: 'Narin BlackNeko' },
+  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 25, cast: 'Narin BlackNeko' },
+  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 15, cast: 'Narin BlackNeko' },
+  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 20, cast: 'Narin BlackNeko' },
+  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 30, cast: 'Narin BlackNeko' },
+  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 10, cast: 'Icezu BlackNeko' },
+  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 25, cast: 'Icezu BlackNeko' },
+  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 15, cast: 'Icezu BlackNeko' },
+  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 20, cast: 'Icezu BlackNeko' },
+  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 30, cast: 'Icezu BlackNeko' },
 ];
 
 const Shop = () => {
