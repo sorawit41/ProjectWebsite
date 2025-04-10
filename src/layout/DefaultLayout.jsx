@@ -65,7 +65,7 @@ const DefaultLayout = ({ children }) => {
       </div>
 
       <Message />
-      <Media />
+      
       <Navbar2 />
       <Footer />
     </div>

@@ -120,7 +120,7 @@ const Shop = () => {
 
   return (
     <div>
-      <div className="py-10">
+      <div className="py-10 pt-20">
         <div className="container mx-auto">
           {/* Search Bar */}
           <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">

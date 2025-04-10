@@ -139,7 +139,7 @@ const Menu = () => {
     <div>
       <Promotion />  {/* Render the Promotion component */}
 
-      <div className="py-10">
+      <div className="py-10 py-20">
         <div className="container mx-auto">
           {/* Search Bar */}
           <div className="mb-6">

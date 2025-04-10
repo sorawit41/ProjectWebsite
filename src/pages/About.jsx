@@ -28,7 +28,7 @@ const About = () => {
   }, []);
 
   return (
-    <div className="bg-white py-16" style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }}>
+    <div className="bg-white py-16 pt-20" style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h3 className="text-3xl font-bold text-gray-800 mb-4">

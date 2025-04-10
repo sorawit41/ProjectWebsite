@@ -9,7 +9,7 @@ const Schedule = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen pt-20">
       {scheduleImage && (
         <img
           src={scheduleImage}  // Use imported image
