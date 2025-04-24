@@ -2,71 +2,113 @@ import React, { useState, useEffect } from 'react';
 import { FaCat, FaHeart, FaExclamationTriangle } from 'react-icons/fa';
 
 const About = () => {
-  const [title, setTitle] = useState('');
-  const [description1, setDescription1] = useState('');
-  const [braveCatsTitle, setBraveCatsTitle] = useState('');
-  const [braveCatsDescription, setBraveCatsDescription] = useState('');
-  const [curseTitle, setCurseTitle] = useState('');
-  const [curseDescription, setCurseDescription] = useState('');
-  const [finalMessage, setFinalMessage] = useState('');
   const [opacity, setOpacity] = useState(0);
 
   useEffect(() => {
-    // Simulate fetching data or any initial setup
-    setTitle('ต้อนรับความสุขจาก Black Neko! ');
-    setDescription1('ณ ดินแดนที่เต็มไปด้วยเสียง "เหมียว" และความอบอุ่น พระราชาแมวดำผู้ใจดีทรงปกครองอาณาจักรแห่งแมวด้วยความรักและเมตตา พระองค์ทรงปรารถนาให้เหล่ามนุษย์มีความสุข จึงมอบหมายภารกิจสุดพิเศษให้เหล่าแมวน้อยหลากหลายสายพันธุ์เดินทางสู่โลกมนุษย์ เพื่อมอบความสุขและเยียวยาจิตใจ');
-    setBraveCatsTitle('เหล่าแมวน้อยผู้กล้าหาญ');
-    setBraveCatsDescription('เหล่าแมวน้อยผู้กล้าหาญจึงออกเดินทาง และได้ร่วมกันสร้างสรรค์ "อาณาจักร Black Neko" สถานที่แห่งความสุขที่เต็มไปด้วยเสียงหัวเราะและการเล่นสนุก พวกเขาคอยเสกเรื่องทุกข์ใจให้หายไป มอบความสุขให้แก่เหล่ามนุษย์และทาสแมวทุกคน');
-    setCurseTitle('คำสาปอันน่ากลัว ');
-    setCurseDescription('แต่ภารกิจนี้ไม่ได้ง่ายดาย... แมวน้อยตัวใดที่ทำภารกิจไม่สำเร็จ จะต้องเผชิญกับคำสาปอันน่ากลัว กลายเป็นทรายแมวที่เหม็นฉึ่งไปตลอดกาล!');
-    setFinalMessage('ดังนั้น... จงเตรียมตัวให้พร้อม เพื่อต้อนรับความน่ารักและความสุขจากเหล่าแมวน้อยแห่งอาณาจักร Black Neko! เมี้ยว! ');
-
-    // Fade in effect on component mount
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setOpacity(1);
     }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="bg-white py-16 pt-20" style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h3 className="text-3xl font-bold text-gray-800 mb-4">
-            {title} <FaCat className="inline-block ml-2 text-gray-600" />
+    <div
+      className="min-h-screen py-20 px-4 transition-opacity duration-1000 ease-in-out bg-white dark:bg-black"
+      style={{ opacity }}
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Title Section */}
+        <div className="text-center animate-fade-in-up">
+          <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+            ต้อนรับความสุขจาก Black Neko! <FaCat className="inline-block ml-2 text-gray-600 dark:text-gray-300" />
           </h3>
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
+          <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-6">
             ณ อาณาจักรแมวอันแสนสุขสันต์... <FaHeart className="inline-block ml-2 text-red-500" />
           </h2>
-          <p className="mt-4 text-lg text-gray-700 leading-relaxed">
-            {description1}
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
+            ณ ดินแดนที่เต็มไปด้วยเสียง "เหมียว" และความอบอุ่น พระราชาแมวดำผู้ใจดีทรงปกครองอาณาจักรแห่งแมวด้วยความรักและเมตตา...
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div>
-            <h3 className="text-3xl font-semibold text-gray-800 mb-4">
-              {braveCatsTitle}
+
+        {/* Grid Content */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="animate-slide-in-left">
+            <h3 className="text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              เหล่าแมวน้อยผู้กล้าหาญ
             </h3>
-            <p className="mt-3 text-gray-700 leading-relaxed">
-              {braveCatsDescription}
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              เหล่าแมวน้อยผู้กล้าหาญจึงออกเดินทาง และได้ร่วมกันสร้างสรรค์ "อาณาจักร Black Neko"...
             </p>
           </div>
-          <div>
-            <h3 className="text-3xl font-semibold text-gray-800 mb-4">
-              {curseTitle} <FaExclamationTriangle className="inline-block ml-2 text-yellow-500" />
+          <div className="animate-slide-in-right">
+            <h3 className="text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              คำสาปอันน่ากลัว <FaExclamationTriangle className="inline-block ml-2 text-yellow-500" />
             </h3>
-            <p className="mt-3 text-gray-700 leading-relaxed">
-              {curseDescription}
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              แต่ภารกิจนี้ไม่ได้ง่ายดาย... แมวน้อยตัวใดที่ทำภารกิจไม่สำเร็จ จะต้องเผชิญกับคำสาป...
             </p>
           </div>
         </div>
-        <div className="mt-16">
-          <div className="text-center mt-8">
-            <p className="text-2xl font-bold text-gray-900">
-              {finalMessage} <FaCat className="inline-block ml-2 text-gray-600" />
-            </p>
-          </div>
+
+        {/* Final Message */}
+        <div className="mt-20 text-center animate-fade-in-up delay-500">
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            ดังนั้น... จงเตรียมตัวให้พร้อม เพื่อต้อนรับความน่ารักจากเหล่าแมวน้อย! <FaCat className="inline-block ml-2 text-gray-600 dark:text-gray-300" />
+          </p>
         </div>
       </div>
+
+      {/* Animations */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideInLeft {
+          0% {
+            opacity: 0;
+            transform: translateX(-50px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInRight {
+          0% {
+            opacity: 0;
+            transform: translateX(50px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInUp 1s ease-out forwards;
+        }
+
+        .animate-slide-in-left {
+          animation: slideInLeft 1s ease-out forwards;
+        }
+
+        .animate-slide-in-right {
+          animation: slideInRight 1s ease-out forwards;
+        }
+
+        .delay-500 {
+          animation-delay: 0.5s;
+        }
+      `}</style>
     </div>
   );
 };

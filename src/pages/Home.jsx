@@ -13,8 +13,9 @@ const Home = () => {
   }, []);
 
   return (
+    
     <div style={{ marginTop: '20px' }}> {/* เพิ่ม margin-top ที่นี่ */}
-      <div style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 1s ease-in-out' }}>
+      <div style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 1s ease-in-out ' }}>
         <HeroBanner />
 
         {/* Add the Featured component here with animation */}
