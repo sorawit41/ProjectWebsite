@@ -6,7 +6,8 @@ const ContactNav = () => {
   return (
     <div>
       <Link to="/Contact">
-        <CiMail size="2.0em" /> {/* เปลี่ยน Component เป็น CiMail */}
+      <CiMail size="1.5em" className="text-black dark:text-white" />
+
       </Link>
     </div>
   )

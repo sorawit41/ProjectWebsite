@@ -1,7 +1,7 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import DefaultLayout from './layout/DefaultLayout'
-import {Home, About, Access, Cast, Media, NewsAndEvent,Menu,Contact,Rules,Schedule,Idol,Receive,Privacy} from "./pages"
+import {Home, About, Access, Cast, Media, NewsAndEvent,Menu,Contact,Rules,Schedule,Idol,Receive,Privacy, Member} from "./pages"
 
 
 const Layout = () => {
@@ -68,6 +68,10 @@ const router = createBrowserRouter([
       {
         path:"/Privacy",
         element: <Privacy />, 
+      },
+      {
+        path:"/Member",
+        element: <Member />, 
       }
     ]
   },

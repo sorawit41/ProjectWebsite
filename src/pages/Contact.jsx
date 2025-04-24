@@ -1,115 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaPhoneAlt, FaEnvelope, FaPaperPlane, FaRegCheckCircle } from 'react-icons/fa';
+import { FaFacebook, FaInstagram } from 'react-icons/fa';
+import qr1 from "../assets/register/qrfacebook.png";
+import qr2 from "../assets/register/qr instagram.png";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    message: '',
-  });
-
-  const [submitted, setSubmitted] = useState(false);
-  const [animate, setAnimate] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('ข้อมูลที่ส่ง:', formData);
-    setSubmitted(true);
-  };
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (submitted) {
-      setAnimate(true);
-      setTimeout(() => setAnimate(false), 3000);
-      setFormData({ name: '', phone: '', email: '', message: '' });
-      setTimeout(() => setSubmitted(false), 3500);
-    }
-  }, [submitted]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setFadeIn(true);
-    }, 500);
+    const timer = setTimeout(() => setIsVisible(true), 300);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 pt-20">
-      <h2 className="text-3xl font-semibold text-center mb-6">ติดต่อพวกเรา</h2>
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg space-y-6"
-        style={{
-          opacity: fadeIn ? 1 : 0,
-          transition: 'opacity 1s ease-in-out',
-        }}
+    <div
+      className={`min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-pink-50 to-blue-100 dark:from-black dark:to-black transition-opacity duration-700 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <div className="w-full max-w-4xl p-8 bg-white dark:bg-black rounded-3xl shadow-2xl dark:shadow-black/40 flex flex-col items-center transition-transform transform duration-700 ease-in-out"
+        style={{ transform: isVisible ? 'scale(1)' : 'scale(0.95)' }}
       >
-        {['name', 'phone', 'email', 'message'].map((field, index) => (
-          <div key={index} className="space-y-2">
-            <label htmlFor={field} className="text-xl font-semibold capitalize">
-              {field}:
-            </label>
-            <div className="relative">
-              {field === 'name' && <FaUser className="absolute left-3 top-3" color="#007bff" />}
-              {field === 'phone' && <FaPhoneAlt className="absolute left-3 top-3" color="#007bff" />}
-              {field === 'email' && <FaEnvelope className="absolute left-3 top-3" color="#007bff" />}
-              {field === 'message' ? (
-                <textarea
-                  id={field}
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md pl-10"
-                  placeholder={`Your ${field}`}
-                  rows="4"
-                  required
-                />
-              ) : (
-                <input
-                  type={field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
-                  id={field}
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md pl-10"
-                  placeholder={`Your ${field}`}
-                  required
-                />
-              )}
-            </div>
-          </div>
-        ))}
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6 animate-bounce">
+          ติดต่อเรา
+        </h1>
+        <p className="text-lg text-center text-gray-600 dark:text-gray-300 mb-8 animate-fade-in">
+          หากมีคำถามหรืออยากพูดคุยกับเรา ติดต่อผ่านช่องทางด้านล่างได้เลย!
+        </p>
 
-        <div className="flex justify-center mt-6">
-          <button
-            type="submit"
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300 flex items-center"
+        <div className="flex flex-col lg:flex-row gap-6 w-full items-center justify-center">
+          {/* Facebook Button */}
+          <a
+            href="https://www.facebook.com/messages/t/165982909924535"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 bg-blue-500 text-white py-4 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 w-full lg:w-1/2 justify-center"
           >
-            <FaPaperPlane className="mr-2" color="#fff" />
-            Submit
-          </button>
-        </div>
-      </form>
+            <FaFacebook size={28} />
+            <span className="text-xl font-semibold">ติดต่อผ่าน Facebook</span>
+          </a>
 
-      {submitted && (
-        <div
-          className={`mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md text-center ${
-            animate ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-5'
-          } transition-opacity duration-500 transition-transform duration-500`}
-        >
-          <p className="font-semibold">Thank you for contacting us!</p>
-          <p>We will get back to you as soon as possible.</p>
+          {/* Instagram Button */}
+          <a
+            href="https://www.instagram.com/direct/t/17845031952083277"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 bg-pink-500 text-white py-4 px-6 rounded-lg shadow-md hover:bg-pink-600 transition duration-300 w-full lg:w-1/2 justify-center"
+          >
+            <FaInstagram size={28} />
+            <span className="text-xl font-semibold">ติดต่อผ่าน Instagram</span>
+          </a>
         </div>
-      )}
+
+        {/* QR Codes */}
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="flex flex-col items-center">
+            <img src={qr1} alt="Facebook QR" className="w-36 h-36 rounded-lg shadow dark:shadow-black/30" />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">QR Facebook</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <img src={qr2} alt="Instagram QR" className="w-36 h-36 rounded-lg shadow dark:shadow-black/30" />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">QR Instagram</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Animation Keyframes */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+          40% { transform: translateY(-10px); }
+          60% { transform: translateY(-5px); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 1s ease-in-out forwards;
+        }
+        .animate-bounce {
+          animation: bounce 1.5s infinite;
+        }
+      `}</style>
     </div>
   );
 };

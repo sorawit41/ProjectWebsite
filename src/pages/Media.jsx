@@ -5,19 +5,19 @@ import { FaYoutube, FaFacebookSquare } from 'react-icons/fa'; // Import icons
 const youtubeVideos = [
   {
     id: 1,
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Replace with a valid YouTube URL
+    url: 'https://www.youtube.com/watch?v=F3k_vHi9KL0&pp=ygUJYmxhY2tuZWtv', // Replace with a valid YouTube URL
   },
   {
     id: 2,
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Replace with a valid YouTube URL
+    url: 'https://www.youtube.com/watch?v=IQzn9L_71Ng&t=3s&pp=ygUJYmxhY2tuZWtv', // Replace with a valid YouTube URL
   },
   {
     id: 3,
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Replace with a valid YouTube URL
+    url: 'https://www.youtube.com/watch?v=qMCZWHZrZBo&pp=ygUJYmxhY2tuZWtv', // Replace with a valid YouTube URL
   },
   {
     id: 4,
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Replace with a valid YouTube URL
+    url: 'https://www.youtube.com/watch?v=9f1TJG4cRTI&pp=ygUJYmxhY2tuZWtv', // Replace with a valid YouTube URL
   },
 ];
 

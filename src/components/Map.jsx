@@ -51,10 +51,10 @@ const Map = () => {
   }, []);
 
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="bg-white dark:bg-black shadow-md rounded-lg overflow-hidden">
       <div className="container mx-auto px-1 py-2 ">
         <nav className="flex items-center justify-center">
-          <div className="text-2xl font-semibold text-center ">แผนที่ทางไปร้าน</div>
+          <div className="text-2xl font-semibold text-center text-gray-800 dark:text-white">แผนที่ทางไปร้าน</div>
         </nav>
       </div>
 
@@ -71,13 +71,13 @@ const Map = () => {
             }}
           ></div>
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <p className="text-lg font-semibold text-gray-800 mb-2">
+            <p className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
               <b>ตั้งอยู่ใน:</b> เอ็มบีเค เซ็นเตอร์
             </p>
-            <p className="text-base text-gray-700 mb-2">
+            <p className="text-base text-gray-700 dark:text-gray-300 mb-2">
               <b>ที่อยู่:</b> ชั้น 7 เอ็ม บี เค เซ็นเตอร์ แขวงวังใหม่ เขตปทุมวัน กรุงเทพมหานคร 10330
             </p>
-            <p className="text-base text-gray-700">
+            <p className="text-base text-gray-700 dark:text-gray-300">
               <b>เวลาทำการ:</b> เปิด ⋅ ปิด 16:00 (00:00) ยกเว้นเสาร์ อาทิตย์ เปิด 11:00 (00:00)
             </p>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HeroBanner, Map, Navbar2 } from '../components';
+import { HeroBanner, Map, Member, Navbar2, ShowCast } from '../components';
 import { Media, NewsAndEvent } from "../pages"
 
 const Home = () => {
@@ -21,6 +21,9 @@ const Home = () => {
         <div style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 1s ease-in-out', marginTop: '20px' }}>
         </div>
         <NewsAndEvent />
+        <ShowCast />
+        <Media />
+        <Member />
         <Map />
 
       </div>

@@ -25,10 +25,10 @@ const DefaultLayout = ({ children }) => {
 
   return (
     <div
-      className="flex flex-col min-h-screen"
-      id="myHeader"
+  className="flex flex-col min-h-screen bg-white text-black dark:bg-black dark:text-black transition-colors duration-300"
+  id="myHeader"
+>
 
-    >
      
       <Header />
       
@@ -60,10 +60,8 @@ const DefaultLayout = ({ children }) => {
         </div>
       )}
       {/* เพิ่ม Map component ตรงนี้ */}
-      <div className="container mx-auto mt-8">
-        
-      </div>
-
+      
+      
       <Message />
       
       <Navbar2 />

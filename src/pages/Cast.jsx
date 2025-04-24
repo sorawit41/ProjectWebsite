@@ -12,7 +12,7 @@ const cast = [
 ];
 
 // Rank filter options
-const availableRanks = ['All', 'Trainee', 'kitten','Angel'];
+const availableRanks = ['All', 'Trainee', 'kitten','Fairy','Angel'];
 
 const Cast = () => {
   const [rank, setRank] = useState('All');
@@ -51,7 +51,7 @@ const Cast = () => {
   };
 
   return (
-    <div className="py-10">
+    <div className="py-10 pt-20">
       <div className="container mx-auto">
         {/* Search Bar */}
         <div className="mb-6">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaFilter, FaTimes, FaShoppingCart, FaTrash } from 'react-icons/fa'; // Import icons
 import { CSSTransition } from 'react-transition-group'; // Import CSSTransition for animations
-
+import { FaFacebook } from 'react-icons/fa';  // นำเข้าไอคอน Facebook
 // Import product images
 import Product1 from '../assets/menu/blackneko-icon.png';
 import Product2 from '../assets/menu/blackneko-icon.png';
@@ -11,16 +11,16 @@ import Product5 from '../assets/menu/blackneko-icon.png';
 
 // Define your product data
 const myProducts = [
-  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 10, cast: 'Narin BlackNeko' },
-  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 25, cast: 'Narin BlackNeko' },
-  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 15, cast: 'Narin BlackNeko' },
-  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 20, cast: 'Narin BlackNeko' },
-  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 30, cast: 'Narin BlackNeko' },
-  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 10, cast: 'Icezu BlackNeko' },
-  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 25, cast: 'Icezu BlackNeko' },
-  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 15, cast: 'Icezu BlackNeko' },
-  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 20, cast: 'Icezu BlackNeko' },
-  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 30, cast: 'Icezu BlackNeko' },
+  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 200, cast: 'Narin BlackNeko' },
+  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 3180, cast: 'Narin BlackNeko' },
+  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 300, cast: 'Narin BlackNeko' },
+  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 400, cast: 'Narin BlackNeko' },
+  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 800, cast: 'Narin BlackNeko' },
+  { id: 1, image: Product1, name: 'Cheki Photo 1', type: 'Cheki', price: 200, cast: 'Icezu BlackNeko' },
+  { id: 2, image: Product2, name: 'Tapestry A', type: 'Tapestry', price: 3180, cast: 'Icezu BlackNeko' },
+  { id: 3, image: Product3, name: 'Picture 4x6 - Set A', type: '4x6picture', price: 300, cast: 'Icezu BlackNeko' },
+  { id: 4, image: Product4, name: 'Picture 8x12 - B', type: '8x12picture', price: 300, cast: 'Icezu BlackNeko' },
+  { id: 5, image: Product5, name: 'Special Set 1', type: 'Set', price: 800, cast: 'Icezu BlackNeko' },
 ];
 
 const Shop = () => {
@@ -60,6 +60,7 @@ const Shop = () => {
   }, []);
 
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
+  const [notification, setNotification] = useState(null);
 
   const clearFilter = () => {
     setProductType('All');
@@ -80,6 +81,8 @@ const Shop = () => {
     } else {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
+    setNotification(`เพิ่ม ${product.name} ลงในตะกร้าแล้ว!`);
+  setTimeout(() => setNotification(null), 3000)
   };
 
   const removeFromCart = (productId) => {
@@ -93,7 +96,13 @@ const Shop = () => {
       )
     );
   };
-
+  const handleCheckout = () => {
+    // แสดงข้อมูลการสั่งซื้อ เช่น รายการสินค้า รวมไปถึงราคา
+    alert("การสั่งซื้อสำเร็จ! ขอบคุณที่ใช้บริการ.");
+    setCart([]); // เคลียร์ตะกร้าหลังจากทำการสั่งซื้อ
+    setNotification("การสั่งซื้อของคุณสำเร็จแล้ว! ขอบคุณที่ใช้บริการ.");
+  };
+  
   const decreaseQuantity = (productId) => {
     setCart(
       cart.map(item =>
@@ -119,11 +128,17 @@ const Shop = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
+      {notification && (
+  <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-md shadow-md z-50 transition duration-300">
+    {notification}
+  </div>
+)}
+
       <div className="py-10 pt-20">
         <div className="container mx-auto">
           {/* Search Bar */}
-          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between ">
             <input
               type="text"
               placeholder="Search product name, type, or cast..."
@@ -262,96 +277,109 @@ const Shop = () => {
         </div>
       </div>
 
-      {/* Shopping Cart Overlay */}
-      <CSSTransition
-        in={isCartOpen}
-        timeout={300}
-        classNames="cart-animation"
-        unmountOnExit
-        nodeRef={cartRef}
+{/* Shopping Cart Overlay */}
+<CSSTransition
+  in={isCartOpen}
+  timeout={300}
+  classNames="cart-animation"
+  unmountOnExit
+  nodeRef={cartRef}
+>
+  <div ref={cartRef} className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-end">
+    <div className="bg-white w-full md:w-1/2 lg:w-1/3 p-6 relative">
+      <button
+        onClick={toggleCart}
+        className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none"
       >
-        <div ref={cartRef} className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-end">
-          <div className="bg-white w-full md:w-1/2 lg:w-1/3 p-6 relative">
-            <button
-              onClick={toggleCart}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none"
+        <FaTimes size={24} />
+      </button>
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+        Shopping Cart
+      </h2>
+      {cart.length === 0 ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        <ul>
+          {cart.map(item => (
+            <li
+              key={item.id}
+              className="flex items-center justify-between py-2 border-b border-gray-200"
             >
-              <FaTimes size={24} />
-            </button>
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-              Shopping Cart
-            </h2>
-            {cart.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <ul>
-                {cart.map(item => (
-                  <li
-                    key={item.id}
-                    className="flex items-center justify-between py-2 border-b border-gray-200"
-                  >
-                    {/* Product info */}
-                    <div className="flex items-center">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover mr-4"
-                      />
-                      <div>
-                        <h4 className="font-semibold flex items-center">
-                          <FaShoppingCart className="mr-2 text-green-500" />
-                          {item.name}
-                        </h4>
-                        <p className="text-gray-600 text-sm">Price: ${item.price}</p>
-                        <p className="text-gray-600 text-xs">Cast: {item.cast}</p>
-                      </div>
-                    </div>
-                    {/* Quantity controls */}
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => decreaseQuantity(item.id)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        -
-                      </button>
-                      <span className="mx-2">{item.quantity}</span>
-                      <button
-                        onClick={() => increaseQuantity(item.id)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 ml-2"
-                      >
-                        <FaTrash size={16} />
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {cart.length > 0 && (
-              <div className="mt-4">
-                {/* Total Calculation */}
-                <p className="font-semibold text-sm">
-                  Subtotal: ${calculateTotal().subtotal}
-                </p>
-                <p className="text-gray-600 text-xs">
-                  VAT (7%): +${calculateTotal().vat}
-                </p>
-                <p className="text-gray-600 text-xs">
-                  Credit (13%): +${calculateTotal().credit}
-                </p>
-                <p className="font-semibold text-lg">
-                  Total: ${calculateTotal().total}
-                </p>
+              {/* Product info */}
+              <div className="flex items-center">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-16 h-16 object-cover mr-4"
+                />
+                <div>
+                  <h4 className="font-semibold flex items-center">
+                    <FaShoppingCart className="mr-2 text-green-500" />
+                    {item.name}
+                  </h4>
+                  <p className="text-gray-600 text-sm">Price: ${item.price}</p>
+                  <p className="text-gray-600 text-xs">Cast: {item.cast}</p>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      </CSSTransition>
+              {/* Quantity controls */}
+              <div className="flex items-center">
+                <button
+                  onClick={() => decreaseQuantity(item.id)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  -
+                </button>
+                <span className="mx-2">{item.quantity}</span>
+                <button
+                  onClick={() => increaseQuantity(item.id)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => removeFromCart(item.id)}
+                  className="text-red-500 hover:text-red-700 ml-2"
+                >
+                  <FaTrash size={16} />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {cart.length > 0 && (
+  <div className="mt-4">
+    {/* การคำนวณยอดรวม */}
+    <p className="font-semibold text-sm">
+      Subtotal: ${calculateTotal().subtotal}
+    </p>
+    <p className="text-gray-600 text-xs">
+      VAT (7%): +${calculateTotal().vat}
+    </p>
+    <p className="text-gray-600 text-xs">
+      Credit (13%): +${calculateTotal().credit}
+    </p>
+    <p className="font-semibold text-lg">
+      Total: ${calculateTotal().total}
+    </p>
+    {/* การคำนวณราคาสุทธิ */}
+    
+    {/* ปุ่ม Buy Now */}
+    <button
+  onClick={() => window.open("https://www.facebook.com/messages/t/165982909924535", "_blank")}  // ใส่ลิงก์ Facebook ของคุณ
+  className="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 w-full flex items-center justify-center"
+>
+  <FaFacebook className="mr-2" />  {/* ไอคอน Facebook */}
+  ติดต่อซื้อได้ที่ Page Facebook
+</button>
+  </div>
+)}
+
+    </div>
+  </div>
+</CSSTransition>
+
+
     </div>
   );
 };
