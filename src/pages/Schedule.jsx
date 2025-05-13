@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import scheduleImage from '../assets/Schedule/image.png'; // Import image directly
+import scheduleImage from '../assets/Schedule/may.png'; // Import image directly
 
 const Schedule = () => {
   const [isLoaded, setIsLoaded] = useState(false);

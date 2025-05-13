@@ -15,26 +15,26 @@ const Contact = () => {
     <div
       className={`min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-pink-50 to-blue-100 dark:from-black dark:to-black transition-opacity duration-700 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
     >
-      <div className="w-full max-w-4xl p-8 bg-white dark:bg-black rounded-3xl shadow-2xl dark:shadow-black/40 flex flex-col items-center transition-transform transform duration-700 ease-in-out"
+      <div className="w-full max-w-4xl p-4 sm:p-6 md:p-8 pt-8 bg-white dark:bg-black rounded-3xl shadow-2xl dark:shadow-black/40 flex flex-col items-center transition-transform transform duration-700 ease-in-out"
         style={{ transform: isVisible ? 'scale(1)' : 'scale(0.95)' }}
       >
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-6 animate-bounce">
+        <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-6 animate-bounce">
           ติดต่อเรา
         </h1>
-        <p className="text-lg text-center text-gray-600 dark:text-gray-300 mb-8 animate-fade-in">
+        <p className="text-base sm:text-lg text-center text-gray-600 dark:text-gray-300 mb-8 animate-fade-in">
           หากมีคำถามหรืออยากพูดคุยกับเรา ติดต่อผ่านช่องทางด้านล่างได้เลย!
         </p>
 
-        <div className="flex flex-col lg:flex-row gap-6 w-full items-center justify-center">
+        <div className="flex flex-col gap-4 w-full">
           {/* Facebook Button */}
           <a
             href="https://www.facebook.com/messages/t/165982909924535"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 bg-blue-500 text-white py-4 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 w-full lg:w-1/2 justify-center"
+            className="flex items-center gap-4 bg-blue-500 text-white py-4 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 justify-center"
           >
-            <FaFacebook size={28} />
-            <span className="text-xl font-semibold">ติดต่อผ่าน Facebook</span>
+            <FaFacebook size={24} />
+            <span className="text-base sm:text-lg font-semibold">ติดต่อผ่าน Facebook</span>
           </a>
 
           {/* Instagram Button */}
@@ -42,21 +42,21 @@ const Contact = () => {
             href="https://www.instagram.com/direct/t/17845031952083277"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 bg-pink-500 text-white py-4 px-6 rounded-lg shadow-md hover:bg-pink-600 transition duration-300 w-full lg:w-1/2 justify-center"
+            className="flex items-center gap-4 bg-pink-500 text-white py-4 px-4 rounded-lg shadow-md hover:bg-pink-600 transition duration-300 justify-center"
           >
-            <FaInstagram size={28} />
-            <span className="text-xl font-semibold">ติดต่อผ่าน Instagram</span>
+            <FaInstagram size={24} />
+            <span className="text-base sm:text-lg font-semibold">ติดต่อผ่าน Instagram</span>
           </a>
         </div>
 
         {/* QR Codes */}
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-8">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
           <div className="flex flex-col items-center">
-            <img src={qr1} alt="Facebook QR" className="w-36 h-36 rounded-lg shadow dark:shadow-black/30" />
+            <img src={qr1} alt="Facebook QR" className="w-32 h-32 sm:w-36 sm:h-36 rounded-lg shadow dark:shadow-black/30" />
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">QR Facebook</p>
           </div>
           <div className="flex flex-col items-center">
-            <img src={qr2} alt="Instagram QR" className="w-36 h-36 rounded-lg shadow dark:shadow-black/30" />
+            <img src={qr2} alt="Instagram QR" className="w-32 h-32 sm:w-36 sm:h-36 rounded-lg shadow dark:shadow-black/30" />
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">QR Instagram</p>
           </div>
         </div>

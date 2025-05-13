@@ -128,259 +128,257 @@ const Shop = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
-      {notification && (
-  <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-md shadow-md z-50 transition duration-300">
-    {notification}
-  </div>
-)}
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
+  {notification && (
+    <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-md shadow-md z-50 transition duration-300">
+      {notification}
+    </div>
+  )}
 
-      <div className="py-10 pt-20">
-        <div className="container mx-auto">
-          {/* Search Bar */}
-          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between ">
-            <input
-              type="text"
-              placeholder="Search product name, type, or cast..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="p-3 w-full md:w-1/2 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:border-blue-500 mb-4 md:mb-0 md:mr-4"
-            />
-            <button
-              onClick={toggleCart}
-              className="bg-gray-100 text-gray-500 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 flex items-center shadow-sm"
-            >
-              <FaShoppingCart className="mr-2" />
-              ตะกร้าสินค้า ({cart.reduce((total, item) => total + item.quantity, 0)})
-            </button>
-          </div>
-
-          {/* Filter Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4 md:mb-2">
-              <button
-                onClick={toggleFilter}
-                className="bg-gray-100 text-gray-500 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 flex items-center shadow-sm"
-              >
-                <FaFilter className="mr-2" />
-                Filter
-                {isFilterOpen ? ' ▲' : ' ▼'}
-              </button>
-              {(productType !== 'All' || castFilter !== 'All') && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Filtered by:{' '}
-                    {productType !== 'All' && (
-                      <span className="font-semibold">{productType}</span>
-                    )}
-                    {productType !== 'All' && castFilter !== 'All' && ', '}
-                    {castFilter !== 'All' && (
-                      <span className="font-semibold">{castFilter}</span>
-                    )}
-                  </span>
-                  <button
-                    onClick={clearFilter}
-                    className="text-sm text-red-500 hover:text-red-700 focus:outline-none flex items-center"
-                  >
-                    <FaTimes className="mr-1" /> Clear
-                  </button>
-                </div>
-              )}
-            </div>
-            <CSSTransition
-              in={isFilterOpen}
-              timeout={300}
-              classNames="filter-animation"
-              unmountOnExit
-              nodeRef={filterRef}
-            >
-              <div ref={filterRef} className="bg-white rounded-md shadow-md p-4 mt-2 border border-gray-200">
-                <div className="mb-4">
-                  <h6 className="font-semibold mb-2">Filter by Type</h6>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {availableTypes.map(type => (
-                      <button
-                        key={type}
-                        onClick={() => setProductType(type)}
-                        className={`block py-2 px-4 text-sm text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 ${
-                          productType === type ? 'font-semibold text-gray-700' : ''
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h6 className="font-semibold mb-2">Filter by Cast</h6>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {availableCasts.map(cast => (
-                      <button
-                        key={cast}
-                        onClick={() => setCastFilter(cast)}
-                        className={`block py-2 px-4 text-sm text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 ${
-                          castFilter === cast ? 'font-semibold text-gray-700' : ''
-                        }`}
-                      >
-                        {cast}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CSSTransition>
-          </div>
-
-          {/* Product Grid */}
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${
-              fadeIn ? 'opacity-100 transition-opacity duration-1000' : 'opacity-0'
-            }`}
-          >
-            {filteredProducts.map(product => (
-              <div
-                key={product.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-              >
-                <div className="relative w-full h-[200px] overflow-hidden mb-4">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="object-cover w-full h-full transition-transform duration-500 hover:scale-110"
-                  />
-                </div>
-                <div className="p-4 flex flex-col items-center">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm text-center">
-                    Type: {product.type}
-                  </p>
-                  <p className="text-gray-600 text-sm text-center">
-                    Cast: {product.cast}
-                  </p>
-                  <p className="text-gray-600 text-sm text-center">
-                    Price: ${product.price}
-                  </p>
-                  <div className="mt-4 w-full">
-                    <button
-                      onClick={() => addToCart(product)}
-                      className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none flex items-center justify-center w-full"
-                    >
-                      <FaShoppingCart className="mr-2" /> Add to Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+  <div className="py-10 pt-20">
+    <div className="container mx-auto">
+      {/* Search Bar */}
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between ">
+        <input
+          type="text"
+          placeholder="Search product name, type, or cast..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="p-3 w-full md:w-1/2 rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:outline-none focus:border-black dark:focus:border-white mb-4 md:mb-0 md:mr-4 bg-white dark:bg-black text-black dark:text-white"
+        />
+        <button
+          onClick={toggleCart}
+          className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 flex items-center shadow-sm"
+        >
+          <FaShoppingCart className="mr-2" />
+          ตะกร้าสินค้า ({cart.reduce((total, item) => total + item.quantity, 0)})
+        </button>
       </div>
 
-{/* Shopping Cart Overlay */}
-<CSSTransition
-  in={isCartOpen}
-  timeout={300}
-  classNames="cart-animation"
-  unmountOnExit
-  nodeRef={cartRef}
->
-  <div ref={cartRef} className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-end">
-    <div className="bg-white w-full md:w-1/2 lg:w-1/3 p-6 relative">
-      <button
-        onClick={toggleCart}
-        className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none"
+      {/* Filter Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4 md:mb-2">
+          <button
+            onClick={toggleFilter}
+            className="bg-white dark:bg-black text-black dark:text-white py-2 px-4 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 flex items-center shadow-sm"
+          >
+            <FaFilter className="mr-2" />
+            Filter
+            {isFilterOpen ? ' ▲' : ' ▼'}
+          </button>
+          {(productType !== 'All' || castFilter !== 'All') && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-black dark:text-white">
+                Filtered by:{' '}
+                {productType !== 'All' && (
+                  <span className="font-semibold">{productType}</span>
+                )}
+                {productType !== 'All' && castFilter !== 'All' && ', '}
+                {castFilter !== 'All' && (
+                  <span className="font-semibold">{castFilter}</span>
+                )}
+              </span>
+              <button
+                onClick={clearFilter}
+                className="text-sm text-black dark:text-white hover:text-gray-800 dark:hover:text-gray-300 focus:outline-none"
+              >
+                <FaTimes className="mr-1" /> Clear
+              </button>
+            </div>
+          )}
+        </div>
+        <CSSTransition
+          in={isFilterOpen}
+          timeout={300}
+          classNames="filter-animation"
+          unmountOnExit
+          nodeRef={filterRef}
+        >
+          <div ref={filterRef} className="bg-white dark:bg-black rounded-md shadow-md p-4 mt-2 border border-gray-200 dark:border-gray-700">
+            <div className="mb-4">
+              <h6 className="font-semibold mb-2 text-black dark:text-white">Filter by Type</h6>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {availableTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setProductType(type)}
+                    className={`block py-2 px-4 text-sm text-black dark:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-300 ${
+                      productType === type ? 'font-semibold' : ''
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h6 className="font-semibold mb-2 text-black dark:text-white">Filter by Cast</h6>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {availableCasts.map(cast => (
+                  <button
+                    key={cast}
+                    onClick={() => setCastFilter(cast)}
+                    className={`block py-2 px-4 text-sm text-black dark:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-300 ${
+                      castFilter === cast ? 'font-semibold' : ''
+                    }`}
+                  >
+                    {cast}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CSSTransition>
+      </div>
+
+      {/* Product Grid */}
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${
+          fadeIn ? 'opacity-100 transition-opacity duration-1000' : 'opacity-0'
+        }`}
       >
-        <FaTimes size={24} />
-      </button>
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Shopping Cart
-      </h2>
-      {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <ul>
-          {cart.map(item => (
-            <li
-              key={item.id}
-              className="flex items-center justify-between py-2 border-b border-gray-200"
-            >
-              {/* Product info */}
-              <div className="flex items-center">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-16 h-16 object-cover mr-4"
-                />
-                <div>
-                  <h4 className="font-semibold flex items-center">
-                    <FaShoppingCart className="mr-2 text-green-500" />
-                    {item.name}
-                  </h4>
-                  <p className="text-gray-600 text-sm">Price: ${item.price}</p>
-                  <p className="text-gray-600 text-xs">Cast: {item.cast}</p>
+        {filteredProducts.map(product => (
+          <div
+            key={product.id}
+            className="bg-white dark:bg-black rounded-lg shadow-md overflow-hidden"
+          >
+            <div className="relative w-full h-[200px] overflow-hidden mb-4">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="object-cover w-full h-full transition-transform duration-500 hover:scale-110"
+              />
+            </div>
+            <div className="p-4 flex flex-col items-center">
+              <h3 className="text-lg font-semibold text-black dark:text-white mb-2 text-center">
+                {product.name}
+              </h3>
+              <p className="text-black dark:text-white text-sm text-center">
+                Type: {product.type}
+              </p>
+              <p className="text-black dark:text-white text-sm text-center">
+                Cast: {product.cast}
+              </p>
+              <p className="text-black dark:text-white text-sm text-center">
+                Price: ${product.price}
+              </p>
+              <div className="mt-4 w-full">
+                <button
+                  onClick={() => addToCart(product)}
+                  className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none flex items-center justify-center w-full"
+                >
+                  <FaShoppingCart className="mr-2" /> Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {/* Shopping Cart Overlay */}
+  <CSSTransition
+    in={isCartOpen}
+    timeout={300}
+    classNames="cart-animation"
+    unmountOnExit
+    nodeRef={cartRef}
+  >
+    <div ref={cartRef} className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-end">
+      <div className="bg-white dark:bg-black w-full md:w-1/2 lg:w-1/3 p-6 relative">
+        <button
+          onClick={toggleCart}
+          className="absolute top-4 right-4 text-black dark:text-white hover:text-gray-800 dark:hover:text-gray-300 focus:outline-none"
+        >
+          <FaTimes size={24} />
+        </button>
+        <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white">
+          Shopping Cart
+        </h2>
+        {cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <ul>
+            {cart.map(item => (
+              <li
+                key={item.id}
+                className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+              >
+                {/* Product info */}
+                <div className="flex items-center">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover mr-4"
+                  />
+                  <div>
+                    <h4 className="font-semibold flex items-center text-black dark:text-white">
+                      <FaShoppingCart className="mr-2 text-black dark:text-white" />
+                      {item.name}
+                    </h4>
+                    <p className="text-black dark:text-white text-sm">Price: ${item.price}</p>
+                    <p className="text-black dark:text-white text-xs">Cast: {item.cast}</p>
+                  </div>
                 </div>
-              </div>
-              {/* Quantity controls */}
-              <div className="flex items-center">
-                <button
-                  onClick={() => decreaseQuantity(item.id)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  -
-                </button>
-                <span className="mx-2">{item.quantity}</span>
-                <button
-                  onClick={() => increaseQuantity(item.id)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  +
-                </button>
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="text-red-500 hover:text-red-700 ml-2"
-                >
-                  <FaTrash size={16} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-      {cart.length > 0 && (
-  <div className="mt-4">
-    {/* การคำนวณยอดรวม */}
-    <p className="font-semibold text-sm">
-      Subtotal: ${calculateTotal().subtotal}
-    </p>
-    <p className="text-gray-600 text-xs">
-      VAT (7%): +${calculateTotal().vat}
-    </p>
-    <p className="text-gray-600 text-xs">
-      Credit (13%): +${calculateTotal().credit}
-    </p>
-    <p className="font-semibold text-lg">
-      Total: ${calculateTotal().total}
-    </p>
-    {/* การคำนวณราคาสุทธิ */}
-    
-    {/* ปุ่ม Buy Now */}
-    <button
-  onClick={() => window.open("https://www.facebook.com/messages/t/165982909924535", "_blank")}  // ใส่ลิงก์ Facebook ของคุณ
-  className="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 w-full flex items-center justify-center"
->
-  <FaFacebook className="mr-2" />  {/* ไอคอน Facebook */}
-  ติดต่อซื้อได้ที่ Page Facebook
-</button>
-  </div>
-)}
-
+                {/* Quantity controls */}
+                <div className="flex items-center">
+                  <button
+                    onClick={() => decreaseQuantity(item.id)}
+                    className="text-black dark:text-white hover:text-gray-800 dark:hover:text-gray-300"
+                  >
+                    -
+                  </button>
+                  <span className="mx-2">{item.quantity}</span>
+                  <button
+                    onClick={() => increaseQuantity(item.id)}
+                    className="text-black dark:text-white hover:text-gray-800 dark:hover:text-gray-300"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-red-500 hover:text-red-700 ml-2 dark:text-red-300 dark:hover:text-red-500"
+                  >
+                    <FaTrash size={16} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {cart.length > 0 && (
+          <div className="mt-4">
+            {/* การคำนวณยอดรวม */}
+            <p className="font-semibold text-sm text-black dark:text-white">
+              Subtotal: ${calculateTotal().subtotal}
+            </p>
+            <p className="text-black dark:text-white text-xs">
+              VAT (7%): +${calculateTotal().vat}
+            </p>
+            <p className="text-black dark:text-white text-xs">
+              Credit (13%): +${calculateTotal().credit}
+            </p>
+            <p className="font-semibold text-lg text-black dark:text-white">
+              Total: ${calculateTotal().total}
+            </p>
+            {/* ปุ่ม Buy Now */}
+            <button
+              onClick={() => window.open("https://www.facebook.com/messages/t/165982909924535", "_blank")}  // ใส่ลิงก์ Facebook ของคุณ
+              className="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 w-full flex items-center justify-center"
+            >
+              <FaFacebook className="mr-2" />  {/* ไอคอน Facebook */}
+              ติดต่อซื้อได้ที่ Page Facebook
+            </button>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-</CSSTransition>
+  </CSSTransition>
+</div>
 
 
-    </div>
+
   );
 };
 

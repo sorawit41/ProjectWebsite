@@ -13,4 +13,7 @@ import Shop from "./Shop";
 import Idol from "./Shop"
 import Privacy from "./Privacy";
 import Member from "../components/Member";
-export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive, Shop,Idol,Privacy,Member};
+import MainMenu from "./MainMenu";
+import DrinkMenu from "./DrinkMenu";
+
+export { Home, About, Access, Cast, Media, NewsAndEvent, Rules, Menu, Contact,Schedule, Receive, Shop,Idol,Privacy,Member,MainMenu,DrinkMenu };

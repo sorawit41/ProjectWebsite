@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaStar, FaGift, FaMapMarkerAlt, FaHeart } from 'react-icons/fa';
-
+import image1 from "../assets/Member/image.png"
 const Member = () => {
   const [visible, setVisible] = useState(false);
 
@@ -45,7 +45,7 @@ const Member = () => {
         </p>
 
         <img
-          src="https://scontent.furt2-1.fna.fbcdn.net/v/t39.30808-6/473188619_122205045164082876_2491658902410437771_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=0zy8eKf53PgQ7kNvwEKoFEu&_nc_oc=AdnmWsypuX1t5EjVgpfoEIep-rTITTmNRJeenm881ZmJRkJOxHgN-qdfNanSlOPCoP8J3ilvSfu4IYXRw33CMIfG&_nc_zt=23&_nc_ht=scontent.furt2-1.fna&_nc_gid=Y3n5KMLrSMbsETvGIX81Hw&oh=00_AfF00lSq4m66-kO6YLWICuCwYtdby3ohxYo8uTMJhzCoKw&oe=68096A31"
+          src={image1}
           alt="Black Neko"
           className="w-full rounded-2xl mt-6 shadow-md"
         />

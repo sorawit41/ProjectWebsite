@@ -1,7 +1,7 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import DefaultLayout from './layout/DefaultLayout'
-import {Home, About, Access, Cast, Media, NewsAndEvent,Menu,Contact,Rules,Schedule,Idol,Receive,Privacy, Member} from "./pages"
+import {Home, About, Access, Cast, Media, NewsAndEvent,Menu,Contact,Rules,Schedule,Idol,Receive,Privacy, Member, MainMenu, DrinkMenu} from "./pages"
 
 
 const Layout = () => {
@@ -72,6 +72,14 @@ const router = createBrowserRouter([
       {
         path:"/Member",
         element: <Member />, 
+      },
+      {
+        path:"/MainMenu",
+        element: <MainMenu />, 
+      },
+      {
+        path:"/DrinkMenu",
+        element: <DrinkMenu />, 
       }
     ]
   },
