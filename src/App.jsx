@@ -1,7 +1,10 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import DefaultLayout from './layout/DefaultLayout'
-import {Home, About, Access, Cast, Media, NewsAndEvent,Menu,Contact,Rules,Schedule,Idol,Receive,Privacy, Member, MainMenu, DrinkMenu} from "./pages"
+import {Home,DashboardPage,UpdatePasswordPage,AdminOrderManagementPage,
+  ProfilePage,AddProductForm,ProductListPage,CheckoutPage,OrderTrackingPage,
+  ForgotPasswordPage,About, Access, Cast, Media, NewsAndEvent,Menu,Contact,Rules,Schedule,Idol,Receive,Privacy, Member, MainMenu, DrinkMenu,LoginPage,RegisterPage} from "./pages"
+
 
 
 const Layout = () => {
@@ -80,7 +83,53 @@ const router = createBrowserRouter([
       {
         path:"/DrinkMenu",
         element: <DrinkMenu />, 
-      }
+      },
+      {
+        path:"/LoginPage",
+        element: <LoginPage />, 
+      },
+      {
+        path:"/RegisterPage",
+        element: <RegisterPage />, 
+      },
+      {
+        path:"/DashboardPage",
+        element: <DashboardPage />, 
+      },
+      {
+        path:"/ForgotPasswordPage",
+        element: <ForgotPasswordPage />, 
+      },
+      {
+        path:"/UpdatePasswordPage",
+        element: <UpdatePasswordPage />, 
+      },
+      {
+        path:"/ProfilePage",
+        element: <ProfilePage />, 
+      },
+      
+      {
+        path:"/AddProductForm",
+        element: <AddProductForm />, 
+      },
+      
+      {
+        path:"/ProductListPage",
+        element: <ProductListPage />, 
+      },
+      {
+         path:"/CheckoutPage",
+        element: <CheckoutPage />, 
+      },
+     {
+         path:"/OrderTrackingPage",
+        element: <OrderTrackingPage />, 
+      },
+      {
+         path:"/AdminOrderManagementPage",
+        element: <AdminOrderManagementPage />, 
+      },
     ]
   },
 ])

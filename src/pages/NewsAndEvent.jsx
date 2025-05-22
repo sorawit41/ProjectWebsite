@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { FaChevronDown } from 'react-icons/fa'; // Icon for dropdown
-import { Link } from 'react-router-dom';
-//May
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { FaChevronDown, FaTimes } from 'react-icons/fa';
+
+// May
 import image19 from "../assets/newsandevemts/May/birthdayidol.png";
 import image18 from "../assets/newsandevemts/May/1year.png";
 import image17 from "../assets/newsandevemts/May/You.png";
@@ -25,8 +25,8 @@ import image12 from "../assets/newsandevemts/Feb/glasses.png";
 import image13 from "../assets/newsandevemts/jan/chinese.png";
 import image14 from "../assets/newsandevemts/jan/children.png";
 import image15 from "../assets/newsandevemts/jan/miko.png";
-// ข้อมูลข่าวและกิจกรรม
-const newsAndEvents = [
+
+const allNewsAndEvents = [
   {
     id: 19,
     month: "พฤษภาคม",
@@ -45,7 +45,7 @@ const newsAndEvents = [
     date: "2025-05-17",
     image: image19
   },
-  
+
   {
     id: 18,
     month: "พฤษภาคม",
@@ -60,7 +60,7 @@ const newsAndEvents = [
     month: "เมษายน",
     title: "🔔 ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO",
     shortDescription: "ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO",
-    fullDescription: "ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO\\nพร้อมวงไอดอลอีก 2 วง มาร่วมงานฉลองงานวันเกิดกันนะเมี้ยว\\nDate & Time: 27.04.2025 (19:30 – 21:30)\\nVenue: BLACK NEKO, MBK Center (7th Floor)\\n__________________\\n📌ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\\n#blacknekombk #blackneko #maidcafe #idolcafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #ST3LLVR #ST3LLVR_HEARTSTEALER\\n#ST3LLVR_BirthdayParty\\n#ST3LLVR_DebutShowcase",
+    fullDescription: "ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO\nพร้อมวงไอดอลอีก 2 วง มาร่วมงานฉลองงานวันเกิดกันนะเมี้ยว\nDate & Time: 27.04.2025 (19:30 – 21:30)\nVenue: BLACK NEKO, MBK Center (7th Floor)\n__________________\n📌ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n#blacknekombk #blackneko #maidcafe #idolcafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #ST3LLVR #ST3LLVR_HEARTSTEALER\n#ST3LLVR_BirthdayParty\n#ST3LLVR_DebutShowcase",
     date: "2025-04-26",
     image: image16
   },
@@ -132,7 +132,7 @@ const newsAndEvents = [
     month: "มีนาคม",
     title: "คิดแคปชั่นไม่ออกแต่รู้ว่างานนี้มีแซ่บแน่นอน ❤️‍🔥",
     shortDescription: "คิดแคปชั่นไม่ออกแต่รู้ว่างานนี้มีแซ่บแน่นอน ❤️‍🔥",
-    fullDescription: "✨ถ้ายังไม่มีมาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 7-9 มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ",
+    fullDescription: "✨ถ้ายังไม่มีมาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 7-9 มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBKชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ",
     date: "2025-03-07",
     image: image8
   },
@@ -195,70 +195,167 @@ const newsAndEvents = [
     month: "มกราคม",
     title: "🔔 Miko Event ! 3-5 มกราคม 2025 🎌",
     shortDescription: "🔔 Miko Event ! 3-5 มกราคม 2025 🎌",
-    fullDescription: "☀️ต้อนรับปีใหม่ด้วยหญิงสาวบริสุทธิ์ผู้มากความสามารถในชุดสีขาวแดง ♪\n\n🔺ร้าน Black Neko จะเต็มไปด้วยสาวๆมิโกะที่เก่งกาจ! พร้อมทั้งโปรโมชั่นสุดพิเศษอีกมากมาย! แล้วเจอกันนะเมี้ยวว ٩( ‘ω’ )و\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok ",
+    fullDescription: "☀️ต้อนรับปีใหม่ด้วยหญิงสาวบริสุทธิ์ผู้มากความสามารถในชุดสีขาวแดง ♪\n\n🔺ร้าน Black Neko จะเต็มไปด้วยสาวๆมิโกะที่เก่งกาจ! พร้อมทั้งโปรโมชั่นสุดพิเศษอีกมากมาย! แล้วเจอกันนะเมี้ยวว ٩( ’ω’ )و\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok ",
     date: "2025-01-02",
     image: image15
   }
 ];
 
+// Define all months in order for the dropdown
+const ALL_MONTHS_ORDER = [
+  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+];
+
+/**
+ * Event Card Component
+ * Displays a single event in a card format.
+ */
+const EventCard = ({ event, onCardClick, opacity }) => (
+  <div
+    className="bg-white dark:bg-black rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 dark:border-gray-700 cursor-pointer"
+    style={{ opacity: opacity, transition: 'opacity 0.5s ease-in-out' }}
+    onClick={() => onCardClick(event)}
+  >
+    <div className="relative">
+      <img
+        src={event.image}
+        alt={event.title}
+        className="w-full h-72 object-cover object-center"
+      />
+      <span className="absolute top-3 right-3 bg-black/60 text-white text-xs font-semibold rounded-full px-2.5 py-1 backdrop-blur-sm shadow-md">
+        {new Date(event.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </span>
+    </div>
+    <div className="p-5">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 mb-2">{event.title}</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">{event.shortDescription}</p>
+      <button
+        className="mt-4 text-black dark:text-white hover:text-gray-800 dark:hover:text-gray-300 focus:outline-none text-sm font-medium transition-colors duration-200"
+      >
+        อ่านเพิ่มเติม
+      </button>
+    </div>
+  </div>
+);
+
+/**
+ * Event Detail Popup Component
+ * Displays full details of a selected event in a modal.
+ */
+const EventDetailPopup = ({ event, onClose }) => {
+  if (!event) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 animate-fade-in">
+      <div className="bg-white dark:bg-black rounded-2xl shadow-2xl max-w-3xl w-full mx-auto my-8 relative max-h-[90vh] overflow-y-auto transform scale-95 animate-scale-in border border-gray-200 dark:border-gray-700/80">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-white transition duration-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800"
+          aria-label="Close"
+        >
+          <FaTimes size={22} />
+        </button>
+        <img
+          src={event.image}
+          alt={event.title}
+          className="w-full h-80 object-cover object-center rounded-t-2xl"
+        />
+        <div className="p-6 md:p-8">
+          <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{event.title}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            วันที่: {new Date(event.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+          <div className="prose prose-sm max-w-none text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+            {event.fullDescription}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * NewsAndEventNavBar Component
+ * Main component for displaying news and events.
+ */
 const NewsAndEventNavBar = () => {
-  const [activeMonth, setActiveMonth] = useState("พฤษภาคม");
-  const [opacity, setOpacity] = useState(0);
-  const [expandedEvents, setExpandedEvents] = useState({});
+  const [activeMonth, setActiveMonth] = useState("พฤษภาคม"); // Default to May
+  const [contentOpacity, setContentOpacity] = useState(0); // State for fade transition
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const groupEventsByMonth = (events) => {
-    const grouped = events.reduce((acc, event) => {
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // Group events by month and sort them by date (latest first)
+  const groupedEvents = useMemo(() => {
+    const eventsMap = allNewsAndEvents.reduce((acc, event) => {
       if (!acc[event.month]) acc[event.month] = [];
       acc[event.month].push(event);
       return acc;
     }, {});
-    return grouped;
-  };
 
-  const groupedEvents = groupEventsByMonth(newsAndEvents);
-  const allMonths = [
-    "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-  ];
-  const eventsForMonth = groupedEvents[activeMonth] || [];
+    // Sort events within each month by date in descending order
+    for (const month in eventsMap) {
+      eventsMap[month].sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+    return eventsMap;
+  }, []);
 
-  const handleMonthChange = (month) => {
+  // Get events for the currently active month
+  const eventsForActiveMonth = useMemo(() => {
+    return groupedEvents[activeMonth] || [];
+  }, [activeMonth, groupedEvents]);
+
+  // Handle month selection from the dropdown
+  const handleMonthChange = useCallback((month) => {
     setActiveMonth(month);
-    setIsDropdownOpen(false);
-  };
+    setIsDropdownOpen(false); // Close dropdown after selection
+  }, []);
 
-  const toggleExpand = (eventId) => {
-    setExpandedEvents((prevState) => ({
-      ...prevState,
-      [eventId]: !prevState[eventId]
-    }));
-  };
+  // Function to open the popup with selected event data
+  const openEventPopup = useCallback((event) => {
+    setSelectedEvent(event);
+    setShowPopup(true);
+  }, []);
 
+  // Function to close the popup
+  const closeEventPopup = useCallback(() => {
+    setShowPopup(false);
+    setSelectedEvent(null);
+  }, []);
+
+  // Effect for smooth opacity transition when activeMonth changes
   useEffect(() => {
-    setOpacity(0);
-    setTimeout(() => {
-      setOpacity(1);
-    }, 100);
+    setContentOpacity(0); // Fade out current content
+    const timer = setTimeout(() => {
+      setContentOpacity(1); // Fade in new content
+    }, 100); // Short delay for fade-out effect before new content appears
+
+    return () => clearTimeout(timer); // Cleanup timeout
   }, [activeMonth]);
 
   return (
-    <div className="bg-white dark:bg-black text-black dark:text-white shadow-md">
-      <div className="container mx-auto px-4 py-6 pt-20">
-        <nav className="flex items-center justify-between">
-          <div className="text-xl font-semibold">งานอีเว้นท์หรือกิจกรรมต่างๆของร้าน</div>
+    <div className="bg-white dark:bg-black min-h-screen py-10 sm:py-24">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-12">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 sm:mb-0">
+            Events & Updates
+          </h2>
           <div className="relative">
             <button
-              className="flex items-center gap-2 focus:outline-none"
+              className="inline-flex items-center gap-2 bg-white dark:bg-black text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-base font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors duration-200"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
-              เดือนที่: <span className="font-bold">{activeMonth}</span> <FaChevronDown />
+              Month: <span className="font-semibold">{activeMonth}</span> <FaChevronDown className="text-sm ml-1" />
             </button>
             {isDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-md z-10">
-                {allMonths.map((month) => (
+              <div className="absolute top-full right-0 mt-2 w-40 bg-white dark:bg-black rounded-lg shadow-xl z-20 border border-gray-200 dark:border-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
+                {ALL_MONTHS_ORDER.map((month) => (
                   <button
                     key={month}
-                    className={`block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left ${activeMonth === month ? 'bg-gray-200' : ''}`}
+                    className={`block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm w-full text-left transition-colors duration-150 ${activeMonth === month ? 'bg-gray-200 dark:bg-gray-700 font-semibold' : ''}`}
                     onClick={() => handleMonthChange(month)}
                   >
                     {month}
@@ -267,51 +364,32 @@ const NewsAndEventNavBar = () => {
               </div>
             )}
           </div>
-        </nav>
-      </div>
+        </div>
 
-      {/* Events Container */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          {eventsForMonth.length > 0 ? (
-            eventsForMonth.map((item) => (
-              <div
+        {/* Events Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {eventsForActiveMonth.length > 0 ? (
+            eventsForActiveMonth.map((item) => (
+              <EventCard
                 key={item.id}
-                className="bg-white dark:bg-black text-black dark:text-white shadow-md rounded-lg p-6 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row gap-6"
-                style={{ opacity: opacity, transition: 'opacity 1s ease-in-out' }}
-              >
-                <div className="md:w-1/3">
-                <img
-  src={item.image} // ใช้ไฟล์ภาพที่นำเข้ามา
-  alt={item.title}
-  className="w-full h-100 object-cover rounded-lg mb-4 md:mb-0" // ที่นี่สามารถเปลี่ยนแปลงขนาดของรูปได้
-/>
-
-                </div>
-                <div className="md:w-2/3">
-                  <h2 className="text-2xl font-bold text-black dark:text-white">{item.title}</h2>
-                  <p className="text-sm text-black dark:text-white mb-4">{new Date(item.date).toLocaleDateString()}</p>
-                  <p className="text-black dark:text-white mb-4">{item.shortDescription}</p>
-                  {expandedEvents[item.id] ? (
-                    <p className="text-black dark:text-white ">{item.fullDescription}</p>
-                  ) : (
-                    <p className="text-black dark:text-white">{item.fullDescription.substring(0, 100)}... </p>
-                  )}
-                  {item.fullDescription.length > 100 && (
-                    <button
-                      className="text-blue-500 hover:underline focus:outline-none"
-                      onClick={() => toggleExpand(item.id)}
-                    >
-                      {expandedEvents[item.id] ? "Read Less" : "Read More"}
-                    </button>
-                  )}
-                </div>
-              </div>
+                event={item}
+                onCardClick={openEventPopup}
+                opacity={contentOpacity}
+              />
             ))
           ) : (
-            <p className="text-gray-500">ยังไม่มีกิจกรรมน้านุ้ด.</p>
+            <div className="col-span-full text-center py-16 text-gray-600 dark:text-gray-400">
+              <p className="text-xl font-medium mb-2">No events found for {activeMonth}.</p>
+              <p>Please select another month or check back later!</p>
+            </div>
           )}
         </div>
+
+        {/* Popup for full event details */}
+        <EventDetailPopup
+          event={selectedEvent}
+          onClose={closeEventPopup}
+        />
       </div>
     </div>
   );

@@ -13,6 +13,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@react-google-maps/api": "^2.20.6",
+    "@supabase/supabase-js": "^2.49.4",
     "leaflet": "^1.9.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
@@ -28,7 +29,9 @@
     "react-router-dom": "^6.30.0",
     "react-scroll": "^1.9.3",
     "react-tiktok-embed": "^1.0.0",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "styled-components": "^6.1.18",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

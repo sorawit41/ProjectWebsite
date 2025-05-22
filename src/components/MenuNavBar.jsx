@@ -3,219 +3,231 @@ import { Link } from 'react-router-dom';
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { FaTimes } from 'react-icons/fa';
 import { BsChevronDown } from 'react-icons/bs';
+import { supabase } from '../pages/supabaseClient'; // Make sure this path is correct
 
 // Import your logo image
-import logo from '../assets/imgs/blackneko-icon.png';
+import logo from '../assets/logo/logo.png'; // Make sure this path is correct
 
 const Menus = [
   { id: 9, name: "คอนเซปร้าน", url: "/about" },
-    { id: 1, name: "อีเว้นท์ต่างๆ", url: "/NewsAndEvent" },
-    { id: 2, name: "ตารางกะน้องแมว", url: "/schedule" },
-    { id: 7, name: "กฎระเบียบการใช้บริการ", url: "/rules" },
-    {
-        id: 3, name: "เมนู & ไอเทม", url: "#", children: [
-            { id: 12, name: "เมนูเครื่องดื่ม", url: "/DrinkMenu" },
-            { id: 13, name: "เมนูอาหาร", url: "/MainMenu" },
-        ]
-    },
-    { id: 4, name: "รายชื่อน้องแมว", url: "/cast" },
-    { id: 10, name: "รับสมัครน้องแมว", url: "/receive" },
-    { id: 11, name: "ติดต่อ", url: "/contact" },
+  { id: 1, name: "อีเว้นท์ต่างๆ", url: "/NewsAndEvent" },
+  { id: 2, name: "ตารางกะน้องแมว", url: "/schedule" },
+  { id: 7, name: "กฎระเบียบการใช้บริการ", url: "/rules" },
+  {
+    id: 3, name: "เมนู & ไอเทม", url: "#", children: [
+      { id: 12, name: "เมนูเครื่องดื่ม", url: "/DrinkMenu" },
+      { id: 13, name: "เมนูอาหาร", url: "/MainMenu" },
+    ]
+  },
+  { id: 4, name: "รายชื่อน้องแมว", url: "/cast" },
+  { id: 10, name: "รับสมัครน้องแมว", url: "/receive" },
+  { id: 11, name: "ติดต่อ", url: "/contact" },
+];
+
+const loggedInUserMenus = [
+  { id: 100, name: "สั่งซื้อสินค้า", url: "./ProductListPage" },
+  { id: 101, name: "ติดตามสินค้า", url: "/OrderTrackingPage" },
 ];
 
 const MenuNavBar = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [menuItemOpen, setMenuItemOpen] = useState(null);
-    const menuRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuItemOpen, setMenuItemOpen] = useState(null);
+  const menuRef = useRef(null);
+  const [user, setUser] = useState(null);
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
+  useEffect(() => {
+    const fetchUserSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+    fetchUserSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+    if (!menuOpen) { // If opening the menu, don't do anything to submenus
+        // If closing the menu, reset open submenu
+        setMenuItemOpen(null);
+    }
+  };
+
+  const toggleMenuItem = (menuId) => {
+    setMenuItemOpen(menuItemOpen === menuId ? null : menuId);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+        setMenuItemOpen(null); // Also close submenu when clicking outside
+      }
     };
 
-    const toggleMenuItem = (menuId) => {
-        setMenuItemOpen(menuItemOpen === menuId ? null : menuId);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, [menuOpen]);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
-                setMenuOpen(false);
-            }
-        };
+  const handleLinkClick = () => {
+    setMenuOpen(false);
+    // No need to setMenuItemOpen(null) here as toggleMenu or handleClickOutside will handle it if menu closes
+  };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [menuOpen, menuRef]);
+  const handleSubMenuLinkClick = () => {
+    setMenuOpen(false);
+    setMenuItemOpen(null); // Explicitly close submenu as well
+  }
 
-    return (
-        <div className="relative z-5">
-            {/* Hamburger menu button */}
-            <button
-                className="hamburger p-2 focus:outline-none"
-                onClick={toggleMenu}
-                aria-label="Toggle Navigation"
-                style={{
-                    padding: '0.5rem',
-                    cursor: 'pointer',
-                    border: 'none',
-                    background: 'none',
-                    outline: 'none',
-                }}
-            >
-                {/* Hamburger icon */}
-                <HiOutlineMenuAlt2 className="text-2xl dark:text-white" style={{ fontSize: '1.5rem' }} />
-            </button>
+  const menuItemClasses = "block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md transition-colors duration-200 ease-in-out";
+  const menuParentItemClasses = `flex items-center justify-between px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md cursor-pointer transition-colors duration-200 ease-in-out`;
 
-            {/* Side Navbar */}
-            <div
-                ref={menuRef}
-                className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-md transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : '-translate-x-full'} dark:bg-gray-800 z-50`}
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    height: '100vh',
-                    width: '16rem',
-                    backgroundColor: '#fff',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                    transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
-                    transition: 'transform 0.3s ease-in-out',
-                    zIndex: 50,
-                }}
-            >
-                {/* Logo container */}
-                <div className="flex items-center justify-center py-4" style={{ padding: '1rem' }}>
-                    <Link to="/">
-                        <img src={logo} alt="Logo" className="h-12 cursor-pointer" style={{ height: '5rem' }} />
-                    </Link>
-                </div>
+  return (
+    <div className="relative z-50">
+      <button
+        className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+        onClick={toggleMenu}
+        aria-label="Toggle Navigation"
+      >
+        <HiOutlineMenuAlt2 className="text-xl" />
+      </button>
 
-                {/* Close button for the side navbar */}
-                <button
-                    className="absolute top-4 right-4 p-2 focus:outline-none"
-                    onClick={toggleMenu}
-                    aria-label="Close Navigation"
-                    style={{
-                        position: 'absolute',
-                        top: '1rem',
-                        right: '1rem',
-                        padding: '0.5rem',
-                        cursor: 'pointer',
-                        border: 'none',
-                        background: 'none',
-                        outline: 'none',
-                    }}
-                >
-                    {/* Close icon */}
-                    <FaTimes className="text-2xl dark:text-black" style={{ fontSize: '1.5rem' }} />
-                </button>
+      {/* Backdrop */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm md:hidden"
+          onClick={toggleMenu} // Allow closing by clicking backdrop
+          aria-hidden="true"
+        />
+      )}
 
-                <ul className="space-y-2 py-4 px-4 mt-2" style={{ marginTop: '0.5rem', padding: '1rem', listStyleType: 'none', margin: 0, paddingLeft: '1rem' }}>
-                    {Menus.map((menu) => {
-                        if (menu.children) {
-                            return (
-                                <li key={menu.id} style={{ marginBottom: '0.75rem' }}>
-                                    <div
-                                        className="flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md cursor-pointer transition duration-200 dark:text-white dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '0.5rem 0.75rem',
-                                            color: '#4b5563',
-                                            borderRadius: '0.375rem',
-                                            transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-                                            textDecoration: 'none',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={() => toggleMenuItem(menu.id)}
-                                         onMouseOver={(e) => {
-                                            if (menuItemOpen !== menu.id) {
-                                              e.target.style.backgroundColor = '#f3f4f6';
-                                              e.target.style.color = '#1f2937';
-                                            }
-                                        }}
-                                        onMouseOut={(e) => {
-                                            if (menuItemOpen !== menu.id) {
-                                              e.target.style.backgroundColor = '';
-                                              e.target.style.color = '#4b5563';
-                                            }
-                                        }}
-                                    >
-                                        {menu.name}
-                                        <BsChevronDown
-                                            className={`transition-transform duration-300 ${menuItemOpen === menu.id ? 'rotate-180' : 'rotate-0'}`}
-                                            style={{ fontSize: '1rem' }}
-                                        />
-                                    </div>
-                                    {menuItemOpen === menu.id && (
-                                        <ul className="ml-4 space-y-2" style={{ marginLeft: '1rem', marginTop: '0.5rem', listStyleType: 'none' }}>
-                                            {menu.children.map((child) => (
-                                                <li key={child.id} style={{ marginBottom: '0.75rem' }}>
-                                                    <Link
-                                                        to={child.url}
-                                                        className="block px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition duration-200 dark:text-white dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                                                        style={{
-                                                            display: 'block',
-                                                            padding: '0.5rem 0.75rem',
-                                                            color: '#4b5563',
-                                                            borderRadius: '0.375rem',
-                                                            transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-                                                            textDecoration: 'none',
-                                                        }}
-                                                        onMouseOver={(e) => {
-                                                            e.target.style.backgroundColor = '#f3f4f6';
-                                                            e.target.style.color = '#1f2937';
-                                                        }}
-                                                        onMouseOut={(e) => {
-                                                            e.target.style.backgroundColor = '';
-                                                            e.target.style.color = '#4b5563';
-                                                        }}
-                                                    >
-                                                        {child.name}
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </li>
-                            );
-                        }
-                        
-                        return (
-                            <li key={menu.id} style={{ marginBottom: '0.75rem' }}>
-                                <Link
-                                    to={menu.url}
-                                    className="block px-3 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition duration-200 dark:text-white dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                                    style={{
-                                        display: 'block',
-                                        padding: '0.5rem 0.75rem',
-                                        color: '#4b5563',
-                                        borderRadius: '0.375rem',
-                                        transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-                                        textDecoration: 'none',
-                                    }}
-                                     onMouseOver={(e) => {
-                                        e.target.style.backgroundColor = '#f3f4f6';
-                                        e.target.style.color = '#1f2937';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.target.style.backgroundColor = '';
-                                        e.target.style.color = '#4b5563';
-                                    }}
-                                >
-                                    {menu.name}
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </div>
+      {/* Sidebar Menu */}
+      <div
+        ref={menuRef}
+        className={`fixed top-0 left-0 h-screen w-72 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out z-[60] flex flex-col
+                    ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`} // Increased z-index for sidebar
+      >
+        {/* Header: Logo and Close button */}
+        <div className="relative flex items-center justify-center p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+          <Link to="/" onClick={handleLinkClick} className="inline-block">
+            <img src={logo} alt="Logo" className="h-16" />
+          </Link>
+          <button
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none"
+            onClick={toggleMenu}
+            aria-label="Close Navigation"
+          >
+            <FaTimes className="text-xl" />
+          </button>
         </div>
-    );
+
+        {/* Scrollable Menu Content Area */}
+        <div className="flex-grow overflow-y-auto">
+          <ul className="py-4 px-3 space-y-1.5">
+            {Menus.map((menu) => {
+              if (menu.children) {
+                const isOpen = menuItemOpen === menu.id;
+                return (
+                  <li key={menu.id}>
+                    <div
+                      className={`${menuParentItemClasses} ${isOpen ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                      onClick={() => toggleMenuItem(menu.id)}
+                    >
+                      {menu.name}
+                      <BsChevronDown
+                        className={`text-sm transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                      />
+                    </div>
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                      // style={{ maxHeight: isOpen ? '500px' : '0' }} // Alternative if max-h-96 is not enough, or use JS to calculate height
+                    >
+                      {/* Conditionally render UL only when open to ensure clean collapse */}
+                      {isOpen && (
+                         <ul className="pl-4 mt-1 space-y-1.5 pt-1 pb-2"> {/* Added some padding for submenu list */}
+                          {menu.children.map((child) => (
+                            <li key={child.id}>
+                              <Link
+                                to={child.url}
+                                onClick={handleSubMenuLinkClick} // Use specific handler for submenu links
+                                className={menuItemClasses}
+                              >
+                                {child.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={menu.id}>
+                  <Link
+                    to={menu.url}
+                    onClick={handleLinkClick}
+                    className={menuItemClasses}
+                  >
+                    {menu.name}
+                  </Link>
+                </li>
+              );
+            })}
+
+            {/* Logged In User Menus */}
+            {user && (
+              <>
+                <li className="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
+                  <span className="block px-4 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    สมาชิก
+                  </span>
+                </li>
+                {loggedInUserMenus.map((loggedInMenu) => (
+                  <li key={loggedInMenu.id}>
+                    <Link
+                      to={loggedInMenu.url}
+                      onClick={handleLinkClick}
+                      className={menuItemClasses}
+                    >
+                      {loggedInMenu.name}
+                    </Link>
+                  </li>
+                ))}
+              </>
+            )}
+          </ul>
+        </div>
+
+        {/* Footer: User Info and Logout */}
+        {user && (
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 shrink-0">
+                <p className="text-sm text-gray-600 dark:text-gray-400 truncate" title={user.email}>{user.email}</p>
+                <button
+                    onClick={async () => {
+                        await supabase.auth.signOut();
+                        setUser(null);
+                        setMenuOpen(false); // Close menu on logout
+                        setMenuItemOpen(null); // Reset submenu
+                    }}
+                    className="w-full mt-2 text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-700/30 rounded-md transition-colors"
+                >
+                    ออกจากระบบ
+                </button>
+            </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default MenuNavBar;
-

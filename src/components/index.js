@@ -9,4 +9,5 @@ import Navbar2 from "./Navbar2"
 import ShowCast from "./ShowCast";
 import Test from "./test";
 import Member from "./Member";
-export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Message,Map,Navbar2,ShowCast,Test,Member };
+import LoginPage from "./LoginPage";
+export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Message,Map,Navbar2,ShowCast,Test,Member,LoginPage };
