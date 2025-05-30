@@ -1,272 +1,81 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { FaChevronDown, FaTimes } from 'react-icons/fa';
+import { FaChevronDown, FaTimes, FaCalendarAlt, FaArrowRight } from 'react-icons/fa';
+import { supabase } from './supabaseClient'; // << ปรับ path ไปยัง supabaseClient ให้ถูกต้อง
 
-// May
-import image19 from "../assets/newsandevemts/May/birthdayidol.png";
-import image18 from "../assets/newsandevemts/May/1year.png";
-import image17 from "../assets/newsandevemts/May/You.png";
-// April
-import image1 from "../assets/newsandevemts/April/2nd Dimension.png";
-import image2 from "../assets/newsandevemts/April/azuki.png";
-import image3 from "../assets/newsandevemts/April/songkarn.png";
-import image4 from "../assets/newsandevemts/April/tsuki.png";
-import image16 from "../assets/newsandevemts/April/ST3LLVR.png";
-//March
-import image5 from "../assets/newsandevemts/March/risa.png";
-import image6 from "../assets/newsandevemts/March/fruit.png";
-import image7 from "../assets/newsandevemts/March/animal.png";
-import image8 from "../assets/newsandevemts/March/galgril.png";
-//Feb
-import image9 from "../assets/newsandevemts/Feb/office.png";
-import image10 from "../assets/newsandevemts/Feb/cat.png";
-import image11 from "../assets/newsandevemts/Feb/val.png";
-import image12 from "../assets/newsandevemts/Feb/glasses.png";
-//jan
-import image13 from "../assets/newsandevemts/jan/chinese.png";
-import image14 from "../assets/newsandevemts/jan/children.png";
-import image15 from "../assets/newsandevemts/jan/miko.png";
+// ลบการ import รูปภาพ Event ที่เป็น local ทั้งหมดออกไป
+// เช่น:
+// import image19 from "../assets/newsandevemts/May/birthdayidol.png";
+// ... (ลบให้หมด) ...
 
-const allNewsAndEvents = [
-  {
-    id: 19,
-    month: "พฤษภาคม",
-    title: "ปุกาศๆ เราจะมีแฟนมีต มินิคอนเสิร์ต ร่วมกับ Black Neko รายละเอียดการซื้อบัตรเราจะมาแจ้งอีกทีงับ 🫡 ล็อกวันให้หน่อยได้ม้ายย",
-    shortDescription: "ปุกาศๆ เราจะมีแฟนมีต มินิคอนเสิร์ต ร่วมกับ Black Neko รายละเอียดการซื้อบัตรเราจะมาแจ้งอีกทีงับ 🫡 ล็อกวันให้หน่อยได้ม้ายย",
-    fullDescription: "ปุกาศๆ เราจะมีแฟนมีต มินิคอนเสิร์ต ร่วมกับ Black Neko รายละเอียดการซื้อบัตรเราจะมาแจ้งอีกทีงับ 🫡 ล็อกวันให้หน่อยได้ม้ายย",
-    date: "2025-05-26",
-    image: image17
-  },
-  {
-    id: 17,
-    month: "พฤษภาคม",
-    title: "อีเวนท์ฉลองวันเกิดของน้องแมวปริศนา 🎂🎉",
-    shortDescription: "อีเวนท์ฉลองวันเกิดของน้องแมวปริศนา 🎂🎉",
-    fullDescription: "ปีนี้น้องทั้งสองจะเตรียมของขวัญพิเศษอะไรมาให้กันนะ\n\n📆 วันที่ 17 พฤษภาคมนี้ มาเจอกันนะคะ😉\n\n✨มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้",
-    date: "2025-05-17",
-    image: image19
-  },
 
-  {
-    id: 18,
-    month: "พฤษภาคม",
-    title: "🐈‍⬛ เตรียมตัวพบกับงานครบรอบ 1 ปี 🫧",
-    shortDescription: "🐈‍⬛ เตรียมตัวพบกับงานครบรอบ 1 ปี 🫧",
-    fullDescription: "ณ อณาจักรสวรรค์ของเหล่าแมวดำพร้อมด้วยกิจกรรมและโปรโมชั่นมากมาย 💖\n\nรายละเอียด กิจกรรม และ โปรโมชั่น\n- ผู้เจ้าร่วมทุกท่าน Free Welcome Drink ( Champagne None-L)\n- เชกิทุกใบจากอีเว้นท์จะได้รับข้อความจากน้องแมวหลังภาพ\n- ใบเสร็จที่มียอดชำระทุกๆ 500 บาท ได้รับช็อคโกแลตจากน้องแมว 1 ชิ้น\n- พบกับ Live Show สุดพิเศษจากน้องแมวตลอด 3 วันเต็ม\n- Drink ราคา 1,000 บาทขึ้นไป Free ชาเมะ / Video 20 sec ของน้องแมวที่เปิด Drink\n- เครื่องดื่ม Size L 2 Free ชาเมะ / Omakase 2 Free 1\n- ทุก 500 บาท จะได้รับตั๋ว Lucky draw ที่สามารถลุ้นรับตุ๊กตาแมว Size XXL โดยจะมีการจับฉลากในวันที่ 4/5/25\n\n🍀 Lucky draw เริ่มแจกตั้งแต่วันที่ 2/5/25 ✨\n\nแวะมาดื่มเครื่องดื่มเย็นๆทานอาหารแสนอร่อยกันนะ เมี้ยว✨ ٩(๑❛ᴗ❛๑)۶\n\n__________________\n📌ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#blacknekombk #blackneko #maidcafe #idolcafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok ดูน้อยลง",
-    date: "2025-05-02",
-    image: image18
-  },
-  {
-    id: 16,
-    month: "เมษายน",
-    title: "🔔 ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO",
-    shortDescription: "ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO",
-    fullDescription: "ST3LLVR BIRTHDAY PARTY AND FRIENDS X BLACK NEKO\nพร้อมวงไอดอลอีก 2 วง มาร่วมงานฉลองงานวันเกิดกันนะเมี้ยว\nDate & Time: 27.04.2025 (19:30 – 21:30)\nVenue: BLACK NEKO, MBK Center (7th Floor)\n__________________\n📌ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n#blacknekombk #blackneko #maidcafe #idolcafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #ST3LLVR #ST3LLVR_HEARTSTEALER\n#ST3LLVR_BirthdayParty\n#ST3LLVR_DebutShowcase",
-    date: "2025-04-26",
-    image: image16
-  },
-  {
-    id: 1,
-    month: "เมษายน",
-    title: "2nd Dimension - 2nd OFF-KAI X Black Neko\n𝑸𝒖𝒆𝒆𝒏 & 𝑷𝒓𝒊𝒏𝒄𝒆𝒔𝒔 👑 ꜱᴘᴀʀᴋʟᴇ ʜᴏᴜʀꜱ\n26 APR 2025 | At Black Neko (MBK CENTER)~ 🍇🍒🍎",
-    shortDescription: "2nd Dimension - 2nd OFF-KAI X Black Neko\n𝑸𝒖𝒆𝒆𝒏 & 𝑷𝒓𝒊𝒏𝒄𝒆ꜱꜱ 👑 ꜱᴘᴀʀᴋʟᴇ ʜᴏᴜʀꜱ\n26 APR 2025 | At Black Neko (MBK CENTER)",
-    fullDescription: "อีกไม่กี่วันก็จะถึงวันงาน OFF-KAI ของพวกเราแล้วนะคะ\nใครยังไม่มีบัตร สามารถซื้อบัตรได้ทาง LINE MY SHOP เลยค่ะ\n\nรอบนี้มาพบกับสาวๆ 2ND DIMENSION ในลุค ควีน&ปรินเซส ที่จะมาทำให้พวกคุณใจละลาย\nเตรียมพบกับโชว์สุดพิเศษจากสมาชิกทุกคน, ร่วมรับประทานอาหาร, พูดคุย และสร้างความทรงจำดีๆไปด้วยกันนะ\n\n__________________\n📌ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#blacknekombk #blackneko #maidcafe #idolcafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok\n#2ndDimension #2DMob #2ndDimensionOFFKAI #2D_2ndOffkai",
-    date: "2025-04-26",
-    image: image1
-  },
-  {
-    id: 2,
-    month: "เมษายน",
-    title: "อีเวนท์ฉลองวันเกิดของน้องแมว Azuki & Fuwarun 🎂🎉 ",
-    shortDescription: "อีเวนท์ฉลองวันเกิดของน้องแมว Azuki & Fuwarun 🎂🎉",
-    fullDescription: "ปีนี้น้องทั้งสองจะเตรียมของขวัญพิเศษอะไรมาให้กันนะ\n\n✨มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 19 เมษายนนี้ มาเจอกันนะคะ😉\n\nโพสต์ประกาศงาน และโพสต์สินค้า\nรายละเอียด :\nGift S : 500 บาท\nGift M : 800 บาท\nGift L : 1200 บาท\nCake : 1500 บาท\n\nPhoto set คู่ 580 บาท\n\nPromotion\n1. Angel&Devil Drink 440 บาท\nGet Free random photo card ชุดอีเวนท์ BD\n2. Live Show 1 Free 1 เฉพาะ Azuki & Fuwarun\n3. ยอดบิลทุกๆ 500 บาท ได้รับสิทธิ์สุ่ม Lucky Draw 1 สิทธิ์ (สุ่มในวันพุธถัดจากวันงาน)\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดูน้อยลง\nความคิดเห็น\n\n\n",
-    date: "2025-04-19",
-    image: image2
-  },
-  {
-    id: 3,
-    month: "เมษายน",
-    title: "🫧 เตรียมพบกับอีเวนท์ฉลองวันปีใหม่ไทย 🔫💦 🐾",
-    shortDescription: "🫧 เตรียมพบกับอีเวนท์ฉลองวันปีใหม่ไทย 🔫💦 🐾",
-    fullDescription: "✨มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 11-13 เมษายนนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดูน้อยลง",
-    date: "2025-04-11",
-    image: image3
-  },
-  {
-    id: 4,
-    month: "เมษายน",
-    title: "Parallella Idol X Black neko",
-    shortDescription: "Parallella Idol X Black neko",
-    fullDescription: "วันศุกร์ที่ 4/4/2025  เวลา 19.00-23.00\nในคืนจันทร์เสี้ยว  ณ ปราสาทโลกคู่ขนานแห่งนึง แวมไพร์ทั้ง 5 ได้มีการจัดงานฉลองวันเกิดให้กับแวมไพร์ที่มีนามว่า สีกิ\nจึงขอเชิญเหล่าแวมไพร์และมนุษย์ทุกท่าน มาร่วมสังสรรค์และแสดงความยินดีไปกับพวกเราที่ปราสาท Black neko (MBK 7 Floor)\nในงานท่านจะได้พบกับโชว์สุดพิเศษจากเหล่าแวมไพร์ทั้ง 5 และร่วมทำกิจกรรมสนุกๆสุดไร้สาระมากมาย ท่านสามารถท้าประลองกับแวมไพร์ทั้ง 5 ได้ที่ลานประลองหน้า\nปราสาท (Tekken8) (ท้าต่อยตาละ 20 บาท)\nDATE 4 April 2025 (Friday)\nTIME 19:00 - 23:00\n",
-    date: "2025-04-04",
-    image: image4
-  },
-  {
-    id: 5,
-    month: "มีนาคม",
-    title: "อีเวนท์ฉลองวันเกิดของน้องแมว Risa & Kokoa 🎂🎉",
-    shortDescription: "อีเวนท์ฉลองวันเกิดของน้องแมว Risa & Kokoa 🎂🎉",
-    fullDescription: "ปีนี้น้องทั้งสองจะเตรียมของขวัญพิเศษอะไรมาให้กันนะ\n\n✨มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 29 มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดู",
-    date: "2025-03-29",
-    image: image5
-  },
-  {
-    id: 6,
-    month: "มีนาคม",
-    title: "แปลงร่างเป็นผลไม้~! 🍎🍇🍒🥝🍑🍅🍉🍊",
-    shortDescription: "แปลงร่างเป็นผลไม้~! 🍎🍇🍒🥝🍑🍅🍉🍊",
-    fullDescription: "✨มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ ! \n📆 วันที่ 21-23 มีนาคมนี้ มาเจอกันนะคะ😉\n__________\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้",
-    date: "2025-03-29",
-    image: image6
-  },
-  {
-    id: 7,
-    month: "มีนาคม",
-    title: "เตรียมตัวพับกบ เอ้ย! พบกับอีเว้นท์สาวหูสัตว์ 🐰🐼\nว่าแต่น้องแมวของเราจะแปลงร่างเป็นตัวอะไรสุดสัปดาห์นี้กันนะ 🤭💕",
-    shortDescription: "เตรียมตัวพับกบ เอ้ย! พบกับอีเว้นท์สาวหูสัตว์ 🐰🐼\nว่าแต่น้องแมวของเราจะแปลงร่างเป็นตัวอะไรสุดสัปดาห์นี้กันนะ 🤭💕",
-    fullDescription: "✨มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 14-16 มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดูน้อยลง",
-    date: "2025-03-14",
-    image: image7
-  },
-  {
-    id: 8,
-    month: "มีนาคม",
-    title: "คิดแคปชั่นไม่ออกแต่รู้ว่างานนี้มีแซ่บแน่นอน ❤️‍🔥",
-    shortDescription: "คิดแคปชั่นไม่ออกแต่รู้ว่างานนี้มีแซ่บแน่นอน ❤️‍🔥",
-    fullDescription: "✨ถ้ายังไม่มีมาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 7-9 มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBKชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ",
-    date: "2025-03-07",
-    image: image8
-  },
-  {
-    id: 9,
-    month: "กุมภาพันธ์",
-    title: "มีสาวออฟฟิศเป็นของตัวเองหรือยังคะ บอส💕",
-    shortDescription: "มีสาวออฟฟิศเป็นของตัวเองหรือยังคะ บอส💕",
-    fullDescription: "✨ถ้ายังไม่มีมาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 28-02 กุมภาพันธ์-มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดูน้อยลง ",
-    date: "2025-02-26",
-    image: image9
-  },
-  {
-    id: 10,
-    month: "กุมภาพันธ์",
-    title: "มีสาวออฟฟิศเป็นของตัวเองหรือยังคะ บอส💕",
-    shortDescription: "มีสาวออฟฟิศเป็นของตัวเองหรือยังคะ บอส💕",
-    fullDescription: "✨ถ้ายังไม่มีมาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 28-02 กุมภาพันธ์-มีนาคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดูน้อยลง ",
-    date: "2025-02-26",
-    image: image10
-  },
-  {
-    id: 11,
-    month: "กุมภาพันธ์",
-    title: "🌹โดนเท มันทำให้ใจพัง เธอน่ารักจัง ทำให้ใจเซ~",
-    shortDescription: "🌹โดนเท มันทำให้ใจพัง เธอน่ารักจัง ทำให้ใจเซ~",
-    fullDescription: "✨วาเลนไทน์ปีนี้ มาหาน้องแมวของเราได้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\nกระซิบว่ามีเมนูพิเศษด้วยล่ะ เมี๊ยวว~ 😼🫶🏻💕\n\n📆 วันที่ 14-16 กุมภาพันธ์นี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้",
-    date: "2025-02-14",
-    image: image11
-  },
-  {
-    id: "12",
-    month: "กุมภาพันธ์",
-    title: "👓 Glasses girl Event! 7-9 กุมภาพันธ์ 2025 💕",
-    shortDescription: "👓 Glasses girl Event! 7-9 กุมภาพันธ์ 2025 💕",
-    fullDescription: "ยินต้อนรับเข้าสู่ร้านที่มีสาวแว่นสุดน่ารักเต็มไปหมด\nเตรียมตัวพบน้องแมวในลุคสาวแว่นสุดสวย รวยความสามารถ ครบเครื่องเรื่องความแซ่บบ💖\n\n🔺ร้าน Black Neko ของเรายังมีโปรโมชั่นสุดพิเศษอีกมากมาย! แล้วเจอกันนะเมี้ยวว ٩( ‘ω’ )و\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok ",
-    date: "2025-02-07",
-    image: image12
-  },
-  {
-    id: 13,
-    month: "มกราคม",
-    title: "🏮ซินเจียยู่อี่ ซินนี้ฮวดไช้ ~",
-    shortDescription: "🏮ซินเจียยู่อี่ ซินนี้ฮวดไช้ ~",
-    fullDescription: "🪭ตรุษจีนนี้แวะมาปาร์ตี้ที่ร้าน Black Neko มีกิจกรรมพิเศษและโปรโมชั่นมากมายรอคุณอยู่ !\n\n📆 วันที่ 25-31 มกราคมนี้ มาเจอกันนะคะ😉\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้ ดูน้อยลง",
-    date: "2025-01-25",
-    image: image13
-  },
-  {
-    id: 14,
-    month: "มกราคม",
-    title: "🔔 Children’s day Event ! 10-12 มกราคม 2025 👶🏻",
-    shortDescription: "🔔 Children’s day Event ! 10-12 มกราคม 2025 👶🏻",
-    fullDescription: "👧🏻ก๊อกๆ วันเด็กปีนี้มีแมวเด็กอะยางงงงง 👀\n\n🔺เด็กๆพร้อมบุกที่ร้าน Black Neko แล้ว! พร้อมทั้งโปรโมชั่นสุดพิเศษอีกมากมาย! แล้วเจอกันนะเมี้ยวว ٩( ’ω’ )و\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok #เทรนด์วันนี้",
-    date: "2025-01-10",
-    image: image14
-  },
-  {
-    id: 15,
-    month: "มกราคม",
-    title: "🔔 Miko Event ! 3-5 มกราคม 2025 🎌",
-    shortDescription: "🔔 Miko Event ! 3-5 มกราคม 2025 🎌",
-    fullDescription: "☀️ต้อนรับปีใหม่ด้วยหญิงสาวบริสุทธิ์ผู้มากความสามารถในชุดสีขาวแดง ♪\n\n🔺ร้าน Black Neko จะเต็มไปด้วยสาวๆมิโกะที่เก่งกาจ! พร้อมทั้งโปรโมชั่นสุดพิเศษอีกมากมาย! แล้วเจอกันนะเมี้ยวว ٩( ’ω’ )و\n\n__________\n\n📌มาร่วมสนุกได้ที่ร้าน Black Neko ชั้น 7 MBK อยู่ติดลิฟท์แก้วฝั่ง BTS สนามกีฬาแห่งชาติ🚈\n\n#Blacknekombk #Blackneko #maidecafe #BlackNeko #MBK #blacknekomaidcafe #blacknekomaidcafeandbar #mbkcenter #mbkcenterbangkok ",
-    date: "2025-01-02",
-    image: image15
-  }
-];
-
-// Define all months in order for the dropdown
+// ALL_MONTHS_ORDER สามารถคงไว้ หรือจะสร้างแบบ dynamic จากข้อมูลที่ได้มาก็ได้
 const ALL_MONTHS_ORDER = [
   "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
   "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
 ];
 
-/**
- * Event Card Component
- * Displays a single event in a card format.
- */
 const EventCard = ({ event, onCardClick, opacity }) => (
   <div
-    className="bg-white dark:bg-black rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 dark:border-gray-700 cursor-pointer"
-    style={{ opacity: opacity, transition: 'opacity 0.5s ease-in-out' }}
+    className="bg-white dark:bg-black rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] border border-gray-200 dark:border-gray-700 cursor-pointer group overflow-hidden"
+    style={{ opacity: opacity, transitionProperty: 'opacity, transform, box-shadow' }}
     onClick={() => onCardClick(event)}
   >
-    <div className="relative">
+    <div className="relative overflow-hidden">
       <img
-        src={event.image}
+        src={event.image} // จะเป็น image_url จาก Supabase
         alt={event.title}
-        className="w-full h-72 object-cover object-center"
+        className="w-full h-64 object-cover object-center transition-transform duration-500 group-hover:scale-110"
       />
-      <span className="absolute top-3 right-3 bg-black/60 text-white text-xs font-semibold rounded-full px-2.5 py-1 backdrop-blur-sm shadow-md">
-        {new Date(event.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
+      <span className="absolute top-4 right-4 bg-black/80 text-white text-xs font-medium rounded-full px-3 py-1.5 backdrop-blur-sm shadow-md flex items-center gap-1.5">
+        <FaCalendarAlt />
+        {new Date(event.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}
       </span>
     </div>
     <div className="p-5">
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 mb-2">{event.title}</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">{event.shortDescription}</p>
+      <h3 className="text-lg font-semibold text-black dark:text-white line-clamp-2 mb-2 h-14">
+        {event.title}
+      </h3>
+      <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed mb-4 h-[4.5rem]">
+        {event.shortDescription}
+      </p>
       <button
-        className="mt-4 text-black dark:text-white hover:text-gray-800 dark:hover:text-gray-300 focus:outline-none text-sm font-medium transition-colors duration-200"
+        type="button" // เพิ่ม type="button"
+        className="inline-flex items-center gap-2 text-sm font-medium text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 group/button"
       >
         อ่านเพิ่มเติม
+        <FaArrowRight className="transform transition-transform duration-200 group-hover/button:translate-x-1" />
       </button>
     </div>
   </div>
 );
 
-/**
- * Event Detail Popup Component
- * Displays full details of a selected event in a modal.
- */
 const EventDetailPopup = ({ event, onClose }) => {
   if (!event) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 animate-fade-in">
-      <div className="bg-white dark:bg-black rounded-2xl shadow-2xl max-w-3xl w-full mx-auto my-8 relative max-h-[90vh] overflow-y-auto transform scale-95 animate-scale-in border border-gray-200 dark:border-gray-700/80">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-white transition duration-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800"
-          aria-label="Close"
-        >
-          <FaTimes size={22} />
-        </button>
-        <img
-          src={event.image}
-          alt={event.title}
-          className="w-full h-80 object-cover object-center rounded-t-2xl"
-        />
-        <div className="p-6 md:p-8">
-          <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{event.title}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-fade-in">
+      <div className="bg-white dark:bg-black rounded-xl shadow-2xl max-w-2xl w-full mx-auto my-8 relative max-h-[90vh] flex flex-col transform scale-95 animate-scale-in border border-gray-300 dark:border-gray-700">
+        <div className="relative">
+          <img
+            src={event.image} // จะเป็น image_url จาก Supabase
+            alt={event.title}
+            className="w-full h-72 object-cover object-center rounded-t-xl"
+          />
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 text-gray-700 bg-white/70 hover:bg-white dark:text-gray-300 dark:bg-black/70 dark:hover:bg-black transition duration-200 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-black"
+            aria-label="Close"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
+        <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-grow">
+          <h3 className="text-2xl font-bold text-black dark:text-white mb-2">{event.title}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex items-center gap-2">
+            <FaCalendarAlt />
             วันที่: {new Date(event.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
-          <div className="prose prose-sm max-w-none text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+          <div className="prose prose-sm max-w-none text-gray-800 dark:text-gray-200 dark:prose-invert leading-relaxed whitespace-pre-wrap">
             {event.fullDescription}
           </div>
         </div>
@@ -275,87 +84,183 @@ const EventDetailPopup = ({ event, onClose }) => {
   );
 };
 
-/**
- * NewsAndEventNavBar Component
- * Main component for displaying news and events.
- */
-const NewsAndEventNavBar = () => {
-  const [activeMonth, setActiveMonth] = useState("พฤษภาคม"); // Default to May
-  const [contentOpacity, setContentOpacity] = useState(0); // State for fade transition
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+const NewsAndEventNavBar = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const [activeMonth, setActiveMonth] = useState(""); // เริ่มต้นเป็นค่าว่าง หรือเดือนปัจจุบัน
+  const [contentOpacity, setContentOpacity] = useState(0);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // Group events by month and sort them by date (latest first)
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // *** ตรวจสอบว่าชื่อตารางและคอลัมน์ตรงกับใน Supabase ของคุณ ***
+        const { data, error: fetchError } = await supabase
+          .from('events') // ชื่อตาราง events
+          .select('id, title, description, short_description, image_url, event_date') // เพิ่ม short_description ถ้ามี
+          .order('event_date', { ascending: false }); // เรียงจาก event ใหม่สุดไปเก่าสุด
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        const processedEvents = data.map(event => {
+          const dateObj = new Date(event.event_date);
+          // สร้างชื่อเดือนภาษาไทย
+          const month = dateObj.toLocaleDateString('th-TH', { month: 'long' }); 
+          
+          // จัดการ shortDescription
+          // ถ้ามีคอลัมน์ short_description ใน database:
+          const shortDesc = event.short_description || (event.description ? event.description.substring(0, 120) + (event.description.length > 120 ? '...' : '') : '');
+          // หรือถ้าไม่มี ก็สร้างจาก description:
+          // const shortDesc = event.description ? event.description.substring(0, 120) + (event.description.length > 120 ? '...' : '') : '';
+
+          return {
+            id: event.id,
+            title: event.title,
+            date: event.event_date, // เก็บวันที่ original ไว้ใช้ sort
+            month: month,          // เดือนภาษาไทย
+            image: event.image_url,  // URL รูปจาก Supabase Storage
+            fullDescription: event.description,
+            shortDescription: shortDesc,
+          };
+        });
+        setEvents(processedEvents);
+        if (processedEvents.length > 0 && !activeMonth) {
+          setActiveMonth(processedEvents[0].month); // ตั้งเดือนแรกเป็นเดือนของ Event ล่าสุด
+        } else if (processedEvents.length === 0 && !activeMonth) {
+            // หากไม่มี events เลย อาจตั้งเป็นเดือนปัจจุบัน หรือเดือนแรกใน ALL_MONTHS_ORDER
+            const currentMonthName = new Date().toLocaleDateString('th-TH', { month: 'long' });
+            setActiveMonth(ALL_MONTHS_ORDER.includes(currentMonthName) ? currentMonthName : ALL_MONTHS_ORDER[0]);
+        }
+
+      } catch (err) {
+        console.error("Error fetching events from Supabase:", err);
+        setError(err.message || 'ไม่สามารถโหลดข้อมูล Event ได้');
+      }
+      setLoading(false);
+    };
+
+    fetchEvents();
+  }, [activeMonth]); // เอา activeMonth ออกจาก dependency array ถ้าไม่ต้องการให้ fetch ใหม่ทุกครั้งที่ activeMonth เปลี่ยนจากค่าเริ่มต้น
+
   const groupedEvents = useMemo(() => {
-    const eventsMap = allNewsAndEvents.reduce((acc, event) => {
+    if (!events.length) return {};
+    const eventsMap = events.reduce((acc, event) => {
       if (!acc[event.month]) acc[event.month] = [];
       acc[event.month].push(event);
       return acc;
     }, {});
-
-    // Sort events within each month by date in descending order
-    for (const month in eventsMap) {
-      eventsMap[month].sort((a, b) => new Date(b.date) - new Date(a.date));
-    }
+    // การเรียงข้อมูลในแต่ละเดือนทำแล้วตอน query จาก Supabase (.order('event_date', ...))
+    // แต่ถ้าต้องการเรียงอีกครั้งเพื่อให้แน่ใจ ก็ทำได้:
+    // for (const month in eventsMap) {
+    //   eventsMap[month].sort((a, b) => new Date(b.date) - new Date(a.date));
+    // }
     return eventsMap;
-  }, []);
+  }, [events]);
 
-  // Get events for the currently active month
   const eventsForActiveMonth = useMemo(() => {
     return groupedEvents[activeMonth] || [];
   }, [activeMonth, groupedEvents]);
+  
+  // สร้างรายการเดือนที่มี Events จริงๆ สำหรับ Dropdown (ทางเลือก)
+  const availableMonths = useMemo(() => {
+    const monthSet = new Set(events.map(e => e.month));
+    return ALL_MONTHS_ORDER.filter(m => monthSet.has(m));
+  }, [events]);
 
-  // Handle month selection from the dropdown
+
   const handleMonthChange = useCallback((month) => {
-    setActiveMonth(month);
-    setIsDropdownOpen(false); // Close dropdown after selection
+    setContentOpacity(0); 
+    setTimeout(() => { 
+      setActiveMonth(month);
+    }, 150); 
+    setIsDropdownOpen(false);
   }, []);
 
-  // Function to open the popup with selected event data
   const openEventPopup = useCallback((event) => {
     setSelectedEvent(event);
     setShowPopup(true);
+    document.body.style.overflow = 'hidden';
   }, []);
 
-  // Function to close the popup
   const closeEventPopup = useCallback(() => {
     setShowPopup(false);
     setSelectedEvent(null);
+    document.body.style.overflow = 'auto'; 
   }, []);
 
-  // Effect for smooth opacity transition when activeMonth changes
   useEffect(() => {
-    setContentOpacity(0); // Fade out current content
     const timer = setTimeout(() => {
-      setContentOpacity(1); // Fade in new content
-    }, 100); // Short delay for fade-out effect before new content appears
+      setContentOpacity(1);
+    }, 50); 
+    return () => clearTimeout(timer);
+  }, [activeMonth, eventsForActiveMonth]); 
 
-    return () => clearTimeout(timer); // Cleanup timeout
-  }, [activeMonth]);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest('.month-selector-wrapper')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
+  
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-black min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-700 dark:text-gray-300">กำลังโหลดข้อมูลกิจกรรม...</p>
+        {/* คุณสามารถเพิ่ม Spinner component ที่นี่ได้ */}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-black min-h-screen flex flex-col items-center justify-center p-4">
+        <p className="text-xl text-red-500 dark:text-red-400 mb-4">เกิดข้อผิดพลาด</p>
+        <p className="text-md text-gray-700 dark:text-gray-300 text-center">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} // ง่ายสุดคือ reload page
+          className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          ลองใหม่
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white dark:bg-black min-h-screen py-10 sm:py-24">
+    <div className="bg-white dark:bg-black min-h-screen py-12 sm:py-20 transition-colors duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 sm:mb-0">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-10 sm:mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-black dark:text-white mb-6 sm:mb-0">
             Events & Updates
           </h2>
-          <div className="relative">
+          <div className="relative month-selector-wrapper">
             <button
-              className="inline-flex items-center gap-2 bg-white dark:bg-black text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-base font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors duration-200"
+              type="button"
+              className="inline-flex items-center gap-2.5 bg-white dark:bg-black text-black dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-black transition-all duration-200"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
-              Month: <span className="font-semibold">{activeMonth}</span> <FaChevronDown className="text-sm ml-1" />
+              Month: <span className="font-semibold">{activeMonth || "เลือกเดือน"}</span>
+              <FaChevronDown className={`text-xs ml-1 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
             {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-40 bg-white dark:bg-black rounded-lg shadow-xl z-20 border border-gray-200 dark:border-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
-                {ALL_MONTHS_ORDER.map((month) => (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-black rounded-lg shadow-xl z-20 border border-gray-200 dark:border-gray-700 max-h-72 overflow-y-auto custom-scrollbar animate-fade-in-short">
+                {(availableMonths.length > 0 ? availableMonths : ALL_MONTHS_ORDER).map((month) => ( // ใช้ availableMonths ถ้ามีข้อมูล หรือ ALL_MONTHS_ORDER ถ้ายังไม่มี
                   <button
+                    type="button"
                     key={month}
-                    className={`block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm w-full text-left transition-colors duration-150 ${activeMonth === month ? 'bg-gray-200 dark:bg-gray-700 font-semibold' : ''}`}
+                    className={`block px-4 py-2.5 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm w-full text-left transition-colors duration-150 ${activeMonth === month ? 'bg-gray-200 dark:bg-gray-700 font-semibold text-black dark:text-white' : ''}`}
                     onClick={() => handleMonthChange(month)}
                   >
                     {month}
@@ -366,33 +271,61 @@ const NewsAndEventNavBar = () => {
           </div>
         </div>
 
-        {/* Events Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {eventsForActiveMonth.length > 0 ? (
-            eventsForActiveMonth.map((item) => (
+        {eventsForActiveMonth.length > 0 ? (
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            {eventsForActiveMonth.map((item) => (
               <EventCard
-                key={item.id}
+                key={item.id} 
                 event={item}
                 onCardClick={openEventPopup}
-                opacity={contentOpacity}
+                opacity={contentOpacity} 
               />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-16 text-gray-600 dark:text-gray-400">
-              <p className="text-xl font-medium mb-2">No events found for {activeMonth}.</p>
-              <p>Please select another month or check back later!</p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            className="col-span-full text-center py-20 text-gray-600 dark:text-gray-400 transition-opacity duration-500 ease-in-out"
+            style={{ opacity: contentOpacity }} 
+          >
+            <FaCalendarAlt className="mx-auto text-5xl text-gray-400 dark:text-gray-500 mb-4" />
+            <p className="text-xl font-medium mb-2">ไม่มีกิจกรรมสำหรับเดือน {activeMonth || "นี้"}</p>
+            <p className="text-sm">กรุณาเลือกเดือนอื่น หรือกลับมาตรวจสอบใหม่ภายหลัง</p>
+          </div>
+        )}
 
-        {/* Popup for full event details */}
-        <EventDetailPopup
-          event={selectedEvent}
-          onClose={closeEventPopup}
-        />
+        {showPopup && selectedEvent && ( 
+            <EventDetailPopup
+            event={selectedEvent}
+            onClose={closeEventPopup}
+            />
+        )}
       </div>
     </div>
   );
 };
 
 export default NewsAndEventNavBar;
+
+// --- ส่วน Animation Keyframes และ Plugins (เหมือนเดิม) ---
+// อย่าลืมเพิ่ม keyframes และ plugins ในไฟล์ CSS หลัก หรือ tailwind.config.js ของคุณ
+// ตัวอย่าง (ใน tailwind.config.js):
+/*
+theme: {
+  extend: {
+    keyframes: {
+      fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+      fadeInShort: { '0%': { opacity: '0', transform: 'translateY(-10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+      scaleIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+    },
+    animation: {
+      'fade-in': 'fadeIn 0.3s ease-out forwards',
+      'fade-in-short': 'fadeInShort 0.2s ease-out forwards',
+      'scale-in': 'scaleIn 0.3s ease-out forwards',
+    },
+  },
+},
+plugins: [
+  require('@tailwindcss/line-clamp'),
+  require('@tailwindcss/typography'),
+],
+*/

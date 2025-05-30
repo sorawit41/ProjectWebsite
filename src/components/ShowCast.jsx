@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaTimes, FaCat, FaMapMarkerAlt, FaDumbbell, FaUtensils, FaHeart, FaPalette, FaSmile } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import { FaTimes, FaCat, FaMapMarkerAlt, FaDumbbell, FaUtensils, FaHeart, FaPalette, FaSmile, FaSyncAlt } from 'react-icons/fa'; // Added FaSyncAlt for the button icon
 
 // Assuming these assets are correctly imported from your project structure
 import narin from "../assets/cast/image.png";
@@ -59,51 +59,77 @@ const DetailItem = ({ icon: Icon, label, value, iconColorClass }) => {
     );
 };
 
+const shuffleArray = (array) => { // Moved shuffleArray outside to be reusable
+    let currentIndex = array.length, randomIndex;
+    const newArray = [...array]; // Create a new array to avoid mutating the original
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
+    }
+    return newArray;
+};
+
 const Cast = () => {
     const [initialAllCast] = useState([...castData]);
     const [displayedCast, setDisplayedCast] = useState([]);
-    
     const [selectedUser, setSelectedUser] = useState(null);
     const [fadeIn, setFadeIn] = useState(false);
+    const [isShuffling, setIsShuffling] = useState(false); // To manage shuffle animation
+
+    const loadRandomCast = useCallback(() => {
+        if (initialAllCast.length > 0) {
+            setIsShuffling(true); // Start shuffling animation
+            setFadeIn(false); // Fade out current cast
+
+            setTimeout(() => { // Allow fade-out animation to complete
+                const shuffled = shuffleArray(initialAllCast);
+                setDisplayedCast(shuffled.slice(0, Math.min(3, shuffled.length)));
+                setFadeIn(true); // Fade in new cast
+                setIsShuffling(false); // End shuffling animation
+            }, 300); // Adjust timeout duration as needed for fade effect
+        }
+    }, [initialAllCast]);
+
 
     useEffect(() => {
-        const shuffleArray = (array) => {
-            let currentIndex = array.length, randomIndex;
-            const newArray = [...array];
-            while (currentIndex !== 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
-            }
-            return newArray;
-        };
+        loadRandomCast(); // Load initial cast
 
-        if (initialAllCast.length > 0) {
-            const shuffled = shuffleArray(initialAllCast);
-            setDisplayedCast(shuffled.slice(0, Math.min(3, shuffled.length)));
-        }
-
-        const timer = setTimeout(() => setFadeIn(true), 50);
-        return () => clearTimeout(timer);
-    }, [initialAllCast]);
+        // This timer is for the initial page load fade-in, can be combined or kept separate
+        const pageLoadTimer = setTimeout(() => setFadeIn(true), 50); // Initial fade-in for the whole component
+        return () => clearTimeout(pageLoadTimer);
+    }, [loadRandomCast]); // Add loadRandomCast to dependency array
 
     const openUserModal = (user) => setSelectedUser(user);
     const closeUserModal = () => setSelectedUser(null);
 
+    const handleReshuffle = () => {
+        loadRandomCast();
+    };
+
     return (
         <div className="py-16 pt-20 md:pt-24 bg-transparent min-h-screen text-gray-900 transition-colors duration-500">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-10 text-center"> {/* This margin controls space above the grid now */}
+                <div className="mb-8 text-center"> {/* Adjusted margin */}
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 pb-2">
                         ลองทำความรู้จักน้องแมวของเรา
                     </h1>
+                    {/* Reshuffle Button */}
+                    {initialAllCast.length >= 3 && ( // Only show button if there are enough cats to reshuffle
+                        <button
+                            onClick={handleReshuffle}
+                            disabled={isShuffling} // Disable button during shuffling
+                            className={`mt-4 px-6 py-2.5 text-sm font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out flex items-center justify-center mx-auto
+                                        ${isShuffling ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white hover:shadow-lg transform hover:-translate-y-0.5'}`}
+                        >
+                            <FaSyncAlt className={`mr-2 ${isShuffling ? 'animate-spin' : ''}`} />
+                            {isShuffling ? 'กำลังสุ่ม...' : 'สุ่มน้องแมวใหม่'}
+                        </button>
+                    )}
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-8">
                     <main className="w-full">
-                        {/* The div holding the "Showing..." text and sort dropdown has been removed */}
-                        {/* If specific spacing is needed here, you can add a mb-6 to this main or mt-6 to the grid below */}
-
                         <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6 transition-opacity duration-700 ease-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
                             {displayedCast.length > 0 ? (
                                 displayedCast.map((user, index) => (
@@ -115,7 +141,7 @@ const Cast = () => {
                                         style={{
                                             opacity: fadeIn ? 1 : 0,
                                             transform: fadeIn ? 'translateY(0)' : 'translateY(20px)',
-                                            transitionDelay: `${fadeIn ? (index % 15) * 0.04 : 0}s`,
+                                            transitionDelay: `${fadeIn ? (index % 15) * 0.04 : 0}s`, // Staggered animation
                                             transitionProperty: 'opacity, transform',
                                             transitionDuration: '0.5s, 0.3s',
                                         }}
@@ -142,9 +168,9 @@ const Cast = () => {
                                 <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-16 text-xl flex flex-col items-center justify-center">
                                     <FaCat size={60} className="mb-4 text-gray-400 dark:text-zinc-600"/>
                                     <p className="font-semibold text-2xl mb-2 text-gray-600 dark:text-gray-300">
-                                        {initialAllCast.length > 0 ? "Selecting random cats..." : "No cast members data available"}
+                                        {initialAllCast.length > 0 ? "กำลังเลือกน้องแมว..." : "ไม่มีข้อมูลน้องแมว"}
                                     </p>
-                                    {initialAllCast.length === 0 && <p>Please check the cast data.</p>}
+                                    {initialAllCast.length === 0 && <p>กรุณาตรวจสอบข้อมูล cast</p>}
                                 </div>
                             )}
                         </div>

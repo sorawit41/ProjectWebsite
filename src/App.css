@@ -1,8 +1,16 @@
+/* src/index.css หรือ src/App.css */
+
+/* 1. Tailwind CSS Directives (ควรอยู่บนสุด) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 2. สไตล์ที่คุณให้มา (ส่วนที่ไม่ใช่ @apply สำหรับ body) */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 1280px;  /* สไตล์นี้ถูกเปิดใช้งาน */
+  margin: 0 auto;     /* สไตล์นี้ถูกเปิดใช้งาน */
+  /* padding: 2rem; */
+  /* text-align: center; */
 }
 
 .logo {
@@ -28,19 +36,40 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  /* a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
-  }
+  } */
 }
 
-.card {
+.info-card {
   padding: 2em;
 }
 
 .read-the-docs {
   color: #888;
 }
+
+/* 3. สไตล์สำหรับ Body (ใช้ @apply ของ Tailwind) */
 body {
-  @apply bg-white text-black dark:bg-black dark:text-white;
+  @apply bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* 4. สไตล์เพิ่มเติมที่เราใช้สำหรับ Card Animation (คงไว้) */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; /* สำหรับ Safari */
+}

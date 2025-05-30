@@ -23,6 +23,12 @@ const LogoutIcon = () => (
   </svg>
 );
 
+const DeleteIcon = () => ( // ไอคอนใหม่สำหรับลบบัญชี
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+);
+
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -34,6 +40,8 @@ const ProfilePage = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
 
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false); // State ใหม่
+
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode ? JSON.parse(savedMode) : false;
@@ -43,10 +51,6 @@ const ProfilePage = () => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
-
-  // Optional: Add a toggle function if you have a dark mode switch in the UI
-  // const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
 
   useEffect(() => {
     if (!selectedFile) {
@@ -72,18 +76,18 @@ const ProfilePage = () => {
           .eq('id', authUser.id)
           .single();
 
-        if (profileError && profileError.code !== 'PGRST116') {
+        if (profileError && profileError.code !== 'PGRST116') { // PGRST116: no rows found, which is fine for new users
           console.error('Error fetching profile:', profileError);
         } else {
           setProfile(profileData || {});
-          if (profileData?.avatar_url && !selectedFile) {
+          if (profileData?.avatar_url && !selectedFile) { // Only set from profile if no file is selected
             setAvatarPreview(profileData.avatar_url);
           }
         }
       }
     };
     fetchUserAndProfile();
-  }, [navigate, selectedFile]); // `selectedFile` dependency here might be redundant if avatar_url is only from profile
+  }, [navigate]); // Removed selectedFile dependency as it was causing re-fetch, avatarPreview handles its changes
 
   const handleUpdateProfile = async (event) => {
     event.preventDefault();
@@ -114,7 +118,7 @@ const ProfilePage = () => {
   const handleFileChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB Limit
         alert("ขนาดไฟล์เกิน 2MB กรุณาเลือกไฟล์ใหม่");
         event.target.value = null; setSelectedFile(null); return;
       }
@@ -125,6 +129,7 @@ const ProfilePage = () => {
       setSelectedFile(file);
     } else {
       setSelectedFile(null);
+      // Revert to profile avatar or null if no file is selected
       if (profile?.avatar_url) setAvatarPreview(profile.avatar_url); else setAvatarPreview(null);
     }
   };
@@ -135,20 +140,37 @@ const ProfilePage = () => {
     }
     setIsUploadingAvatar(true);
     const fileExt = selectedFile.name.split('.').pop();
-    const fileName = `avatar_${Date.now()}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
+    const fileName = `avatar_${user.id}_${Date.now()}.${fileExt}`; // More unique filename
+    const filePath = `${user.id}/${fileName}`; // Store files in a user-specific folder
 
     try {
-      const { error: uploadError } = await supabase.storage.from(BUCKET_NAME).upload(filePath, selectedFile, { cacheControl: '3600', upsert: true });
+      // Remove old avatar if exists and a new one is being uploaded
+      if (profile?.avatar_url) {
+        const oldAvatarUrlParts = profile.avatar_url.split(`${BUCKET_NAME}/`);
+        if (oldAvatarUrlParts.length > 1) {
+          const oldAvatarPathWithQuery = oldAvatarUrlParts[1];
+          const oldAvatarPath = oldAvatarPathWithQuery.split('?')[0];
+          if (oldAvatarPath && oldAvatarPath !== filePath) { // Don't remove if it's somehow the same path
+            await supabase.storage.from(BUCKET_NAME).remove([oldAvatarPath]);
+          }
+        }
+      }
+      
+      const { error: uploadError } = await supabase.storage.from(BUCKET_NAME).upload(filePath, selectedFile, { cacheControl: '3600', upsert: false }); // upsert: false ensures new file, true might overwrite if names collide unexpectedly
       if (uploadError) throw uploadError;
+      
       const { data: publicURLData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath);
-      const timestampedAvatarUrl = `${publicURLData.publicUrl}?t=${new Date().getTime()}`;
+      const timestampedAvatarUrl = `${publicURLData.publicUrl}?t=${new Date().getTime()}`; // Cache busting
+
       const { error: updateProfileError } = await supabase.from('profiles').update({ avatar_url: timestampedAvatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
       if (updateProfileError) throw updateProfileError;
+      
       setProfile(prev => ({ ...prev, avatar_url: timestampedAvatarUrl, updated_at: new Date().toISOString() }));
-      setSelectedFile(null);
-      setAvatarPreview(timestampedAvatarUrl); // Ensure preview updates to the new Supabase URL
+      setSelectedFile(null); // Clear selected file
+      setAvatarPreview(timestampedAvatarUrl); // Update preview to the new Supabase URL
+      if (fileInputRef.current) fileInputRef.current.value = ""; // Reset file input
       alert("อัปโหลดรูปโปรไฟล์สำเร็จ!");
+
     } catch (error) {
       console.error("Error uploading avatar:", error);
       alert(`เกิดข้อผิดพลาดในการอัปโหลดรูป: ${error.message || String(error)}`);
@@ -161,6 +183,95 @@ const ProfilePage = () => {
     const { error } = await supabase.auth.signOut();
     if (error) alert('เกิดข้อผิดพลาดในการออกจากระบบ: ' + error.message);
     else navigate('/LoginPage');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) {
+        alert("ไม่พบข้อมูลผู้ใช้");
+        return;
+    }
+
+    const confirmation = window.confirm(
+        "คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ?\n\n" +
+        "การดำเนินการนี้จะลบข้อมูลโปรไฟล์และรูปภาพ Avatar ของคุณออกจากระบบอย่างถาวร และไม่สามารถกู้คืนได้\n\n" +
+        "หมายเหตุ: การดำเนินการนี้จะลบข้อมูลโปรไฟล์และไฟล์ Avatar ของคุณ และทำการออกจากระบบ บัญชีผู้ใช้ (Auth User) ของคุณอาจยังคงอยู่ในระบบยืนยันตัวตน และอาจต้องมีการดำเนินการเพิ่มเติมจากผู้ดูแลระบบหรือผ่านฟังก์ชันเฉพาะในการลบออกจากระบบยืนยันตัวตนอย่างสมบูรณ์"
+    );
+
+    if (!confirmation) {
+        return;
+    }
+
+    setIsDeletingAccount(true);
+    console.log(`Attempting to delete account for user ID: ${user.id}`);
+
+    try {
+        // 1. Delete avatar from storage (if exists)
+        if (profile?.avatar_url) {
+            console.log(`Attempting to delete avatar: ${profile.avatar_url}`);
+            const avatarUrlParts = profile.avatar_url.split(`${BUCKET_NAME}/`);
+            if (avatarUrlParts.length > 1) {
+                const avatarPathWithQuery = avatarUrlParts[1];
+                const avatarPath = avatarPathWithQuery.split('?')[0]; // Remove query params
+                if (avatarPath) {
+                    const { error: storageError } = await supabase.storage.from(BUCKET_NAME).remove([avatarPath]);
+                    if (storageError) {
+                        console.warn("Could not delete avatar from storage:", storageError);
+                        // Non-critical, proceed with account deletion
+                    } else {
+                        console.log("Avatar deleted from storage successfully or was not found.");
+                    }
+                }
+            }
+        } else {
+            console.log("No avatar_url found in profile, skipping avatar deletion.");
+        }
+
+        // 2. Delete profile from 'profiles' table
+        console.log(`Attempting to delete profile for user ID: ${user.id} from 'profiles' table.`);
+        const { data: deletedProfileData, error: profileDeleteError } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', user.id)
+            .select(); // <--- เพิ่ม .select() เพื่อดูผลลัพธ์
+
+        if (profileDeleteError) {
+            console.error('Error object from profile delete:', JSON.stringify(profileDeleteError, null, 2));
+            // PGRST116: "Not Found" - no row was found. This means the profile might have already been deleted or never existed for this user.id
+            if (profileDeleteError.code === 'PGRST116') {
+                alert('ไม่พบข้อมูลโปรไฟล์ที่จะลบ หรืออาจถูกลบไปแล้ว (Code: PGRST116)');
+            } else {
+                // Other errors, possibly RLS or database errors
+                throw new Error(`เกิดข้อผิดพลาดในการลบข้อมูลโปรไฟล์: ${profileDeleteError.message} (Code: ${profileDeleteError.code})`);
+            }
+        } else {
+            // No error, check if data was returned (meaning something was deleted)
+            if (deletedProfileData && deletedProfileData.length > 0) {
+                console.log('Profile deleted successfully from table:', deletedProfileData);
+                alert('ข้อมูลโปรไฟล์ถูกลบเรียบร้อยแล้ว');
+            } else {
+                console.log('Profile delete operation reported success, but no rows were returned. This might mean RLS prevented the delete, or the profile did not exist.');
+                alert('การดำเนินการลบโปรไฟล์เสร็จสิ้น แต่ไม่พบข้อมูลโปรไฟล์ที่ตรงกัน หรือ RLS policy อาจไม่อนุญาตให้ลบ');
+            }
+        }
+        
+        // 3. Sign out the user
+        // (Rest of the code for signing out and navigating)
+        alert("ข้อมูลโปรไฟล์และรูปภาพ Avatar (ถ้ามี) ได้รับการจัดการแล้ว ระบบจะทำการออกจากระบบ");
+
+        const { error: signOutError } = await supabase.auth.signOut();
+        if (signOutError) {
+            console.error("Error signing out after account data deletion:", signOutError);
+            // Still navigate away as their data is gone or they intended to delete.
+        }
+        
+        navigate('/LoginPage');
+
+    } catch (error) {
+        console.error("Error during account deletion process:", error);
+        alert(`เกิดข้อผิดพลาดในระหว่างการลบบัญชี: ${error.message}`);
+    } finally {
+        setIsDeletingAccount(false);
+    }
   };
 
   const formatDate = (isoString) => {
@@ -227,14 +338,14 @@ const ProfilePage = () => {
 
 
   return (
-<div className="min-h-screen bg-white dark:bg-slate-900 py-20 px-4 sm:px-6 lg:px-8 font-inter transition-colors duration-300">
+<div className="min-h-screen bg-white dark:bg-slate-900 py-12 sm:py-20 px-4 sm:px-6 lg:px-8 font-inter transition-colors duration-300">
     <div className="container mx-auto max-w-screen-xl">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100">
             ตั้งค่าโปรไฟล์
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            จัดการข้อมูลส่วนตัวและข้อมูลบัญชีของคุณ
+            จัดการข้อมูลส่วนตัวและข้อมูลบัญชีของคุณ (ไม่มีการเผยแพร่ข้อมูลส่วนบุคคลสู่สาธารณะ)
           </p>
         </header>
 
@@ -252,7 +363,7 @@ const ProfilePage = () => {
                 </div>
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploadingAvatar}
+                  disabled={isUploadingAvatar || isDeletingAccount}
                   className="absolute inset-0 w-full h-full bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
                   title="เปลี่ยนรูปโปรไฟล์"
                 >
@@ -262,13 +373,14 @@ const ProfilePage = () => {
               <input
                 type="file" accept="image/jpeg, image/png, image/gif"
                 ref={fileInputRef} onChange={handleFileChange}
-                className="hidden" disabled={isUploadingAvatar}
+                className="hidden" disabled={isUploadingAvatar || isDeletingAccount}
               />
               
               {selectedFile && !isUploadingAvatar && (
                 <button
                   onClick={handleAvatarUpload}
-                  className="w-full mt-3 mb-2 py-2 px-4 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors duration-300 shadow flex items-center justify-center"
+                  disabled={isDeletingAccount}
+                  className="w-full mt-3 mb-2 py-2 px-4 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors duration-300 shadow flex items-center justify-center disabled:opacity-50"
                 >
                   <SaveIcon /> บันทึกรูปนี้
                 </button>
@@ -293,7 +405,8 @@ const ProfilePage = () => {
 
               <button
                 onClick={handleLogout}
-                className="w-full mt-6 py-2.5 px-4 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors duration-300 shadow flex items-center justify-center"
+                disabled={isDeletingAccount}
+                className="w-full mt-6 py-2.5 px-4 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors duration-300 shadow flex items-center justify-center disabled:opacity-50"
               >
                 <LogoutIcon /> ออกจากระบบ
               </button>
@@ -303,7 +416,6 @@ const ProfilePage = () => {
           {/* --- Right Column (Main Content) --- */}
           <main className="lg:w-2/3 xl:w-3/4">
             <form onSubmit={handleUpdateProfile} className="bg-white dark:bg-slate-800/70 backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-xl space-y-8">
-              {/* Personal Information Section */}
               <section>
                 <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-1">ข้อมูลส่วนตัว</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">อัปเดตข้อมูลส่วนตัวของคุณที่นี่</p>
@@ -315,7 +427,6 @@ const ProfilePage = () => {
                 </div>
               </section>
 
-              {/* Bio Section */}
               <section>
                 <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-1">เกี่ยวกับฉัน (Bio)</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">เล่าเรื่องราวเกี่ยวกับตัวคุณให้คนอื่นได้รู้จัก</p>
@@ -325,7 +436,7 @@ const ProfilePage = () => {
               <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-end">
                 <button
                   type="submit"
-                  disabled={isUploadingAvatar}
+                  disabled={isUploadingAvatar || isDeletingAccount}
                   className="py-2.5 px-6 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-base font-medium transition-colors duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 dark:focus:ring-offset-slate-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
                 >
                   <SaveIcon /> บันทึกการเปลี่ยนแปลง
@@ -333,25 +444,56 @@ const ProfilePage = () => {
               </div>
             </form>
 
-            {/* Account Information Section */}
             <section className="mt-8 bg-white dark:bg-slate-800/70 backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-xl">
               <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-1">ข้อมูลบัญชี</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">ข้อมูลเหล่านี้ไม่สามารถแก้ไขได้</p>
               <div className="space-y-4 text-sm">
-                <div className="flex justify-between">
+                <div className="flex justify-between flex-col sm:flex-row">
                   <span className="font-medium text-slate-600 dark:text-slate-400">User ID (UID):</span>
-                  <span className="text-slate-700 dark:text-slate-300 break-all text-right">{user.id}</span>
+                  <span className="text-slate-700 dark:text-slate-300 break-all text-left sm:text-right">{user.id}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between flex-col sm:flex-row">
                   <span className="font-medium text-slate-600 dark:text-slate-400">ลงทะเบียนเมื่อ:</span>
-                  <span className="text-slate-700 dark:text-slate-300">{formatDate(user.created_at)}</span>
+                  <span className="text-slate-700 dark:text-slate-300 text-left sm:text-right">{formatDate(user.created_at)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between flex-col sm:flex-row">
                   <span className="font-medium text-slate-600 dark:text-slate-400">อัปเดตโปรไฟล์ล่าสุด:</span>
-                  <span className="text-slate-700 dark:text-slate-300">{formatDate(profile?.updated_at)}</span>
+                  <span className="text-slate-700 dark:text-slate-300 text-left sm:text-right">{formatDate(profile?.updated_at)}</span>
                 </div>
               </div>
             </section>
+
+            {/* --- Delete Account Section (Danger Zone) --- */}
+            <section className="mt-8 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700/50 p-6 sm:p-8 rounded-xl shadow-xl">
+                <div className="flex items-center mb-3">
+                    <DeleteIcon />
+                    <h3 className="text-xl font-semibold text-red-700 dark:text-red-400 ml-1">
+                        ลบบัญชี (Danger Zone)
+                    </h3>
+                </div>
+                <p className="text-sm text-red-600 dark:text-red-300 mb-5">
+                    การดำเนินการนี้จะเป็นการลบข้อมูลโปรไฟล์และรูปภาพ Avatar ของคุณอย่างถาวร และไม่สามารถกู้คืนได้
+                    โปรดทราบว่าการลบบัญชีผู้ใช้ (Auth User) โดยสมบูรณ์จากระบบยืนยันตัวตนของ Supabase อาจจำเป็นต้องดำเนินการผ่าน Supabase Edge Function หรือโดยผู้ดูแลระบบ
+                </p>
+                <button
+                    onClick={handleDeleteAccount}
+                    disabled={isUploadingAvatar || isDeletingAccount}
+                    className="w-full sm:w-auto py-2.5 px-6 bg-red-600 hover:bg-red-700 text-white rounded-lg text-base font-medium transition-colors duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-900 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                    {isDeletingAccount ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            กำลังลบบัญชี...
+                        </>
+                    ) : (
+                        <> <DeleteIcon /> ลบบัญชีของฉันอย่างถาวร </>
+                    )}
+                </button>
+            </section>
+
           </main>
         </div>
       </div>

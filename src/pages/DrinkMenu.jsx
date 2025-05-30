@@ -29,12 +29,6 @@ const DrinkMenu = () => {
       <img src={image13} alt="Food Menu 13" style={imageStyle} />
       <img src={image14} alt="Food Menu 14" style={imageStyle} />
       <img src={image15} alt="Food Menu 15" style={imageStyle} />
-      <img src={image16} alt="Food Menu 16" style={imageStyle} />
-      <img src={image17} alt="Food Menu 17" style={imageStyle} />
-      <img src={image18} alt="Food Menu 18" style={imageStyle} />
-      <img src={image19} alt="Food Menu 19" style={imageStyle} />
-      <img src={image20} alt="Food Menu 20" style={imageStyle} />
-      <img src={image21} alt="Food Menu 21" style={imageStyle} />
     </div>
   );
 };
