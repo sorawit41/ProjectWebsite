@@ -1,9 +1,13 @@
+// --- File: src/components/game/Card.js ---
+
 import React from 'react';
 
 function Card({ id, image, isFlipped, isMatched, onClick }) {
   return (
     <div
-      className={`w-32 h-44 m-2 rounded-lg shadow-lg cursor-pointer transform transition-transform duration-500
+      // เปลี่ยนจาก w-32 h-44 เป็น w-full และ aspect-[3/4] เพื่อให้ขนาดของการ์ด
+      // ถูกควบคุมโดย Grid Container ใน GameBoard และรักษาสัดส่วนไว้
+      className={`w-full aspect-[3/4] rounded-lg shadow-lg cursor-pointer transform transition-transform duration-500
                   group perspective
                   ${isFlipped || isMatched ? 'bg-white [transform:rotateY(180deg)]' : 'bg-gray-700 hover:bg-gray-600'}
                   ${isMatched ? 'opacity-50 cursor-default ring-2 ring-offset-2 ring-green-500' : ''}
@@ -17,7 +21,8 @@ function Card({ id, image, isFlipped, isMatched, onClick }) {
                     transition-colors duration-300
                     ${isFlipped || isMatched ? 'opacity-0' : 'opacity-100'}`}
       >
-        <span className="text-5xl text-white">?</span>
+        {/* ปรับขนาดตัวอักษรให้เล็กลงบนจอมือถือ และใหญ่ขึ้นบนจอที่ใหญ่กว่า */}
+        <span className="text-4xl sm:text-5xl text-white">?</span>
       </div>
 
       {/* Front of the card */}
@@ -28,7 +33,8 @@ function Card({ id, image, isFlipped, isMatched, onClick }) {
                     ${isFlipped || isMatched ? 'opacity-100' : 'opacity-0'}`}
       >
         {(isFlipped || isMatched) && (
-          <img src={image} alt="card-content" className="max-w-full max-h-full p-3 object-contain" />
+          // ลด padding บนจอมือถือ
+          <img src={image} alt="card-content" className="max-w-full max-h-full p-2 sm:p-3 object-contain" />
         )}
       </div>
     </div>

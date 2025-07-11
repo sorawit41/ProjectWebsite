@@ -1,225 +1,431 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
-import { FaTimes, FaCat, FaMapMarkerAlt, FaDumbbell, FaUtensils, FaHeart, FaPalette, FaSmile, FaSyncAlt } from 'react-icons/fa'; // Added FaSyncAlt for the button icon
+import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../pages/supabaseClient'; // ปรับ path ตามโครงสร้างโปรเจคของคุณ
 
-// Assuming these assets are correctly imported from your project structure
-import narin from "../assets/cast/image.png";
-import icezu from "../assets/cast/image copy.png";
-import unknow from "../assets/cast/unknow.png"; // Make sure this path is correct
+// Icons
+import {
+    FaTimes, FaCat, FaMapMarkerAlt, FaDumbbell, FaUtensils,
+    FaHeart, FaPalette, FaSmile, FaSyncAlt,
+    FaFacebook, FaTiktok, FaInstagram, FaChevronLeft, FaChevronRight
+} from 'react-icons/fa';
 
-// The full cast data array (as provided in your first message)
-const castData = [
-  // ... (Your full cast array goes here)
-  // Example:
-  { id: 4, image: unknow, name: "Momo", rank: "Angel", type: "แมวอวกาศ",birthPlace: "หลุมดำ!! Ton18", strength: "แมวว๊ากแฝดน้อง", favoriteFood: "ช็อกโกแลต มาชเมลโล เนื้อ ", loveThing: "รักของกิน รักMoney รักนุดนะ", hobby: "กินๆนอนๆเล่นเกม ดูหนัง ดูเมะ อ่านการตูน", favoriteColor: "ชมพู", messageToHumans: "ไปเที่ยวหลุมดำด้วยกันมั๊ยยย" },
-  { id: 6, image: unknow, name: "Mei", rank: "Angel", type: "สามสี", birthPlace: "เกิดที่ไหนไม่รู้ แต่เกิดในรัชกาลที่๙", strength: "ใบไม้บนหัว", favoriteFood: "ข้าวคลุกปลาทู", loveThing: "ตบTekken8", hobby: "หายใจ/Breathe", favoriteColor: "Blue/ฟ้า", messageToHumans: "I luv u ,but i hate u ,But i luv cat more than u." },
-  { id: 7, image: unknow, name: "Cin", rank: "Angel", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 8, image: unknow, name: "Azuki", rank: "Angel", birthPlace: "ถ้าอยากรู้โอนมา!!!",type:"ความลับ!", strength: "ชอบทำหน้าซึม แจ่ชีวิตปกติดี ทำหน้าง่วงแต่นอนมา10ชม แล้ว", favoriteFood: "แซลม่อนสด ปลาโอสด ส้มตำ อาหารทะเล เมณูจำนวกเส้นเพราะเราเป็นเด็กเส้น", loveThing: "งานแต่ไม่ต้องทำงานแต่ได้เงินมหาศาล เวลาว่าง วันหยุด", hobby: "กินของอร่อยๆ หลับแบบแซ่บๆนอนดูNetflix เล่นSocial ใส่ใจเรื่องชาวบ้าน", favoriteColor: "สีแดง", messageToHumans: "เงินซื้อฉันไม่ได้ แต่ของกินไม่แน่" },
-  { id: 9, image: unknow, name: "Fukada", rank: "Angel", birthPlace: "ดวงจันทร์",type:"ครึ่งแมวครึ่งผี", strength: "หน้าเปลี่ยนืุก3เดือน", favoriteFood: "ส้มตำ", loveThing: "you", hobby: "miss you", favoriteColor: "ม่วง,ดำ", messageToHumans: "อย่าเหยียบหางข้อย เป็นแมวขี้ตกใจ" },
-  { id: 10, image: narin, name: "Narin", rank: "Angel",type: "Persian", birthPlace: "สวนเชอร์รี่ในดินแดนSweetie", strength: "ง่วง", favoriteFood: "ของอร่อย", loveThing: "สีชมพู ชินนาท่อน ฮวาเฉิง Liz lisa", hobby: "บ่น สาววายสมองไหล", favoriteColor: "ชมพู ม่วง", messageToHumans: "รักนะ เลี้ยงไอติมหน่อยจิ ISFP" },
-  { id: 11, image: unknow, name: "Tsuki", rank: "Litter Angel", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 12, image: unknow, name: "Cream", rank: "Litter Angel", birthPlace: "ฟาร์ม.. คาปิร่า",type:"ไทย", strength: "คาปิปาร่า", favoriteFood: "เหล้า เบียร์", loveThing: "คาปิปาร่า โดเรม่อน", hobby: "ดูบอล", favoriteColor: "แดง ฟ้า", messageToHumans: " .... " },
-  { id: 13, image: unknow, name: "Cornine", rank: "Litter Angel", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 14, image: unknow, name: "Fuwarun", rank: "Litter Angel", birthPlace: "มาดากัสก้า โตมาด้วย ความเลี้ยงดูของฝูงลีเมอร์",type:"แมวเมอร์", strength: "เข็มกลัดน้องเชษฐ์ที่โบว์กลางอก!!", favoriteFood: "ท้องปลาแซลม่อน ย่างแซ่บๆ แอลกฮอลล์ทุกชนิด", loveThing: "น้องเชษฐ์", hobby: "นอน", favoriteColor: "สีม่วง", messageToHumans: "ผุรักทุกคนมากนะ!แต่รักน้องเชษฐ์มากกว่า" },
-  { id: 15, image: unknow, name: "Hamo", rank: "Litter Angel", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 16, image: icezu, name: "Icezu", rank: "Litter Angel", birthPlace: "ไอซืถูกอันเชิญมาจากดินแดนอันแสนไกลเป็นเผ่าเอลผ์ที่สามารถใช้เวทย์มนตร์แปลงร่างได้เป็นราชาแมวได้มอบหมายภารกิตให้มาเป็นตัวแทนในการคลุกคลีกับประชาแมว จึงได้แปลงร่างและเข้ามาเป็นspyในอาณาจักรBlackNeko",type:"วืเชียรมาศ", strength: "เป็นเอลฟ์แฝงตัวในมวลประชาแมว", favoriteFood: "เกี๊ยวน้ำ เกี๊ยวซ่า ซุปเห็ด Omakase-Drinks Ice Cream", loveThing: "เงิน!!! กลิ่นเงินมันช่างหอมหวาน", hobby: "ร้องเพลง อนิซอง แปลไทย ดูอนิเมะ", favoriteColor: "แดง ม่วง พาสเทล โฮโลแกรม", messageToHumans: "Come! and Give me the money! Love You" },
-  { id: 17, image: unknow, name: "Ivy", rank: "Litter Angel", birthPlace: "เกิดจากความผันที่แสนสุขของนุ้ด เพราะเทื่อไหร่ที่คุณยิ้มมีความสุขในวันนั้น หนูจะปรกกฎกายขึ้นมาเพื่อให้รอยยิ้มคุณของคุณอยู่ตลอดไป",type:"Persian NekoMata", strength: "แมวขี้เล่นพูดเยอะ ติดคนมาก", favoriteFood: "ของหวาน ขนมทุกอย่าง อะไรก็ได้ที่กินกับนุ้ดได้", loveThing: "Hamster น้อนนนนน การมีเวลาเล่นเกม", hobby: "เล่นเกม!! กิน Vtuber", favoriteColor: "ชมพู ดำ ม่วง", messageToHumans: "ว๊ะฮะฮ่า!!!โดนหลอกแล้วจริงๆไอวี่เป็นแมวเบียวจะมากัดกินความผันของพวกคุณตั้งหากล่ะ! เจอแน่ เด็กแสบดื้อซนคนนี้ เอ้ย!ตัวนี้มาแล้ว เจอแน่ หึๆๆๆ เราเองความสุ่นวายในชีวิตคุณ" },
-  { id: 18, image: unknow, name: "Kokoa", rank: "Litter Angel", birthPlace: "บ้านขนมแสนหวาน ที่มีคุณยายใจดีเก็บมาเลี้ยง สวนกุหลาบหลังบ้านเป็นสวนสนุป ทุกอย่าง!",type:"Japanese bobtail", strength: "ความแบ๊ว", favoriteFood: "ของเผ็ดๆ เพราะว่าเป็นคนแซ่บๆ อาหารญี่ปุ่น อาหารไทย อาหารอร่อย ขนมหวาน", loveThing: "เงิน<3 ความวิบวับ สีชมพูทุกสิ่งบนโลก", hobby: "วิ่งเล่น นอน ดูเมะ ฟังเพลง", favoriteColor: "สีชมพู", messageToHumans: "เอ็นดูเลาหน่อย อยากกินเชกิ 10ล้านใบ" },
-  { id: 19, image: unknow, name: "Miyuki", rank: "Litter Angel", birthPlace: "เกิดจากดอกกุหลาบาีฟ้าในดินแดน",type:"Ragdoll", strength: "คุยไม่เก่งแต่ถ้าคุณเรื่องเกมที่ชอบจะพูดมากทันที", favoriteFood: "กุ้งเทมปุระ ช็อคโกแลต", loveThing: "มนุษย์", hobby: "เล่นเกม นอน", favoriteColor: "สีม่วง", messageToHumans: "Meoww" },
-  { id: 20, image: unknow, name: "Mio", rank: "Litter Angel", type: "เมนคูน",birthPlace: "กำเนิดจากป่ามนป่าต้องห้ามที่ว่ากันว่าใครที่เข้าไปแล้วจะไม่ได้กลับออกมา .. ", strength: "หัวทอง ตัวเล็ก หาวเก่ง", favoriteFood: "ชานม!ชานม!", loveThing: "ชานม!หมูกะทะ!", hobby: "นอน/เล่นเกม!ทำงาน", favoriteColor: "แดง,ชมพู", messageToHumans: "สวัสดี/เจ้ามนุษย์ ขี้เกียจเปลี่ยนสีปากกาแล้ว เอาเปลี่ยนสีปากกาแล้ว เอาเป็นว่ามารู้จักกันดีกว่า แมวตัวนี้เลี้ยงง่ายแต่ดื้อมาก มาดุน้องแมวหน่อยมา! มามะ!,มาลูกหัวแมวหน่อยแต่กัดนะ!แฮ่ๆ" },
-  { id: 21, image: unknow, name: "Momoka", rank: "Litter Angel", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 22, image: unknow, name: "Moolek", rank: "Litter Angel",type: "แมวเล้า", birthPlace: "ไม่รู้เกืดที่ไหน แม่บอกเจอที่ ถังเบียร์", strength: "แมวสีเหลืองใส่แว่น", favoriteFood: "Alcohal ทุกชิดให้สมกับการเป็นแมวเล้า & ของกินที่ไม่อ้วนเพราะเก็บแคลไปกินแอล 555+", loveThing: "รักทุกคนที่รักหมูเล็ก,ใจดีกับหมูเล็ก รักที่าุดเลยนะคะคนดีของฉัน", hobby: "ชอบเต้น ร้องเพลง ตลอดเวลา มาสั่งLive ให้หมูเล็กที่ดื้อ", favoriteColor: "อย่างสีเหลือง", messageToHumans: "สวัสดีจ้าหมูเล็ก(Moolek) นะคะเป็นแมวExtrovert พูดมากชอบเลอคน หมูเล็กพร้อมคุยกับทุกคนเลยนะคะ ขี้เหล้า ไม่มีคนกินALเบิมเพี้นเรียกได้เลยพร้อมตั้งวง555+ ถ้าคุณรักหมูเล็กนี้หมูเล็กจะรักคุณกับ100เท่า รักนะ" },
-  { id: 23, image: unknow, name: "Risa", rank: "Litter Angel", birthPlace: "ที่ไหนไม่รู้ แต่อยู่ในลังส้มข้าวบ้านนุ้ด ริบหนูไปเลี้ยงหน่อยน้าา",type:"วิเชียรมาศ", strength: "แมวตาลำไย", favoriteFood: "ชาไทย ยูสุโซดา", loveThing: "ที่นอนกับผ้าห่มนุ่มๆของหวาน นุ้ดยังไงละ", hobby: "กินของอร่อย นอน ", favoriteColor: "สีแดง สีของพระเอกยังไงละ", messageToHumans: "นุ้ดจะกลับบ้านแล้วเบ๋อ อย่าเพิ่งกลับจิ แวะข้างบ้านก่อนจิ" },
-  { id: 24, image: unknow, name: "Yuna", rank: "Litter Angel",type: "แมวขี้โม้", birthPlace: "เกิดจากนรก แมวเฝ้านรก 3 หัว", strength: "ชอบขำสุขๆ", favoriteFood: "ทาโกะวาซาบิ ถั่วแระ", loveThing: "เตียง! ปอมปอมปุริน", hobby: "ร้องเพลง,นอน,นอน", favoriteColor: "สีดำ", messageToHumans: "ผมยูนะ,มะตะแล้วแต่เรียกไม่เรียกก็แล้วแต่" },
-  { id: 25, image: unknow, name: "Hitomi", rank: "Fairy", birthPlace: "แมวต่างโลก อิเซไก BlackNeko แบบไม่รู็ตัว!?",type:"! ! !", strength: "แมวฟันห่าง", favoriteFood: "นทสตอเบอรี่ พุตดิ้ง", loveThing: "Idol", hobby: "โอตาดตะ", favoriteColor: "", messageToHumans: "หิวเหล้า หิว หิว " },
-  { id: 26, image: unknow, name: "Maywa", rank: "Fairy", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 27, image: unknow, name: "Kurimi", rank: "Fairy", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 28, image: unknow, name: "Itsumi", rank: "Fairy", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 29, image: unknow, name: "Ayse", rank: "Fairy", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 30, image: unknow, name: "Reka", rank: "Fairy", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 31, image: unknow, name: "Yumeko", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 32, image: unknow, name: "Shiori", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 33, image: unknow, name: "Tsubaki", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 34, image: unknow, name: "Sora", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 35, image: unknow, name: "Erika", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 36, image: unknow, name: "Layra", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 37, image: unknow, name: "Nene", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 38, image: unknow, name: "Saya", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-  { id: 39, image: unknow, name: "Sylvie", rank: "Trainee", type: "", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" },
-];
+// --- Utility Functions ---
 
-// Helper component for modal details
-const DetailItem = ({ icon: Icon, label, value, iconColorClass }) => {
-    if (!value && typeof value !== 'number') return null;
+// ฟังก์ชันสุ่ม Array (จากโค้ดเดิม)
+const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
+// ฟังก์ชันสำหรับสร้าง Gradient ของ Rank (จากโค้ดตัวอย่าง)
+const getRankGradient = (rank) => {
+    const gradients = {
+        'Angel': 'from-yellow-300 via-amber-400 to-orange-500',
+        'Litter Angel': 'from-cyan-300 via-sky-400 to-blue-500',
+        'Fairy': 'from-pink-300 via-rose-400 to-purple-500',
+        'Trainee': 'from-emerald-300 via-teal-400 to-cyan-500',
+        'Legend': 'from-violet-400 via-purple-500 to-indigo-600',
+        'Mythic': 'from-slate-600 via-purple-700 to-black',
+        'รอ Audition': 'from-gray-300 via-slate-400 to-gray-500'
+    };
+    return gradients[rank] || 'from-gray-400 to-gray-500';
+};
+
+
+// --- Sub-components ---
+
+// Image Carousel for Modal (จากโค้ดตัวอย่าง)
+const ImageCarousel = ({ images }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    // ตรวจสอบว่ามีรูปภาพหรือไม่ และเป็น Array ที่ถูกต้อง
+    const validImages = Array.isArray(images) && images.length > 0 ? images : [];
+    const hasMultipleImages = validImages.length > 1;
+
+    const goToPrevious = (e) => {
+        e.stopPropagation();
+        const isFirstSlide = currentIndex === 0;
+        const newIndex = isFirstSlide ? validImages.length - 1 : currentIndex - 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const goToNext = (e) => {
+        e.stopPropagation();
+        const isLastSlide = currentIndex === validImages.length - 1;
+        const newIndex = isLastSlide ? 0 : currentIndex + 1;
+        setCurrentIndex(newIndex);
+    };
+
+    if (validImages.length === 0) {
+        return (
+            <div className="w-full h-full bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
+                 <FaCat className="text-purple-300" size={60} />
+            </div>
+        );
+    }
+    
     return (
-        <div className="flex items-start py-1">
-            {Icon && <Icon className={`mr-3 mt-1 flex-shrink-0 ${iconColorClass || 'text-gray-500'}`} size={18} />}
-            <span className="font-semibold text-gray-700 dark:text-gray-300 min-w-[120px] md:min-w-[140px]">{label}:</span>
-            <span className="text-gray-600 dark:text-gray-400">{value}</span>
+        <div className="w-full h-full relative group overflow-hidden">
+            <div
+                style={{ backgroundImage: `url(${validImages[currentIndex]})` }}
+                className="w-full h-full bg-center bg-cover duration-700 transition-all ease-in-out transform group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+            {hasMultipleImages && (
+                <>
+                    <button onClick={goToPrevious} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 left-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
+                        <FaChevronLeft size={18} />
+                    </button>
+                    <button onClick={goToNext} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 right-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
+                        <FaChevronRight size={18} />
+                    </button>
+                    <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex justify-center gap-2">
+                        {validImages.map((_, slideIndex) => (
+                            <div
+                                key={slideIndex}
+                                onClick={(e) => { e.stopPropagation(); setCurrentIndex(slideIndex); }}
+                                className={`cursor-pointer h-2.5 rounded-full transition-all duration-300 ${currentIndex === slideIndex ? 'bg-white w-6' : 'bg-white/60 w-2.5'}`}
+                            />
+                        ))}
+                    </div>
+                </>
+            )}
         </div>
     );
 };
 
-const shuffleArray = (array) => { // Moved shuffleArray outside to be reusable
-    let currentIndex = array.length, randomIndex;
-    const newArray = [...array]; // Create a new array to avoid mutating the original
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
-    }
-    return newArray;
+// Enhanced Detail Item for Modal (จากโค้ดตัวอย่าง)
+const DetailItem = ({ icon: Icon, label, value, iconColorClass = "text-slate-500", isLink = false }) => {
+    if (!value && typeof value !== 'number') return null;
+    return (
+        <div className="group flex items-start p-4 bg-gradient-to-r from-white to-slate-50/50 rounded-xl border border-slate-200/50 hover:border-purple-300/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-gradient-to-br from-white to-slate-50 rounded-lg shadow-sm border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
+                <Icon className={iconColorClass} size={18} />
+            </div>
+            <div className="ml-4 flex-1">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</p>
+                {isLink ? (
+                    <a
+                        href={String(value).startsWith('http') ? value : `https://${value}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-purple-600 hover:text-purple-700 font-bold break-all transition-colors duration-200 hover:underline"
+                    >
+                        {value}
+                    </a>
+                ) : (
+                    <p className="text-sm font-bold text-slate-800 break-words mt-1">{value}</p>
+                )}
+            </div>
+        </div>
+    );
 };
 
+// Enhanced Loading State (จากโค้ดตัวอย่าง)
+const LoadingState = () => (
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+        <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+            <FaCat size={80} className="relative text-purple-500 animate-bounce"/>
+        </div>
+        <h2 className="mt-8 text-2xl font-bold text-slate-700">กำลังโหลดข้อมูลน้องแมว...</h2>
+        <p className="mt-2 text-slate-500">กรุณารอสักครู่</p>
+    </div>
+);
+
+// Enhanced Error State (จากโค้ดตัวอย่าง)
+const ErrorState = ({ error }) => (
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 p-4">
+        <div className="w-full max-w-md text-center bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-red-200/50">
+            <FaCat size={60} className="mx-auto text-red-500"/>
+            <h2 className="mt-8 text-2xl font-bold text-red-800">เกิดข้อผิดพลาด!</h2>
+            <p className="mt-3 text-red-600 leading-relaxed">{error}</p>
+        </div>
+    </div>
+);
+
+// Enhanced Empty State
+const EmptyState = () => (
+    <div className="col-span-full text-center py-20 sm:py-32">
+        <div className="bg-white border border-slate-200 rounded-3xl p-12 max-w-lg mx-auto shadow-lg">
+            <FaCat size={80} className="mx-auto text-slate-400"/>
+            <h3 className="mt-8 text-2xl font-black text-slate-700">ไม่มีข้อมูลน้องแมว</h3>
+            <p className="mt-3 text-slate-500 leading-relaxed font-medium">
+                กรุณาตรวจสอบการเชื่อมต่อ หรืออาจจะยังไม่มีน้องแมวในระบบ
+            </p>
+        </div>
+    </div>
+);
+
+
+// Enhanced Cat Card (จากโค้ดตัวอย่าง)
+const CatCard = ({ user, index, fadeInCards, onClick }) => (
+    <div
+        onClick={onClick}
+        title={`ดูข้อมูล ${user.name}`}
+        className="group cursor-pointer bg-white rounded-3xl border border-slate-200/80 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:border-purple-300 hover:-translate-y-2"
+        style={{
+            opacity: fadeInCards ? 1 : 0,
+            transform: fadeInCards ? 'translateY(0)' : 'translateY(20px)',
+            transitionDelay: `${fadeInCards ? index * 0.1 : 0}s`,
+            transitionProperty: 'opacity, transform',
+        }}
+    >
+        <div className="relative w-full aspect-[4/5] overflow-hidden">
+            <img
+                src={user.image_url || "https://via.placeholder.com/400x500.png?text=No+Image"}
+                alt={user.name}
+                className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+                loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+            <div className={`absolute top-4 right-4 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg text-white bg-gradient-to-r ${getRankGradient(user.rank)} border border-white/20`}>
+                {user.rank}
+            </div>
+        </div>
+        <div className="p-5 text-center bg-white">
+            <h3 className="text-xl font-bold text-slate-800 truncate group-hover:text-purple-600 transition-colors duration-300">
+                {user.name}
+            </h3>
+            {user.type && (
+                <p className="text-sm text-slate-500 truncate mt-1">
+                    {user.type}
+                </p>
+            )}
+        </div>
+    </div>
+);
+
+// Enhanced User Modal (จากโค้ดตัวอย่าง)
+const UserModal = ({ user, onClose }) => (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} />
+        
+        <div className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 flex flex-col md:flex-row animate-zoom-in">
+            <button
+                onClick={onClose}
+                aria-label="Close modal"
+                className="absolute top-4 right-4 z-20 w-10 h-10 bg-white/80 backdrop-blur-sm text-slate-600 hover:text-slate-900 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-90 border border-slate-200/50 shadow-lg"
+            >
+                <FaTimes size={18} />
+            </button>
+            
+            <div className="w-full md:w-2/5 flex-shrink-0 relative bg-slate-100 md:rounded-l-3xl rounded-t-3xl md:rounded-tr-none">
+                <ImageCarousel 
+                    images={
+                        (user.image_urls && Array.isArray(user.image_urls) && user.image_urls.length > 0)
+                        ? user.image_urls 
+                        : (user.image_url ? [user.image_url] : [])
+                    } 
+                />
+                <div className={`absolute top-5 left-5 text-sm font-bold px-4 py-2 rounded-full shadow-2xl text-white bg-gradient-to-r ${getRankGradient(user.rank)} border border-white/30 backdrop-blur-sm`}>
+                    {user.rank}
+                </div>
+            </div>
+
+            <div className="p-6 md:p-8 flex-1 bg-white md:rounded-r-3xl rounded-b-3xl">
+                <div className="mb-6">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 leading-tight">
+                        {user.name}
+                    </h2>
+                    {user.type && (
+                        <p className="mt-1 text-lg text-slate-500 font-medium">
+                            {user.type}
+                        </p>
+                    )}
+                </div>
+
+                {user.message_to_humans && (
+                    <blockquote className="p-4 mb-6 bg-slate-50 border-l-4 border-purple-400 rounded-r-xl">
+                        <p className="italic text-purple-800 font-medium">
+                            "{user.message_to_humans}"
+                        </p>
+                    </blockquote>
+                )}
+
+                <div className="space-y-6">
+                   <div className="border-b-2 border-slate-200 pb-2">
+                       <h3 className="text-lg font-bold text-slate-700">ข้อมูลส่วนตัว</h3>
+                   </div>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <DetailItem icon={FaMapMarkerAlt} label="สถานที่เกิด" value={user.birth_place} iconColorClass="text-red-500" />
+                      <DetailItem icon={FaDumbbell} label="ความสามารถ" value={user.strength} iconColorClass="text-blue-500" />
+                      <DetailItem icon={FaUtensils} label="อาหารโปรด" value={user.favorite_food} iconColorClass="text-orange-500" />
+                      <DetailItem icon={FaHeart} label="สิ่งที่รัก" value={user.love_thing} iconColorClass="text-rose-500" />
+                      <DetailItem icon={FaSmile} label="งานอดิเรก" value={user.hobby} iconColorClass="text-yellow-500" />
+                      <DetailItem icon={FaPalette} label="สีโปรด" value={user.favorite_color} iconColorClass="text-purple-500" />
+                   </div>
+                </div>
+
+                {(user.facebook_url || user.tiktok_url || user.instagram_url) && (
+                    <div className="mt-8">
+                        <div className="border-b-2 border-slate-200 pb-2 mb-4">
+                            <h3 className="text-lg font-bold text-slate-700">ช่องทางติดตาม</h3>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <DetailItem icon={FaFacebook} label="Facebook" value={user.facebook_url} iconColorClass="text-blue-600" isLink={true} />
+                            <DetailItem icon={FaTiktok} label="TikTok" value={user.tiktok_url} iconColorClass="text-black" isLink={true} />
+                            <DetailItem icon={FaInstagram} label="Instagram" value={user.instagram_url} iconColorClass="text-pink-600" isLink={true} />
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+);
+
+
+// --- Main Cast Component ---
 const Cast = () => {
-    const [initialAllCast] = useState([...castData]);
+    // State จากโค้ดเดิม
+    const [allCastsData, setAllCastsData] = useState([]);
     const [displayedCast, setDisplayedCast] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [fadeIn, setFadeIn] = useState(false);
-    const [isShuffling, setIsShuffling] = useState(false); // To manage shuffle animation
+    const [fadeInCards, setFadeInCards] = useState(false);
+    const [isShuffling, setIsShuffling] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const loadRandomCast = useCallback(() => {
-        if (initialAllCast.length > 0) {
-            setIsShuffling(true); // Start shuffling animation
-            setFadeIn(false); // Fade out current cast
-
-            setTimeout(() => { // Allow fade-out animation to complete
-                const shuffled = shuffleArray(initialAllCast);
-                setDisplayedCast(shuffled.slice(0, Math.min(3, shuffled.length)));
-                setFadeIn(true); // Fade in new cast
-                setIsShuffling(false); // End shuffling animation
-            }, 300); // Adjust timeout duration as needed for fade effect
-        }
-    }, [initialAllCast]);
-
-
+    // Fetch casts (เหมือนเดิม)
     useEffect(() => {
-        loadRandomCast(); // Load initial cast
+        const fetchCasts = async () => {
+            setIsLoading(true);
+            setError(null);
+            
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('casts')
+                    .select('*');
+                
+                if (fetchError) throw fetchError;
+                
+                setAllCastsData(data || []);
+            } catch (err) {
+                console.error("Error fetching casts:", err.message);
+                setError(`ไม่สามารถโหลดข้อมูลน้องแมวได้ (${err.message})`);
+                setAllCastsData([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-        // This timer is for the initial page load fade-in, can be combined or kept separate
-        const pageLoadTimer = setTimeout(() => setFadeIn(true), 50); // Initial fade-in for the whole component
-        return () => clearTimeout(pageLoadTimer);
-    }, [loadRandomCast]); // Add loadRandomCast to dependency array
+        fetchCasts();
+    }, []);
 
+    // Shuffle and display initial cats (เหมือนเดิม)
+    useEffect(() => {
+        if (!isLoading && allCastsData.length > 0) {
+            setIsShuffling(true);
+            setFadeInCards(false);
+            
+            setTimeout(() => {
+                const shuffled = shuffleArray(allCastsData);
+                setDisplayedCast(shuffled.slice(0, Math.min(allCastsData.length, 3)));
+                setFadeInCards(true);
+                setIsShuffling(false);
+            }, 300);
+        } else if (!isLoading && allCastsData.length === 0) {
+            setDisplayedCast([]);
+            setFadeInCards(true);
+        }
+    }, [isLoading, allCastsData]);
+
+    // Reshuffle cats (เหมือนเดิม)
+    const reshuffleCats = useCallback(() => {
+        if (allCastsData.length > 3) {
+            setIsShuffling(true);
+            setFadeInCards(false);
+            
+            setTimeout(() => {
+                // เพื่อให้แน่ใจว่าจะไม่สุ่มได้เซ็ตเดิมเป๊ะๆ (อาจเกิดขึ้นได้แต่ยาก)
+                // เราจะ shuffle จนกว่าจะได้เซ็ตที่ไม่เหมือนเดิม หรือพยายาม 5 ครั้ง
+                let newShuffled;
+                let attempts = 0;
+                do {
+                    newShuffled = shuffleArray(allCastsData).slice(0, 3);
+                    attempts++;
+                } while (
+                    newShuffled.every(cat => displayedCast.some(d => d.id === cat.id)) &&
+                    attempts < 5
+                );
+
+                setDisplayedCast(newShuffled);
+                setFadeInCards(true);
+                setIsShuffling(false);
+            }, 300);
+        }
+    }, [allCastsData, displayedCast]);
+
+    // Modal handlers (เหมือนเดิม)
     const openUserModal = (user) => setSelectedUser(user);
     const closeUserModal = () => setSelectedUser(null);
 
-    const handleReshuffle = () => {
-        loadRandomCast();
-    };
+    // Render states
+    if (isLoading) return <LoadingState />;
+    if (error) return <ErrorState error={error} />;
 
     return (
-        <div className="py-16 pt-20 md:pt-24 bg-transparent min-h-screen text-gray-900 transition-colors duration-500">
+        <div className="min-h-screen bg-white text-slate-800 py-16 sm:py-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-8 text-center"> {/* Adjusted margin */}
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 pb-2">
+                
+                {/* Enhanced Header (จากโค้ดตัวอย่าง) */}
+                <div className="text-center mb-12 sm:mb-16">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-800 tracking-tight">
                         ลองทำความรู้จักน้องแมวของเรา
                     </h1>
-                    {/* Reshuffle Button */}
-                    {initialAllCast.length >= 3 && ( // Only show button if there are enough cats to reshuffle
+                    <p className="mt-5 max-w-2xl mx-auto text-lg text-slate-600">
+                        พบกับความน่ารักสดใสของเหล่าสมาชิกเหมียวแบบสุ่ม ✨
+                    </p>
+                </div>
+                
+                {/* Reshuffle Button with new style */}
+                <div className="text-center mb-12 sm:mb-16">
+                    {allCastsData.length > 3 && (
                         <button
-                            onClick={handleReshuffle}
-                            disabled={isShuffling} // Disable button during shuffling
-                            className={`mt-4 px-6 py-2.5 text-sm font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out flex items-center justify-center mx-auto
-                                        ${isShuffling ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white hover:shadow-lg transform hover:-translate-y-0.5'}`}
+                            onClick={reshuffleCats}
+                            disabled={isShuffling}
+                            className={`px-6 py-3 text-base font-bold rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out flex items-center justify-center mx-auto ${
+                                isShuffling 
+                                    ? 'bg-slate-400 cursor-not-allowed' 
+                                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-xl transform hover:-translate-y-1'
+                            }`}
                         >
-                            <FaSyncAlt className={`mr-2 ${isShuffling ? 'animate-spin' : ''}`} />
+                            <FaSyncAlt className={`mr-2.5 ${isShuffling ? 'animate-spin' : ''}`} />
                             {isShuffling ? 'กำลังสุ่ม...' : 'สุ่มน้องแมวใหม่'}
                         </button>
                     )}
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-8">
-                    <main className="w-full">
-                        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6 transition-opacity duration-700 ease-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-                            {displayedCast.length > 0 ? (
-                                displayedCast.map((user, index) => (
-                                    <div
-                                        key={user.id}
-                                        onClick={() => openUserModal(user)}
-                                        title={`View details for ${user.name}`}
-                                        className="group cursor-pointer bg-white dark:bg-zinc-800/80 rounded-2xl shadow-lg hover:shadow-xl dark:hover:shadow-[0_10px_15px_-3px_rgba(255,255,255,0.02),0_4px_6px_-4px_rgba(255,255,255,0.02)] overflow-hidden transition-all duration-300 ease-in-out transform hover:-translate-y-1"
-                                        style={{
-                                            opacity: fadeIn ? 1 : 0,
-                                            transform: fadeIn ? 'translateY(0)' : 'translateY(20px)',
-                                            transitionDelay: `${fadeIn ? (index % 15) * 0.04 : 0}s`, // Staggered animation
-                                            transitionProperty: 'opacity, transform',
-                                            transitionDuration: '0.5s, 0.3s',
-                                        }}
-                                    >
-                                        <div className="relative w-full h-72 overflow-hidden">
-                                            <img
-                                                src={user.image}
-                                                alt={user.name}
-                                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-400 ease-in-out"
-                                            />
-                                            <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2.5 py-1 rounded-full backdrop-blur-sm shadow">
-                                                {user.rank}
-                                            </div>
-                                        </div>
-                                        <div className="p-5">
-                                            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-1 truncate group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                                                {user.name}
-                                            </h3>
-                                            {user.type && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.type}</p>}
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-16 text-xl flex flex-col items-center justify-center">
-                                    <FaCat size={60} className="mb-4 text-gray-400 dark:text-zinc-600"/>
-                                    <p className="font-semibold text-2xl mb-2 text-gray-600 dark:text-gray-300">
-                                        {initialAllCast.length > 0 ? "กำลังเลือกน้องแมว..." : "ไม่มีข้อมูลน้องแมว"}
-                                    </p>
-                                    {initialAllCast.length === 0 && <p>กรุณาตรวจสอบข้อมูล cast</p>}
-                                </div>
-                            )}
-                        </div>
-                    </main>
+                {/* Main content grid */}
+                <div className="flex justify-center">
+                    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl transition-opacity duration-700 ease-out ${
+                        fadeInCards ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                        {displayedCast.length > 0 ? (
+                            displayedCast.map((user, index) => (
+                                <CatCard
+                                    key={user.id}
+                                    user={user}
+                                    index={index}
+                                    fadeInCards={fadeInCards}
+                                    onClick={() => openUserModal(user)}
+                                />
+                            ))
+                        ) : (
+                            <EmptyState />
+                        )}
+                    </div>
                 </div>
 
-                {/* Modal */}
+                {/* User Modal */}
                 {selectedUser && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-fade-in">
-                        <div
-                            className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-2xl w-full mx-auto p-6 md:p-8 relative max-h-[90vh] overflow-y-auto transform scale-95 animate-scale-in"
-                        >
-                            <button
-                                onClick={closeUserModal}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-white transition duration-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 z-10"
-                            >
-                                <FaTimes size={22} />
-                            </button>
-                            <div className="flex flex-col items-center space-y-5 pt-6 md:pt-0">
-                                <img
-                                    src={selectedUser.image}
-                                    alt={selectedUser.name}
-                                    className="w-36 h-36 md:w-40 md:h-40 object-cover rounded-full shadow-xl"
-                                />
-                                <div className="text-center">
-                                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">{selectedUser.name}</h2>
-                                    <p className="text-lg text-pink-500 dark:text-pink-400 font-semibold mt-1">Rank: {selectedUser.rank}</p>
-                                    {selectedUser.type && <p className="text-md text-gray-500 dark:text-gray-400 mt-0.5">Type: {selectedUser.type}</p>}
-                                </div>
-
-                                <div className="w-full mt-4 pt-4 border-t border-gray-200 dark:border-zinc-700/50 text-base space-y-1.5">
-                                    <DetailItem icon={FaMapMarkerAlt} label="Birth Place" value={selectedUser.birthPlace} iconColorClass="text-red-500" />
-                                    <DetailItem icon={FaDumbbell} label="Strength" value={selectedUser.strength} iconColorClass="text-blue-500" />
-                                    <DetailItem icon={FaUtensils} label="Favorite Food" value={selectedUser.favoriteFood} iconColorClass="text-orange-500" />
-                                    <DetailItem icon={FaHeart} label="Loves" value={selectedUser.loveThing} iconColorClass="text-rose-500" />
-                                    <DetailItem icon={FaSmile} label="Hobby" value={selectedUser.hobby} iconColorClass="text-yellow-500" />
-                                    <DetailItem icon={FaPalette} label="Favorite Color" value={selectedUser.favoriteColor} iconColorClass="text-purple-500" />
-                                </div>
-
-                                {selectedUser.messageToHumans && (
-                                    <p className="w-full italic mt-5 text-center bg-gradient-to-r from-pink-500/10 to-purple-500/10 dark:from-pink-500/5 dark:to-purple-500/5 p-4 rounded-lg text-gray-800 dark:text-gray-200 shadow-inner">
-                                        <span className="text-2xl leading-none mr-1 text-pink-500/70 dark:text-pink-400/70">“</span>
-                                        {selectedUser.messageToHumans}
-                                        <span className="text-2xl leading-none ml-1 text-pink-500/70 dark:text-pink-400/70">”</span>
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <UserModal 
+                        user={selectedUser} 
+                        onClose={closeUserModal} 
+                    />
                 )}
             </div>
         </div>

@@ -1,237 +1,468 @@
 import React, { useState, useEffect } from 'react';
-// นำเข้า FaCat สำหรับกรณีไม่มีผลลัพธ์
-import { FaCat, FaTimes } from 'react-icons/fa';
-// ไอคอนสำหรับ Modal ยังคงอยู่
-import { FaMapMarkerAlt, FaDumbbell, FaUtensils, FaHeart, FaPalette, FaSmile } from 'react-icons/fa';
+import { supabase } from './supabaseClient';
 
-import narin from "../assets/cast/image.png";
-import icezu from "../assets/cast/image copy.png";
-import unknow from "../assets/cast/logo.png";
+// Icons for Modal and UI
+import {
+    FaCat, FaTimes, FaMapMarkerAlt, FaDumbbell, FaUtensils,
+    FaHeart, FaPalette, FaSmile, FaFacebook, FaTiktok,
+    FaInstagram, FaSearch, FaFilter, FaChevronLeft, FaChevronRight
+} from 'react-icons/fa';
 
-const initialCast = [
-    // ... (Your full cast data here) ...
-    // Rank: Angel
-    { id: 4, image: unknow, name: "Momo", rank: "Angel", type: "แมวอวกาศ", birthPlace: "หลุมดำ!! Ton18", strength: "แมวว๊ากแฝดน้อง", favoriteFood: "ช็อกโกแลต มาชเมลโล เนื้อ ", loveThing: "รักของกิน รักMoney รักนุดนะ", hobby: "กินๆนอนๆเล่นเกม ดูหนัง ดูเมะ อ่านการตูน", favoriteColor: "ชมพู", messageToHumans: "ไปเที่ยวหลุมดำด้วยกันมั๊ยยย" },
-    { id: 6, image: unknow, name: "Mei", rank: "Angel", type: "สามสี", birthPlace: "เกิดที่ไหนไม่รู้ แต่เกิดในรัชกาลที่๙", strength: "ใบไม้บนหัว", favoriteFood: "ข้าวคลุกปลาทู", loveThing: "ตบTekken8", hobby: "หายใจ/Breathe", favoriteColor: "Blue/ฟ้า", messageToHumans: "I luv u ,but i hate u ,But i luv cat more than u." },
-    { id: 7, image: unknow, name: "Cin", rank: "Angel", type: "British Shorthair", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type for example
-    { id: 8, image: unknow, name: "Azuki", rank: "Angel", birthPlace: "ถ้าอยากรู้โอนมา!!!", type: "ความลับ!", strength: "ชอบทำหน้าซึม แจ่ชีวิตปกติดี ทำหน้าง่วงแต่นอนมา10ชม แล้ว", favoriteFood: "แซลม่อนสด ปลาโอสด ส้มตำ อาหารทะเล เมณูจำนวกเส้นเพราะเราเป็นเด็กเส้น", loveThing: "งานแต่ไม่ต้องทำงานแต่ได้เงินมหาศาล เวลาว่าง วันหยุด", hobby: "กินของอร่อยๆ หลับแบบแซ่บๆนอนดูNetflix เล่นSocial ใส่ใจเรื่องชาวบ้าน", favoriteColor: "สีแดง", messageToHumans: "เงินซื้อฉันไม่ได้ แต่ของกินไม่แน่" },
-    { id: 9, image: unknow, name: "Fukada", rank: "Angel", birthPlace: "ดวงจันทร์", type: "ครึ่งแมวครึ่งผี", strength: "หน้าเปลี่ยนืุก3เดือน", favoriteFood: "ส้มตำ", loveThing: "you", hobby: "miss you", favoriteColor: "ม่วง,ดำ", messageToHumans: "อย่าเหยียบหางข้อย เป็นแมวขี้ตกใจ" },
-    { id: 10, image: narin, name: "Narin", rank: "Angel", type: "Persian", birthPlace: "สวนเชอร์รี่ในดินแดนSweetie", strength: "ง่วง", favoriteFood: "ของอร่อย", loveThing: "สีชมพู ชินนาท่อน ฮวาเฉิง Liz lisa", hobby: "บ่น สาววายสมองไหล", favoriteColor: "ชมพู ม่วง", messageToHumans: "รักนะ เลี้ยงไอติมหน่อยจิ ISFP" },
-    // Rank: Litter Angel
-    { id: 11, image: unknow, name: "Tsuki", rank: "Litter Angel", type: "Ragdoll", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 12, image: unknow, name: "Cream", rank: "Litter Angel", birthPlace: "ฟาร์ม.. คาปิร่า", type: "ไทย", strength: "คาปิปาร่า", favoriteFood: "เหล้า เบียร์", loveThing: "คาปิปาร่า โดเรม่อน", hobby: "ดูบอล", favoriteColor: "แดง ฟ้า", messageToHumans: " ...." },
-    { id: 13, image: unknow, name: "Cornine", rank: "Litter Angel", type: "Scottish Fold", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 14, image: unknow, name: "Fuwarun", rank: "Litter Angel", birthPlace: "มาดากัสก้า โตมาด้วย ความเลี้ยงดูของฝูงลีเมอร์", type: "แมวเมอร์", strength: "เข็มกลัดน้องเชษฐ์ที่โบว์กลางอก!!", favoriteFood: "ท้องปลาแซลม่อน ย่างแซ่บๆ แอลกฮอลล์ทุกชนิด", loveThing: "น้องเชษฐ์", hobby: "นอน", favoriteColor: "สีม่วง", messageToHumans: "ผุรักทุกคนมากนะ!แต่รักน้องเชษฐ์มากกว่า" },
-    { id: 15, image: unknow, name: "Hamo", rank: "Litter Angel", type: "Sphynx", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 17, image: unknow, name: "Ivy", rank: "Litter Angel", birthPlace: "เกิดจากความผันที่แสนสุขของนุ้ด เพราะเทื่อไหร่ที่คุณยิ้มมีความสุขในวันนั้น หนูจะปรกกฎกายขึ้นมาเพื่อให้รอยยิ้มคุณของคุณอยู่ตลอดไป", type: "Persian NekoMata", strength: "แมวขี้เล่นพูดเยอะ ติดคนมาก", favoriteFood: "ของหวาน ขนมทุกอย่าง อะไรก็ได้ที่กินกับนุ้ดได้", loveThing: "Hamster น้อนนนนน การมีเวลาเล่นเกม", hobby: "เล่นเกม!! กิน Vtuber", favoriteColor: "ชมพู ดำ ม่วง", messageToHumans: "ว๊ะฮะฮ่า!!!โดนหลอกแล้วจริงๆไอวี่เป็นแมวเบียวจะมากัดกินความผันของพวกคุณตั้งหากล่ะ! เจอแน่ เด็กแสบดื้อซนคนนี้ เอ้ย!ตัวนี้มาแล้ว เจอแน่ หึๆๆๆ เราเองความสุ่นวายในชีวิตคุณ" },
-    { id: 18, image: unknow, name: "Kokoa", rank: "Litter Angel", birthPlace: "บ้านขนมแสนหวาน ที่มีคุณยายใจดีเก็บมาเลี้ยง สวนกุหลาบหลังบ้านเป็นสวนสนุป ทุกอย่าง!", type: "Japanese bobtail", strength: "ความแบ๊ว", favoriteFood: "ของเผ็ดๆ เพราะว่าเป็นคนแซ่บๆ อาหารญี่ปุ่น อาหารไทย อาหารอร่อย ขนมหวาน", loveThing: "เงิน<3 ความวิบวับ สีชมพูทุกสิ่งบนโลก", hobby: "วิ่งเล่น นอน ดูเมะ ฟังเพลง", favoriteColor: "สีชมพู", messageToHumans: "เอ็นดูเลาหน่อย อยากกินเชกิ 10ล้านใบ" },
-    { id: 19, image: unknow, name: "Miyuki", rank: "Litter Angel", birthPlace: "เกิดจากดอกกุหลาบาีฟ้าในดินแดน", type: "Ragdoll", strength: "คุยไม่เก่งแต่ถ้าคุณเรื่องเกมที่ชอบจะพูดมากทันที", favoriteFood: "กุ้งเทมปุระ ช็อคโกแลต", loveThing: "มนุษย์", hobby: "เล่นเกม นอน", favoriteColor: "สีม่วง", messageToHumans: "Meoww" },
-    { id: 20, image: unknow, name: "Mio", rank: "Litter Angel", type: "เมนคูน", birthPlace: "กำเนิดจากป่ามนป่าต้องห้ามที่ว่ากันกันว่าใครที่เข้าไปแล้วจะไม่ได้กลับออกมา .. ", strength: "หัวทอง ตัวเล็ก หาวเก่ง", favoriteFood: "ชานม!ชานม!", loveThing: "ชานม!หมูกะทะ!", hobby: "นอน/เล่นเกม!ทำงาน", favoriteColor: "แดง,ชมพู", messageToHumans: "สวัสดี/เจ้ามนุษย์ ขี้เกียจเปลี่ยนสีปากกาแล้ว เอาเปลี่ยนสีปากกาแล้ว เอาเป็นว่ามารู้จักกันดีกว่า แมวตัวนี้เลี้ยงง่ายแต่ดื้อมาก มาดุน้องแมวหน่อยมา! มามะ!,มาลูกหัวแมวหน่อยแต่กัดนะ!แฮ่ๆ" },
-    { id: 21, image: unknow, name: "Momoka", rank: "Litter Angel", type: "American Shorthair", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 22, image: unknow, name: "Moolek", rank: "Litter Angel", type: "แมวเล้า", birthPlace: "ไม่รู้เกืดที่ไหน แม่บอกเจอที่ ถังเบียร์", strength: "แมวสีเหลืองใส่แว่น", favoriteFood: "Alcohal ทุกชิดให้สมกับการเป็นแมวเล้า & ของกินที่ไม่อ้วนเพราะเก็บแคลไปกินแอล 555+", loveThing: "รักทุกคนที่รักหมูเล็ก,ใจดีกับหมูเล็ก รักที่าุดเลยนะคะคนดีของฉัน", hobby: "ชอบเต้น ร้องเพลง ตลอดเวลา มาสั่งLive ให้หมูเล็กที่ดื้อ", favoriteColor: "อย่างสีเหลือง", messageToHumans: "สวัสดีจ้าหมูเล็ก(Moolek) นะคะเป็นแมวExtrovert พูดมากชอบเลอคน หมูเล็กพร้อมคุยกับทุกคนเลยนะคะ ขี้เหล้า ไม่มีคนกินALเบิมเพี้นเรียกได้เลยพร้อมตั้งวง555+ ถ้าคุณรักหมูเล็กนี้หมูเล็กจะรักคุณกับ100เท่า รักนะ" },
-    { id: 23, image: unknow, name: "Risa", rank: "Litter Angel", birthPlace: "ที่ไหนไม่รู้ แต่อยู่ในลังส้มข้าวบ้านนุ้ด ริบหนูไปเลี้ยงหน่อยน้าา", type: "วิเชียรมาศ", strength: "แมวตาลำไย", favoriteFood: "ชาไทย ยูสุโซดา", loveThing: "ที่นอนกับผ้าห่มนุ่มๆของหวาน นุ้ดยังไงละ", hobby: "กินของอร่อย นอน ", favoriteColor: "สีแดง สีของพระเอกยังไงละ", messageToHumans: "นุ้ดจะกลับบ้านแล้วเบ๋อ อย่าเพิ่งกลับจิ แวะข้างบ้านก่อนจิ" },
-    { id: 24, image: unknow, name: "Yuna", rank: "Litter Angel", type: "แมวขี้โม้", birthPlace: "เกิดจากนรก แมวเฝ้านรก 3 หัว", strength: "ชอบขำสุขๆ", favoriteFood: "ทาโกะวาซาบิ ถั่วแระ", loveThing: "เตียง! ปอมปอมปุริน", hobby: "ร้องเพลง,นอน,นอน", favoriteColor: "สีดำ", messageToHumans: "ผมยูนะ,มะตะแล้วแต่เรียกไม่เรียกก็แล้วแต่" },
-    // Rank: Fairy
-    { id: 25, image: unknow, name: "Hitomi", rank: "Fairy", birthPlace: "แมวต่างโลก อิเซไก BlackNeko แบบไม่รู็ตัว!?", type: "! ! !", strength: "แมวฟันห่าง", favoriteFood: "นทสตอเบอรี่ พุตดิ้ง", loveThing: "Idol", hobby: "โอตาดตะ", favoriteColor: "", messageToHumans: "หิวเหล้า หิว หิว " },
-    { id: 26, image: unknow, name: "Maywa", rank: "Fairy", type: "Bengal", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 27, image: unknow, name: "Kurimi", rank: "Fairy", type: "Maine Coon", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 28, image: unknow, name: "Itsumi", rank: "Fairy", type: "Siamese", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 29, image: unknow, name: "Ayse", rank: "Fairy", type: "Birman", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 30, image: unknow, name: "Reka", rank: "Fairy", type: "Abyssinian", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    // Rank: Trainee
-    { id: 31, image: unknow, name: "Yumeko", rank: "Trainee", type: "Oriental Shorthair", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 32, image: unknow, name: "Shiori", rank: "Trainee", type: "Manx", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 33, image: unknow, name: "Tsubaki", rank: "Trainee", type: "Devon Rex", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 34, image: unknow, name: "Sora", rank: "Trainee", type: "Russian Blue", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 35, image: unknow, name: "Erika", rank: "Trainee", type: "Siberian", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 36, image: unknow, name: "Layra", rank: "Trainee", type: "Tonkinese", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 37, image: unknow, name: "Nene", rank: "Trainee", type: "Burmese", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 38, image: unknow, name: "Saya", rank: "Trainee", type: "Chartreux", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-    { id: 39, image: unknow, name: "Sylvie", rank: "Trainee", type: "Exotic Shorthair", birthPlace: "", strength: "", favoriteFood: "", loveThing: "", hobby: "", favoriteColor: "", messageToHumans: "" }, // Added type
-];
+// --- NEW: Image Carousel Component ---
+const ImageCarousel = ({ images }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const hasMultipleImages = images && images.length > 1;
+
+    const goToPrevious = () => {
+        const isFirstSlide = currentIndex === 0;
+        const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const goToNext = () => {
+        const isLastSlide = currentIndex === images.length - 1;
+        const newIndex = isLastSlide ? 0 : currentIndex + 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const goToSlide = (slideIndex) => {
+        setCurrentIndex(slideIndex);
+    };
+
+    if (!images || images.length === 0) {
+        return (
+            <div className="w-full h-full bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
+                    <FaCat className="relative text-purple-400 animate-bounce" size={60} />
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="w-full h-full relative group overflow-hidden">
+            {/* Background glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20"></div>
+            
+            {/* Image Display */}
+            <div
+                style={{ backgroundImage: `url(${images[currentIndex]})` }}
+                className="w-full h-full bg-center bg-cover duration-700 transition-all ease-in-out transform group-hover:scale-105"
+            ></div>
+
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+
+            {/* Left Arrow */}
+            {hasMultipleImages && (
+                <div onClick={goToPrevious} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 left-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
+                    <FaChevronLeft size={18} />
+                </div>
+            )}
+            
+            {/* Right Arrow */}
+            {hasMultipleImages && (
+                <div onClick={goToNext} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 right-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
+                    <FaChevronRight size={18} />
+                </div>
+            )}
+
+            {/* Dots Indicator */}
+            {hasMultipleImages && (
+                 <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex justify-center gap-2 bg-black/20 backdrop-blur-md rounded-full px-4 py-2">
+                    {images.map((_, slideIndex) => (
+                        <div
+                            key={slideIndex}
+                            onClick={() => goToSlide(slideIndex)}
+                            className={`cursor-pointer h-2.5 rounded-full transition-all duration-300 hover:scale-125 ${currentIndex === slideIndex ? 'bg-white w-8 shadow-lg' : 'bg-white/60 w-2.5 hover:bg-white/80'}`}
+                        ></div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Define the desired order of ranks for sorting
+const RANK_ORDER = ["Angel", "Litter Angel", "Fairy", "Trainee", "Legend", "Mythic", "รอ Audition"];
 
 const Cast = () => {
+    const [allCastsData, setAllCastsData] = useState([]);
     const [filteredCast, setFilteredCast] = useState([]);
     const [sortBy, setSortBy] = useState('id-asc');
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const [fadeIn, setFadeIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const [isGridVisible, setIsGridVisible] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
+    // Fetch cast data from Supabase
     useEffect(() => {
-        let newFilteredData = [...initialCast];
+        const fetchCasts = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('casts')
+                    .select('*')
+                    .order('id', { ascending: true });
+
+                if (fetchError) throw fetchError;
+                
+                setAllCastsData(data || []);
+
+            } catch (err) {
+                console.error("Error fetching casts:", err);
+                setError("ไม่สามารถโหลดข้อมูลน้องแมวได้ กรุณาลองใหม่อีกครั้ง");
+                setAllCastsData([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCasts();
+    }, []);
+
+    // Effect for filtering and sorting
+    useEffect(() => {
+        let newFilteredData = [...allCastsData];
+
+        if (searchTerm) {
+            newFilteredData = newFilteredData.filter(cast =>
+                cast.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                cast.rank.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (cast.type && cast.type.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+        }
 
         switch (sortBy) {
             case 'name-asc':
-                newFilteredData.sort((a, b) => a.name.localeCompare(b.name));
+                newFilteredData.sort((a, b) => a.name.localeCompare(b.name, 'th'));
                 break;
             case 'name-desc':
-                newFilteredData.sort((a, b) => b.name.localeCompare(a.name));
+                newFilteredData.sort((a, b) => b.name.localeCompare(a.name, 'th'));
                 break;
             case 'rank-asc':
-                // คำเตือนนี้ยังคงอยู่หากคุณไม่ได้แก้ไขการเรียงตาม Rank ให้สมบูรณ์
-                console.warn("Sorting by rank is not fully supported without allRanks definition in a filter-less component.");
+                newFilteredData.sort((a, b) => {
+                    const rankAIndex = RANK_ORDER.indexOf(a.rank);
+                    const rankBIndex = RANK_ORDER.indexOf(b.rank);
+                    if (rankAIndex === -1 && rankBIndex === -1) return a.rank.localeCompare(b.rank, 'th');
+                    if (rankAIndex === -1) return 1;
+                    if (rankBIndex === -1) return -1;
+                    return rankAIndex - rankBIndex;
+                });
                 break;
             case 'id-asc':
+                newFilteredData.sort((a, b) => a.id - b.id);
+                break;
+            case 'id-desc':
+                newFilteredData.sort((a, b) => b.id - b.id);
+                break;
             default:
                 newFilteredData.sort((a, b) => a.id - b.id);
                 break;
         }
         setFilteredCast(newFilteredData);
-    }, [sortBy]);
+        
+        // Trigger grid fade-in animation
+        if (newFilteredData.length > 0) {
+            const timer = setTimeout(() => setIsGridVisible(true), 100);
+            return () => clearTimeout(timer);
+        } else {
+            setIsGridVisible(false);
+        }
 
-    useEffect(() => {
-        setFadeIn(false);
-        const timer = setTimeout(() => {
-            setFadeIn(true);
-        }, 100);
-        return () => clearTimeout(timer);
-    }, [filteredCast]);
+    }, [allCastsData, sortBy, searchTerm]);
 
     const openUserModal = (user) => setSelectedUser(user);
     const closeUserModal = () => setSelectedUser(null);
 
-    const DetailItem = ({ icon: Icon, label, value, iconColorClass = "text-pink-500" }) => {
+    // Enhanced gradient function for ranks
+    const getRankGradient = (rank) => {
+        const gradients = {
+            'Angel': 'from-yellow-300 via-amber-400 to-orange-500',
+            'Litter Angel': 'from-cyan-300 via-sky-400 to-blue-500',
+            'Fairy': 'from-pink-300 via-rose-400 to-purple-500',
+            'Trainee': 'from-emerald-300 via-teal-400 to-cyan-500',
+            'Legend': 'from-violet-400 via-purple-500 to-indigo-600',
+            'Mythic': 'from-slate-600 via-purple-700 to-black',
+            'รอ Audition': 'from-gray-300 via-slate-400 to-gray-500'
+        };
+        return gradients[rank] || 'from-gray-400 to-gray-500';
+    };
+    
+    // Enhanced Detail Item for Modal
+    const DetailItem = ({ icon: Icon, label, value, iconColorClass = "text-slate-500", isLink = false }) => {
         if (!value) return null;
         return (
-            // ขอบด้านล่างของ DetailItem ยังคงอยู่ เพื่อแยกแต่ละบรรทัดข้อมูล
-            <div className="flex items-start py-2.5 border-b border-gray-200 dark:border-zinc-700/50 last:border-b-0">
-                <span className={`w-7 pt-1 ${iconColorClass} dark:opacity-80`}><Icon size={18}/></span>
-                <span className="text-gray-500 dark:text-gray-400 w-32 shrink-0 font-medium">{label}:</span>
-                <span className="text-gray-700 dark:text-gray-200 flex-1">{value}</span>
+            <div className="group flex items-start p-5 bg-gradient-to-r from-white to-slate-50/50 rounded-xl border border-slate-200/50 hover:border-purple-300/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-sm border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
+                    <Icon className={iconColorClass} size={20} />
+                </div>
+                <div className="ml-4 flex-1">
+                    <p className="text-sm font-semibold text-slate-500 uppercase tracking-wide">{label}</p>
+                    {isLink ? (
+                        <a
+                            href={value.startsWith('http') ? value : `https://${value}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-purple-600 hover:text-purple-700 font-bold break-all transition-colors duration-200 hover:underline"
+                        >
+                            {value}
+                        </a>
+                    ) : (
+                        <p className="text-base font-bold text-slate-800 break-words mt-1">{value}</p>
+                    )}
+                </div>
             </div>
         );
     };
 
+    // --- RENDER STATES ---
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+                    <FaCat size={80} className="relative text-purple-500 animate-bounce"/>
+                </div>
+                <h2 className="mt-8 text-2xl font-bold text-slate-700 animate-pulse">กำลังโหลดข้อมูลน้องแมว...</h2>
+                <p className="mt-2 text-slate-500 animate-pulse">กรุณารอสักครู่</p>
+                <div className="mt-6 flex space-x-2">
+                    <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce"></div>
+                    <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 p-4">
+                <div className="w-full max-w-md text-center bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-red-200/50">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
+                        <FaCat size={60} className="relative mx-auto text-red-500"/>
+                    </div>
+                    <h2 className="mt-8 text-2xl font-bold text-red-800">เกิดข้อผิดพลาด!</h2>
+                    <p className="mt-3 text-red-600 leading-relaxed">{error}</p>
+                </div>
+            </div>
+        );
+    }
+
+    // --- MAIN COMPONENT ---
+
     return (
-        // เปลี่ยน bg-white และ min-h-screen เป็น bg-transparent เพื่อให้โปร่งใส
-        <div className="py-16 pt-20 md:pt-24 bg-transparent min-h-screen text-gray-900 transition-colors duration-500">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-10 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 pb-2">
-                        เหล่าน้องแมว
-                    </h1>
+        <div className="min-h-screen bg-white text-slate-800 py-16 sm:py-24 relative overflow-hidden">
+            
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                 
+                {/* Enhanced Header */}
+                <div className="text-center mb-16">
+                    <div className="relative inline-block">
+                        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-800 tracking-tight hover:text-transparent hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 hover:bg-clip-text transition-all duration-500">
+                            ทำเนียบน้องแมว
+                        </h1>
+                    </div>
+                    <p className="mt-6 max-w-3xl mx-auto text-xl text-slate-600 leading-relaxed font-medium">
+                        พบกับความน่ารักสดใสของเหล่าสมาชิกเหมียวทุกคน ✨
+                    </p>
+                    <div className="mt-4 flex justify-center space-x-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* --- Main Content Area (Cast Grid) --- */}
-                    <main className="w-full">
-                        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Showing {filteredCast.length} of {initialCast.length} cast members
-                            </p>
-                            <div className="flex items-center space-x-2">
-                                <label htmlFor="sort-by" className="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+                {/* Enhanced Controls */}
+                <div className="mb-16 p-6 bg-white border border-slate-200 rounded-3xl shadow-lg">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div className="relative w-full sm:max-w-xs lg:max-w-sm group">
+                            <div className="relative">
+                                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                                <input
+                                    type="text"
+                                    placeholder="ค้นหาด้วยชื่อ, rank..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition-all duration-300 text-slate-700 font-medium placeholder-slate-400"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-3 text-sm font-bold text-slate-700 bg-white rounded-full px-4 py-2 border border-slate-200">
+                                <FaCat className="text-purple-500" />
+                                <span>พบ {filteredCast.length} ชีวิต</span>
+                            </div>
+                            <div className="relative group">
                                 <select
-                                    id="sort-by"
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="form-select block w-auto pl-3 pr-8 py-2 text-sm border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-200 dark:focus:ring-offset-zinc-900 shadow-sm"
+                                    className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 text-slate-700"
                                 >
-                                    <option value="id-asc">Default</option>
-                                    <option value="name-asc">Name: A-Z</option>
-                                    <option value="name-desc">Name: Z-A</option>
-                                    {/* ตัวเลือก "Rank Order" อาจไม่ทำงานสมบูรณ์หากไม่มีการนำเข้า allRanks */}
-                                    {/* <option value="rank-asc">Rank Order</option> */}
+                                    <option value="id-asc">ID (น้อยไปมาก)</option>
+                                    <option value="id-desc">ID (มากไปน้อย)</option>
+                                    <option value="name-asc">ชื่อ (ก → ฮ)</option>
+                                    <option value="name-desc">ชื่อ (ฮ → ก)</option>
+                                    <option value="rank-asc">จัดอันดับ Rank</option>
                                 </select>
                             </div>
                         </div>
-
-                        {/* เปลี่ยนตรงนี้: เพิ่ม md:grid-cols-3 และ lg:grid-cols-4 */}
-                        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 transition-opacity duration-700 ease-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-                            {filteredCast.length > 0 ? (
-                                filteredCast.map((user, index) => (
-                                    <div
-                                        key={user.id}
-                                        onClick={() => openUserModal(user)}
-                                        title={`View details for ${user.name}`}
-                                        // ลบคลาส 'border' ออกจากตรงนี้
-                                        className="group cursor-pointer bg-white dark:bg-zinc-800/80 rounded-2xl shadow-lg hover:shadow-xl dark:hover:shadow-[0_10px_15px_-3px_rgba(255,255,255,0.02),0_4px_6px_-4px_rgba(255,255,255,0.02)] overflow-hidden transition-all duration-300 ease-in-out transform hover:-translate-y-1"
-                                        style={{
-                                            opacity: fadeIn ? 1 : 0,
-                                            transform: fadeIn ? 'translateY(0)' : 'translateY(20px)',
-                                            transitionDelay: `${fadeIn ? (index % 15) * 0.04 : 0}s`,
-                                            transitionProperty: 'opacity, transform',
-                                            transitionDuration: '0.5s, 0.3s',
-                                        }}
-                                    >
-                                        <div className="relative w-full h-72 overflow-hidden">
-                                            <img
-                                                src={user.image}
-                                                alt={user.name}
-                                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-400 ease-in-out"
-                                            />
-                                            <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2.5 py-1 rounded-full backdrop-blur-sm shadow">
-                                                {user.rank}
-                                            </div>
-                                        </div>
-                                        <div className="p-5">
-                                            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-1 truncate group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                                                {user.name}
-                                            </h3>
-                                            {user.type && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.type}</p>}
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-16 text-xl flex flex-col items-center justify-center">
-                                    <FaCat size={60} className="mb-4 text-gray-400 dark:text-zinc-600"/>
-                                    <p className="font-semibold text-2xl mb-2 text-gray-600 dark:text-gray-300">No cast members found</p>
-                                    <p>Please check the cast data.</p>
-                                </div>
-                            )}
-                        </div>
-                    </main>
+                    </div>
                 </div>
 
-                {/* Modal */}
-                {selectedUser && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-fade-in">
-                        <div
-                            // ลบคลาส 'border' ออกจาก Modal ด้วย
-                            className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-2xl w-full mx-auto p-6 md:p-8 relative max-h-[90vh] overflow-y-auto transform scale-95 animate-scale-in"
-                        >
-                            <button
-                                onClick={closeUserModal}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-white transition duration-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800"
+                {/* Enhanced Cast Grid */}
+                {filteredCast.length > 0 ? (
+                    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 transition-all duration-1000 ${isGridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        {filteredCast.map((user, index) => (
+                            <div
+                                key={user.id}
+                                onClick={() => openUserModal(user)}
+                                className="group cursor-pointer bg-white rounded-3xl border border-slate-200 overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-purple-400 hover:-translate-y-2 hover:scale-105 relative"
+                                style={{
+                                    transitionDelay: `${(index % 16) * 0.05}s`
+                                }}
                             >
-                                <FaTimes size={22} />
-                            </button>
-                            <div className="flex flex-col items-center space-y-5">
-                                <img
-                                    src={selectedUser.image}
-                                    alt={selectedUser.name}
-                                    // ลบคลาส 'border' ที่รูปโปรไฟล์ใน Modal ด้วย
-                                    className="w-36 h-36 md:w-40 md:h-40 object-cover rounded-full shadow-xl"
-                                />
-                                <div className="text-center">
-                                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">{selectedUser.name}</h2>
-                                    <p className="text-lg text-pink-500 dark:text-pink-400 font-semibold mt-1">Rank: {selectedUser.rank}</p>
-                                    {selectedUser.type && <p className="text-md text-gray-500 dark:text-gray-400 mt-0.5">Type: {selectedUser.type}</p>}
+                                {/* Remove glow effect */}
+                                
+                                <div className="relative w-full aspect-[4/5] overflow-hidden rounded-t-3xl">
+                                    <img
+                                        src={user.image_url || "https://placekitten.com/400/500"}
+                                        alt={user.name}
+                                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+                                        loading="lazy"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent group-hover:from-black/5 transition-all duration-500"></div>
+                                    <div className={`absolute top-4 right-4 text-xs font-black px-4 py-2 rounded-full shadow-lg text-white bg-gradient-to-r ${getRankGradient(user.rank)} border border-white/20`}>
+                                        {user.rank}
+                                    </div>
                                 </div>
-
-                                <div className="w-full mt-4 pt-4 border-t border-gray-200 dark:border-zinc-700/50 text-base text-gray-700 dark:text-gray-300 space-y-1.5">
-                                    <DetailItem icon={FaMapMarkerAlt} label="Birth Place" value={selectedUser.birthPlace} iconColorClass="text-red-500" />
-                                    <DetailItem icon={FaDumbbell} label="Strength" value={selectedUser.strength} iconColorClass="text-blue-500" />
-                                    <DetailItem icon={FaUtensils} label="Favorite Food" value={selectedUser.favoriteFood} iconColorClass="text-orange-500" />
-                                    <DetailItem icon={FaHeart} label="Loves" value={selectedUser.loveThing} iconColorClass="text-rose-500" />
-                                    <DetailItem icon={FaSmile} label="Hobby" value={selectedUser.hobby} iconColorClass="text-yellow-500" />
-                                    <DetailItem icon={FaPalette} label="Favorite Color" value={selectedUser.favoriteColor} iconColorClass="text-purple-500" />
+                                <div className="relative p-6 text-center bg-white">
+                                    <h3 className="text-xl font-black text-slate-800 truncate group-hover:text-purple-600 transition-colors duration-300">
+                                        {user.name}
+                                    </h3>
+                                    {user.type && (
+                                        <p className="text-sm text-slate-500 truncate mt-1 font-semibold">
+                                            {user.type}
+                                        </p>
+                                    )}
                                 </div>
-
-                                {selectedUser.messageToHumans && (
-                                    // ลบคลาส 'border' ที่ข้อความด้วย
-                                    <p className="w-full italic mt-5 text-center bg-gradient-to-r from-pink-500/10 to-purple-500/10 dark:from-pink-500/5 dark:to-purple-500/5 p-4 rounded-lg text-gray-800 dark:text-gray-200 shadow-inner">
-                                        <span className="text-2xl leading-none mr-1 text-pink-500/70 dark:text-pink-400/70">“</span>
-                                        {selectedUser.messageToHumans}
-                                        <span className="text-2xl leading-none ml-1 text-pink-500/70 dark:text-pink-400/70">”</span>
-                                    </p>
-                                )}
                             </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-20 sm:py-32">
+                        <div className="bg-white border border-slate-200 rounded-3xl p-12 max-w-lg mx-auto shadow-lg">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+                                <FaCat size={80} className="relative mx-auto text-slate-400"/>
+                            </div>
+                            <h3 className="mt-8 text-2xl font-black text-slate-700">
+                                ไม่พบน้องแมวที่ค้นหา
+                            </h3>
+                            <p className="mt-3 text-slate-500 leading-relaxed font-medium">
+                                {searchTerm ? `ไม่พบผลลัพธ์สำหรับ "${searchTerm}"` : 'อาจจะยังไม่มีน้องแมวในระบบ'}
+                            </p>
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="mt-8 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-1"
+                                >
+                                    ล้างการค้นหา
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
             </div>
+
+            {/* Enhanced Modal */}
+            {selectedUser && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+                        onClick={closeUserModal}
+                    ></div>
+                    
+                    <div className="relative bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 flex flex-col md:flex-row animate-in zoom-in-95 duration-300">
+                        <button
+                            onClick={closeUserModal}
+                            className="absolute top-6 right-6 z-20 w-12 h-12 bg-white/80 backdrop-blur-sm text-slate-600 hover:text-slate-900 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-90 border border-slate-200/50 shadow-lg"
+                        >
+                            <FaTimes size={18} />
+                        </button>
+                        
+                        {/* Enhanced Image Section */}
+                        <div className="w-full md:w-2/5 flex-shrink-0 relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 md:rounded-l-3xl rounded-t-3xl md:rounded-tr-none">
+                           <ImageCarousel 
+                                images={
+                                    (selectedUser.image_urls && Array.isArray(selectedUser.image_urls) && selectedUser.image_urls.length > 0)
+                                    ? selectedUser.image_urls 
+                                    : [selectedUser.image_url]
+                                } 
+                            />
+                            <div className={`absolute top-6 left-6 text-sm font-black px-5 py-2.5 rounded-full shadow-2xl text-white bg-gradient-to-r ${getRankGradient(selectedUser.rank)} border border-white/30 backdrop-blur-sm`}>
+                                {selectedUser.rank}
+                            </div>
+                        </div>
+
+                        {/* Enhanced Modal Info Section */}
+                        <div className="p-8 md:p-10 flex-1 bg-white">
+                            <div className="mb-8">
+                                <h2 className="text-4xl sm:text-5xl font-black text-slate-800 hover:text-transparent hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:bg-clip-text transition-all duration-500 leading-tight">
+                                    {selectedUser.name}
+                                </h2>
+                                {selectedUser.type && (
+                                    <p className="mt-2 text-xl text-slate-500 font-bold">
+                                        {selectedUser.type}
+                                    </p>
+                                )}
+                            </div>
+
+                            {selectedUser.message_to_humans && (
+                                <blockquote className="p-6 mb-8 bg-slate-50 border-l-4 border-purple-400 rounded-r-2xl shadow-lg">
+                                    <p className="text-lg italic text-purple-800 font-semibold leading-relaxed">
+                                        "{selectedUser.message_to_humans}"
+                                    </p>
+                                </blockquote>
+                            )}
+
+                            <div className="space-y-6">
+                               <div className="border-b-2 border-gradient-to-r from-purple-200 to-pink-200 pb-3">
+                                   <h3 className="text-xl font-black text-slate-700">ข้อมูลส่วนตัว</h3>
+                               </div>
+                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                  <DetailItem icon={FaMapMarkerAlt} label="สถานที่เกิด" value={selectedUser.birth_place} iconColorClass="text-red-500" />
+                                  <DetailItem icon={FaDumbbell} label="ความสามารถ" value={selectedUser.strength} iconColorClass="text-blue-500" />
+                                  <DetailItem icon={FaUtensils} label="อาหารโปรด" value={selectedUser.favorite_food} iconColorClass="text-orange-500" />
+                                  <DetailItem icon={FaHeart} label="สิ่งที่รัก" value={selectedUser.love_thing} iconColorClass="text-rose-500" />
+                                  <DetailItem icon={FaSmile} label="งานอดิเรก" value={selectedUser.hobby} iconColorClass="text-yellow-500" />
+                                  <DetailItem icon={FaPalette} label="สีโปรด" value={selectedUser.favorite_color} iconColorClass="text-purple-500" />
+                               </div>
+                            </div>
+
+                            {(selectedUser.facebook_url || selectedUser.tiktok_url || selectedUser.instagram_url) && (
+                                <div className="mt-10">
+                                    <div className="border-b-2 border-gradient-to-r from-purple-200 to-pink-200 pb-3 mb-6">
+                                        <h3 className="text-xl font-black text-slate-700">ช่องทางติดตาม</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <DetailItem icon={FaFacebook} label="Facebook" value={selectedUser.facebook_url} iconColorClass="text-blue-600" isLink={true} />
+                                        <DetailItem icon={FaTiktok} label="TikTok" value={selectedUser.tiktok_url} iconColorClass="text-black" isLink={true} />
+                                        <DetailItem icon={FaInstagram} label="Instagram" value={selectedUser.instagram_url} iconColorClass="text-pink-600" isLink={true} />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

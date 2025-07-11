@@ -4,7 +4,7 @@ import story2 from "../assets/about/2.png"; // น่าจะเป็นส่
 
 const Receive = () => {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-white">
       {/* ใช้ pt-20 กับ div หลัก หรือ padding-top ใน CSS เพื่อให้มีพื้นที่ด้านบน */}
       <div className="w-full relative pt-20"> {/* เพิ่ม pt-20 เพื่อให้มีช่องว่างด้านบนของหน้าจอ */}
         {/* รูปแรก */}

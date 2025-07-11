@@ -2,13 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { FaChevronDown, FaTimes, FaCalendarAlt, FaArrowRight } from 'react-icons/fa';
 import { supabase } from './supabaseClient'; // << ปรับ path ไปยัง supabaseClient ให้ถูกต้อง
 
-// ลบการ import รูปภาพ Event ที่เป็น local ทั้งหมดออกไป
-// เช่น:
-// import image19 from "../assets/newsandevemts/May/birthdayidol.png";
-// ... (ลบให้หมด) ...
-
-
-// ALL_MONTHS_ORDER สามารถคงไว้ หรือจะสร้างแบบ dynamic จากข้อมูลที่ได้มาก็ได้
 const ALL_MONTHS_ORDER = [
   "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
   "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"

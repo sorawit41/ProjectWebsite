@@ -139,7 +139,7 @@ const PrivacyPolicy = () => {
         หากท่านมีคำถาม ข้อสงสัย หรือข้อเสนอแนะเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ โปรดติดต่อเราได้ผ่านช่องทางต่อไปนี้:
       </p>
       <p style={paragraphStyle}>
-        <strong style={strongStyle}>อีเมล:</strong> Blackneko.mbk@gmail.com
+        <strong style={strongStyle}>อีเมล:</strong> mek.it@blackneko.in.th
       </p>
     </div>
   );

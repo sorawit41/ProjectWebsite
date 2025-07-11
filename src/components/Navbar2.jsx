@@ -47,8 +47,8 @@ const UnifiedFooter = () => {
 
   const contactInfo = [
     { icon: <FaMapMarkerAlt className="mr-2 mt-1 flex-shrink-0" />, text: "ศูนย์การค้า MBK Center, แขวงวังใหม่ เขตปทุมวัน กรุงเทพมหานคร 10330" },
-    { icon: <FaPhone className="mr-2 mt-1 flex-shrink-0" />, text: "XXXXXXXXXXX" }, //  ใส่เบอร์โทรจริง
-    { icon: <FaEnvelope className="mr-2 mt-1 flex-shrink-0" />, text: "Blackneko.mbk@gmail.com" },
+    { icon: <FaPhone className="mr-2 mt-1 flex-shrink-0" />, text: "0895535468" }, //  ใส่เบอร์โทรจริง
+    { icon: <FaEnvelope className="mr-2 mt-1 flex-shrink-0" />, text: "mek.it@blackneko.in.th" },
   ];
 
   const openingHours = [
