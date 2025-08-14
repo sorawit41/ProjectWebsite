@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { supabase } from './supabaseClient'; // ตรวจสอบว่า path ถูกต้อง
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // ไอคอนสำหรับแสดง/ซ่อนรหัสผ่าน
+import { FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // เพิ่ม FaCheckCircle และ FaTimesCircle
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -12,9 +12,28 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // New states for real-time password validation feedback
+  const [hasUppercase, setHasUppercase] = useState(false);
+  const [isLongEnough, setIsLongEnough] = useState(false);
+
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Handle password input changes with real-time validation
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+
+    // Update validation states
+    setHasUppercase(/[A-Z]/.test(newPassword));
+    setIsLongEnough(newPassword.length >= 6);
+
+    // Clear error messages related to password if conditions are met
+    if (error && (error.includes('รหัสผ่านต้องมีความยาว') || error.includes('รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษตัวใหญ่'))) {
+      setError('');
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -22,21 +41,19 @@ const RegisterPage = () => {
     setMessage('');
     setLoading(true);
 
-    // 1. ตรวจสอบความยาวรหัสผ่าน
+    // Client-side validation before Supabase call
     if (password.length < 6) {
       setError('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
       setLoading(false);
       return;
     }
 
-    // 2. ตรวจสอบว่ามีตัวอักษรตัวใหญ่อย่างน้อย 1 ตัว (เพิ่มใหม่)
     if (!/[A-Z]/.test(password)) {
       setError('รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษตัวใหญ่อย่างน้อย 1 ตัว');
       setLoading(false);
       return;
     }
 
-    // 3. ตรวจสอบรหัสผ่านให้ตรงกัน
     if (password !== confirmPassword) {
       setError('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
       setLoading(false);
@@ -56,27 +73,27 @@ const RegisterPage = () => {
         setError('อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น');
       } else if (signUpError.message.includes("Password should be at least 6 characters")) {
         setError('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-      } else if (signUpError.message.includes("Password must contain at least one uppercase letter")) { // อาจจะมี error นี้จาก Supabase โดยตรง
+      } else if (signUpError.message.includes("Password must contain at least one uppercase letter")) {
         setError('รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษตัวใหญ่อย่างน้อย 1 ตัว');
       }
       else {
         setError('เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง (ดู Console สำหรับรายละเอียด)');
       }
     } else {
-      // ปรับปรุงข้อความให้ชัดเจนยิ่งขึ้นเรื่องการยืนยันอีเมล
-      const userEmailForMessage = data?.user?.email || email; // ใช้ email จาก response ถ้ามี, หรือจาก state
+      const userEmailForMessage = data?.user?.email || email;
       setMessage(
         `การลงทะเบียนเกือบเสร็จสมบูรณ์! โปรดตรวจสอบกล่องจดหมายของ ${userEmailForMessage} และคลิกลิงก์ยืนยันที่เราส่งไปให้เพื่อเปิดใช้งานบัญชีของคุณ`
       );
       setEmail('');
       setPassword('');
       setConfirmPassword('');
-      // navigate('/login'); // ยังคง comment ไว้เพื่อให้ผู้ใช้ไปยืนยันอีเมลก่อน
+      // Reset password validation states
+      setHasUppercase(false);
+      setIsLongEnough(false);
     }
   };
 
   return (
-    // โค้ดส่วน JSX เหมือนเดิมกับที่คุณให้มาล่าสุด (รวมถึง bg-white และ py-20)
     <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-slate-900 p-4 font-sans transition-colors duration-300 py-20">
       <div
         className="w-full max-w-md bg-white/80 dark:bg-slate-800/70 backdrop-blur-lg shadow-2xl rounded-2xl p-8 sm:p-10 transform transition-all hover:scale-[1.01]"
@@ -133,7 +150,7 @@ const RegisterPage = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange} // Use the new handler here
                 required
                 className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/50 dark:bg-slate-700/60 dark:text-white transition-shadow duration-300 focus:shadow-lg pr-10"
               />
@@ -146,7 +163,29 @@ const RegisterPage = () => {
                 {showPassword ? <FaEyeSlash size={18}/> : <FaEye size={18}/>}
               </button>
             </div>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">ความยาวอย่างน้อย 6 ตัวอักษร และมีตัวใหญ่ 1 ตัว</p> {/* ปรับปรุงคำแนะนำ */}
+            {/* Real-time password validation feedback */}
+            <div className="mt-2 text-sm space-y-1">
+              <div className="flex items-center transition-colors duration-200">
+                {isLongEnough ? (
+                  <FaCheckCircle className="text-green-500 mr-2" />
+                ) : (
+                  <FaTimesCircle className="text-red-500 mr-2" />
+                )}
+                <span className={isLongEnough ? "text-green-600 dark:text-green-400" : "text-slate-500 dark:text-slate-400"}>
+                  ความยาวอย่างน้อย 6 ตัวอักษร
+                </span>
+              </div>
+              <div className="flex items-center transition-colors duration-200">
+                {hasUppercase ? (
+                  <FaCheckCircle className="text-green-500 mr-2" />
+                ) : (
+                  <FaTimesCircle className="text-red-500 mr-2" />
+                )}
+                <span className={hasUppercase ? "text-green-600 dark:text-green-400" : "text-slate-500 dark:text-slate-400"}>
+                  มีตัวอักษรภาษาอังกฤษตัวใหญ่อย่างน้อย 1 ตัว
+                </span>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -179,9 +218,9 @@ const RegisterPage = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !hasUppercase || !isLongEnough} // Disable if requirements not met
             className={`w-full py-3 px-4 font-semibold text-lg text-white rounded-xl shadow-lg transition-all duration-300 ease-in-out
-                        ${loading
+                        ${loading || !hasUppercase || !isLongEnough
                           ? 'bg-slate-400 cursor-not-allowed'
                           : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transform hover:scale-105 active:scale-95'
                         }`}

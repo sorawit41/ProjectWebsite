@@ -7,7 +7,7 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import {
     FaClipboardList, FaCalendarAlt, FaUsersCog, FaRegCalendarCheck, FaImages, FaBriefcase,
     FaCat, FaPlus, FaEdit, FaTrash, FaImage, FaFacebook, FaTiktok, FaInstagram, FaLink, FaDownload,
-    FaIdCard, FaQrcode, FaCoins, FaTimesCircle, FaBoxes
+    FaIdCard, FaQrcode, FaCoins, FaTimesCircle, FaBoxes , FaBullhorn
 } from 'react-icons/fa';
 
 // Import product service functions
@@ -75,6 +75,14 @@ const initialProductFormState = {
         custom: [], // For manually added item choices
     },
     options: [], // This will be an array of option objects
+};
+
+const initialAnnouncementFormState = {
+    id: null,
+    message: '',
+    link_url: '',
+    is_active: true,
+    sort_order: 0,
 };
 
 function AdminOrderManagementPage() {
@@ -172,6 +180,13 @@ function AdminOrderManagementPage() {
     const [isProductSubmitting, setIsProductSubmitting] = useState(false);
     const [productError, setProductError] = useState('');
     const [productActionMessage, setProductActionMessage] = useState('');
+    // ✅ [เพิ่มใหม่] States สำหรับจัดการประกาศ
+    const [announcements, setAnnouncements] = useState([]);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+    const [announcementForm, setAnnouncementForm] = useState(initialAnnouncementFormState);
+    const [isAnnouncementSubmitting, setIsAnnouncementSubmitting] = useState(false);
+    const [announcementError, setAnnouncementError] = useState('');
+    const [announcementActionMessage, setAnnouncementActionMessage] = useState('');
 
     // State for custom available item choice input
     const [newCustomItemChoice, setNewCustomItemChoice] = useState('');
@@ -392,7 +407,22 @@ function AdminOrderManagementPage() {
             setProductError("ไม่สามารถดึงข้อมูลสินค้าได้: " + err.message);
         }
     }, []);
-
+    // ✅ [เพิ่มใหม่] ฟังก์ชันดึงข้อมูลประกาศ
+    const fetchAnnouncements = useCallback(async () => {
+        setAnnouncementError('');
+        try {
+            const { data, error } = await supabase
+                .from('announcements')
+                .select('*')
+                .order('sort_order', { ascending: true })
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            setAnnouncements(data || []);
+        } catch (err) {
+            console.error("Error fetching announcements:", err);
+            setAnnouncementError("ไม่สามารถโหลดข้อมูลประกาศได้: " + err.message);
+        }
+    }, []);
     // --- Main Data Fetching and Auth Effect ---
     useEffect(() => {
         async function checkAuthAndFetchData() {
@@ -405,7 +435,8 @@ function AdminOrderManagementPage() {
             setJobAppsError(''); setJobAppsActionMessage('');
             setScheduleEntryError(''); setScheduleEntryMessage('');
             setProductError(''); setProductActionMessage('');
-
+            // ✅ [อัปเดต] เพิ่มการรีเซ็ต state ของประกาศ
+            setAnnouncementError(''); setAnnouncementActionMessage('');
             try {
                 const { data: { user }, error: getUserError } = await supabase.auth.getUser();
                 if (getUserError) { throw new Error("ไม่สามารถตรวจสอบข้อมูลผู้ใช้ได้: " + getUserError.message); }
@@ -423,25 +454,26 @@ function AdminOrderManagementPage() {
                         fetchBannerImages(),
                         fetchJobApplications(),
                         fetchCastsForOrderSummary(),
-                        fetchManagedProducts()
+                        fetchManagedProducts(),
+                        fetchAnnouncements()
                     ]);
                     fetchSchedulesByDate(new Date().toISOString().split('T')[0]);
                 } else {
                     setIsAuthorized(false);
                     const authErrorMsg = user ? "คุณไม่ได้รับสิทธิ์ให้เข้าถึงหน้านี้" : "กรุณาเข้าสู่ระบบ";
-                    [setOrderError, setEventError, setCastError, setScheduleError, setBannerError, setJobAppsError, setScheduleEntryError, setProductError].forEach(setError => setError(authErrorMsg));
+                    [setOrderError, setEventError, setCastError, setScheduleError, setBannerError, setJobAppsError, setScheduleEntryError, setProductError, setAnnouncementError].forEach(setError => setError(authErrorMsg));
                 }
             } catch (err) {
                 console.error("Critical error in checkAuthAndFetchData:", err);
                 const generalErrorMessage = "เกิดข้อผิดพลาดร้ายแรง: " + err.message;
-                [setOrderError, setEventError, setCastError, setScheduleError, setBannerError, setJobAppsError, setScheduleEntryError, setProductError].forEach(setError => setError(generalErrorMessage));
+                [setOrderError, setEventError, setCastError, setScheduleError, setBannerError, setJobAppsError, setScheduleEntryError, setProductError, setAnnouncementError].forEach(setError => setError(generalErrorMessage));
                 setIsAuthorized(false);
             } finally {
                 setIsLoading(false);
             }
         }
-        checkAuthAndFetchData();
-    }, [fetchOrdersForReview, fetchApprovedOrders, fetchRejectedOrders, fetchAdminEvents, fetchAllManagedCasts, fetchCurrentScheduleImageUrl, fetchBannerImages, fetchJobApplications, fetchSchedulesByDate, fetchCastsForOrderSummary, fetchManagedProducts]);
+          checkAuthAndFetchData();
+    }, [fetchOrdersForReview, fetchApprovedOrders, fetchRejectedOrders, fetchAdminEvents, fetchAllManagedCasts, fetchCurrentScheduleImageUrl, fetchBannerImages, fetchJobApplications, fetchSchedulesByDate, fetchCastsForOrderSummary, fetchManagedProducts, fetchAnnouncements]);
 
     // Effect to refetch schedules when scheduleDate changes
     useEffect(() => {
@@ -1340,7 +1372,112 @@ function AdminOrderManagementPage() {
             return { ...prev, options: newOptions };
         });
     };
+    // ✅ [เพิ่มใหม่] Logic สำหรับจัดการประกาศ
+    const resetAnnouncementForm = useCallback(() => {
+        setAnnouncementForm(initialAnnouncementFormState);
+        setSelectedAnnouncement(null);
+        setAnnouncementError('');
+        setAnnouncementActionMessage('');
+        const formElement = document.getElementById('announcement-form-section');
+        if (formElement) formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
 
+    const handleAnnouncementFormChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setAnnouncementForm(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleSelectAnnouncementForEditing = useCallback((announcement) => {
+        setSelectedAnnouncement(announcement);
+        setAnnouncementForm({
+            id: announcement.id,
+            message: announcement.message || '',
+            link_url: announcement.link_url || '',
+            is_active: announcement.is_active,
+            sort_order: announcement.sort_order || 0,
+        });
+        setAnnouncementActionMessage('');
+        setAnnouncementError('');
+        const formElement = document.getElementById('announcement-form-section');
+        if (formElement) formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
+
+    const handleAnnouncementSubmit = async (e) => {
+        e.preventDefault();
+        if (!announcementForm.message) {
+            setAnnouncementError("กรุณากรอกข้อความประกาศ");
+            return;
+        }
+        setIsAnnouncementSubmitting(true);
+        setAnnouncementError('');
+        setAnnouncementActionMessage('');
+
+        const dataToSave = {
+            message: announcementForm.message,
+            link_url: announcementForm.link_url || null,
+            is_active: announcementForm.is_active,
+            sort_order: Number(announcementForm.sort_order),
+        };
+
+        try {
+            let resultMessage = '';
+            if (selectedAnnouncement?.id) {
+                // Update existing announcement
+                const { data, error } = await supabase
+                    .from('announcements')
+                    .update(dataToSave)
+                    .eq('id', selectedAnnouncement.id)
+                    .select()
+                    .single();
+                if (error) throw error;
+                resultMessage = `ประกาศ "${data.message.substring(0, 20)}..." อัปเดตสำเร็จ!`;
+            } else {
+                // Insert new announcement
+                const { data, error } = await supabase
+                    .from('announcements')
+                    .insert(dataToSave)
+                    .select()
+                    .single();
+                if (error) throw error;
+                resultMessage = `ประกาศใหม่ "${data.message.substring(0, 20)}..." สร้างสำเร็จ!`;
+            }
+            setAnnouncementActionMessage(resultMessage);
+            resetAnnouncementForm();
+            await fetchAnnouncements();
+        } catch (err) {
+            console.error("Error saving announcement:", err);
+            setAnnouncementError("บันทึกข้อมูลประกาศไม่สำเร็จ: " + err.message);
+        } finally {
+            setIsAnnouncementSubmitting(false);
+        }
+    };
+
+    const handleDeleteAnnouncement = async (announcementId, announcementMessage) => {
+        if (!window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบประกาศ: "${announcementMessage.substring(0, 50)}..."?`)) return;
+
+        setIsAnnouncementSubmitting(true);
+        setAnnouncementError('');
+        setAnnouncementActionMessage('');
+
+        try {
+            const { error } = await supabase.from('announcements').delete().eq('id', announcementId);
+            if (error) throw error;
+
+            setAnnouncementActionMessage(`ประกาศ ID: ${announcementId} ถูกลบสำเร็จ!`);
+            await fetchAnnouncements();
+            if (selectedAnnouncement?.id === announcementId) {
+                resetAnnouncementForm();
+            }
+        } catch (err) {
+            console.error("Error deleting announcement:", err);
+            setAnnouncementError("ลบประกาศไม่สำเร็จ: " + err.message);
+        } finally {
+            setIsAnnouncementSubmitting(false);
+        }
+    };
     const handleRemoveBundleItem = (optionIndex, bundleItemIndex) => {
         setProductForm(prev => {
             const newOptions = [...prev.options];
@@ -1607,7 +1744,8 @@ const handleProductSubmit = async (e) => {
 
     // --- Render Logic ---
     if (isLoading) return <div style={{ textAlign: 'center', padding: '20px', paddingTop: '80px', fontSize: '1.2em' }}>⏳ กำลังโหลดข้อมูล...</div>;
-    if (!isAuthorized) return <div style={{ color: 'red', textAlign: 'center', padding: '20px', paddingTop: '80px' }}><h2>⛔ Access Denied</h2><p>{orderError || eventError || castError || scheduleError || bannerError || jobAppsError || scheduleEntryError || productError || "คุณไม่ได้รับสิทธิ์ให้เข้าถึงหน้านี้"}</p></div>;
+    // ✅ [อัปเดต] เพิ่ม announcementError ในเงื่อนไข
+    if (!isAuthorized) return <div style={{ color: 'red', textAlign: 'center', padding: '20px', paddingTop: '80px' }}><h2>⛔ Access Denied</h2><p>{orderError || eventError || castError || scheduleError || bannerError || jobAppsError || scheduleEntryError || productError || announcementError || "คุณไม่ได้รับสิทธิ์ให้เข้าถึงหน้านี้"}</p></div>;
 
     const tabButtonStyle = (isActive) => ({
         padding: '10px 20px', cursor: 'pointer',
@@ -1686,6 +1824,9 @@ const handleProductSubmit = async (e) => {
                 </button>
                 <button onClick={() => setActiveAdminSection('membership')} style={tabButtonStyle(activeAdminSection === 'membership')}>
                     <FaIdCard /> จัดการสมาชิก/แต้ม
+                </button>
+                <button onClick={() => setActiveAdminSection('announcements')} style={tabButtonStyle(activeAdminSection === 'announcements')}>
+                    <FaBullhorn /> จัดการประกาศ
                 </button>
             </div>
 
@@ -2548,7 +2689,7 @@ const handleProductSubmit = async (e) => {
                                                                         {Object.keys(productForm.selected_available_item_choices).filter(k => productForm.selected_available_item_choices[k] || productForm.selected_available_item_choices.custom.includes(k)).map(choice => (
                                                                             <option key={choice} value={choice}>{choice}</option>
                                                                         ))}
-                                                                         {productForm.selected_available_item_choices.custom.map(choice => (
+                                                                        {productForm.selected_available_item_choices.custom.map(choice => (
                                                                             <option key={choice} value={choice}>{choice} (Custom)</option>
                                                                         ))}
                                                                     </select>
@@ -2588,7 +2729,7 @@ const handleProductSubmit = async (e) => {
                                                                 {Object.keys(productForm.selected_available_item_choices).filter(k => productForm.selected_available_item_choices[k] || productForm.selected_available_item_choices.custom.includes(k)).map(choice => (
                                                                     <option key={choice} value={choice}>{choice}</option>
                                                                 ))}
-                                                                 {productForm.selected_available_item_choices.custom.map(choice => (
+                                                                {productForm.selected_available_item_choices.custom.map(choice => (
                                                                     <option key={choice} value={choice}>{choice} (Custom)</option>
                                                                 ))}
                                                             </select>
@@ -2729,6 +2870,92 @@ const handleProductSubmit = async (e) => {
                                         </tr>
                                     )) : (
                                         <tr><td colSpan="4" style={{ textAlign: 'center', padding: '30px', color: '#777', fontSize: '1.1em' }}><FaBoxes style={{ marginRight: '10px', fontSize: '1.5em' }} /> ไม่พบข้อมูลสินค้า</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+                {/* NEW: Announcement Section */}
+                {activeAdminSection === 'announcements' && (
+                    <div className="announcement-management-section" style={{ marginTop: '20px' }}>
+                        <h2 style={{ fontSize: '1.6em', color: '#0056b3', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <FaBullhorn /> จัดการประกาศ (สำหรับแถบข้อความวิ่ง)
+                        </h2>
+
+                        {announcementActionMessage && <p style={{ color: 'green', border: '1px solid #4CAF50', padding: '12px', marginBottom: '15px', borderRadius: '4px', backgroundColor: '#e8f5e9' }}>✅ {announcementActionMessage}</p>}
+                        {announcementError && <p style={{ color: 'red', border: '1px solid #f44336', padding: '12px', marginBottom: '15px', borderRadius: '4px', backgroundColor: '#ffebee' }}>❌ {announcementError}</p>}
+
+                        <form onSubmit={handleAnnouncementSubmit} id="announcement-form-section" style={{ ...formSectionStyle, backgroundColor: selectedAnnouncement ? '#fff9e6' : '#e6f7ff' }}>
+                            <h3 style={{ marginTop: 0, borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px', fontSize: '1.3em', color: '#333' }}>
+                                {selectedAnnouncement ? `แก้ไขประกาศ: #${selectedAnnouncement.id}` : 'สร้างประกาศใหม่'}
+                            </h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
+                                <div>
+                                    <label htmlFor="announcementMessage" style={formLabelStyle}>ข้อความประกาศ (*):</label>
+                                    <textarea id="announcementMessage" name="message" value={announcementForm.message} onChange={handleAnnouncementFormChange} required rows="3" style={formInputStyle}></textarea>
+                                </div>
+                                <div>
+                                    <label htmlFor="announcementLinkUrl" style={formLabelStyle}><FaLink style={{ marginRight: '5px' }} />URL ลิงก์ (เมื่อคลิก):</label>
+                                    <input type="text" id="announcementLinkUrl" name="link_url" value={announcementForm.link_url} onChange={handleAnnouncementFormChange} placeholder="เช่น https://example.com (ไม่บังคับ)" style={formInputStyle} />
+                                </div>
+                                <div style={{ display: 'flex', gap: '30px' }}>
+                                    <div>
+                                        <label htmlFor="announcementSortOrder" style={formLabelStyle}>ลำดับการแสดง (Sort Order):</label>
+                                        <input type="number" id="announcementSortOrder" name="sort_order" value={announcementForm.sort_order} onChange={handleAnnouncementFormChange} style={{ ...formInputStyle, width: '120px' }} />
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', marginTop: '25px' }}>
+                                        <input type="checkbox" id="announcementIsActive" name="is_active" checked={announcementForm.is_active} onChange={handleAnnouncementFormChange} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
+                                        <label htmlFor="announcementIsActive" style={{ fontWeight: 'bold', cursor: 'pointer' }}>เปิดใช้งาน (Active)</label>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px' }}>
+                                    <button type="submit" disabled={isAnnouncementSubmitting} style={formButtonStyle(selectedAnnouncement ? '#ffc107' : '#28a745', isAnnouncementSubmitting)}>
+                                        <FaPlus /> {isAnnouncementSubmitting ? 'กำลังบันทึก...' : (selectedAnnouncement ? 'อัปเดตประกาศ' : 'สร้างประกาศ')}
+                                    </button>
+                                    {selectedAnnouncement && (
+                                        <button type="button" onClick={resetAnnouncementForm} disabled={isAnnouncementSubmitting} style={formButtonStyle('#6c757d', isAnnouncementSubmitting)}>
+                                            ยกเลิกการแก้ไข
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </form>
+
+                        <h3 style={{ fontSize: '1.3em', color: '#333', marginTop: '40px', borderTop: '1px solid #ccc', paddingTop: '20px' }}>
+                            รายการประกาศทั้งหมด ({announcements.length})
+                        </h3>
+                        <div style={{ maxHeight: '600px', overflowY: 'auto', border: '1px solid #ccc', borderRadius: '4px', marginTop: '10px' }}>
+                            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: '0.9em' }}>
+                                <thead style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}>
+                                    <tr>
+                                        <th style={{ padding: '12px', borderBottom: '2px solid #dee2e6', textAlign: 'left', borderRight: '1px solid #dee2e6' }}>ข้อความ</th>
+                                        <th style={{ padding: '12px', borderBottom: '2px solid #dee2e6', textAlign: 'left', borderRight: '1px solid #dee2e6' }}>ลิงก์</th>
+                                        <th style={{ padding: '12px', borderBottom: '2px solid #dee2e6', textAlign: 'center', borderRight: '1px solid #dee2e6', width: '100px' }}>Active</th>
+                                        <th style={{ padding: '12px', borderBottom: '2px solid #dee2e6', textAlign: 'center', borderRight: '1px solid #dee2e6', width: '100px' }}>Sort</th>
+                                        <th style={{ padding: '12px', borderBottom: '2px solid #dee2e6', textAlign: 'left', minWidth: '150px' }}>จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {announcements.length > 0 ? announcements.map(ann => (
+                                        <tr key={ann.id} style={{ backgroundColor: selectedAnnouncement?.id === ann.id ? '#fff9e6' : 'white' }} className="admin-table-row">
+                                            <td style={{ padding: '10px', borderRight: '1px solid #eee', verticalAlign: 'middle', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={ann.message}>
+                                                {ann.message}
+                                            </td>
+                                            <td style={{ padding: '10px', borderRight: '1px solid #eee', verticalAlign: 'middle', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {ann.link_url ? <a href={ann.link_url} target="_blank" rel="noopener noreferrer">{ann.link_url}</a> : '-'}
+                                            </td>
+                                            <td style={{ padding: '10px', borderRight: '1px solid #eee', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                <span style={{ color: ann.is_active ? 'green' : 'red', fontWeight: 'bold' }}>{ann.is_active ? '✔' : '✖'}</span>
+                                            </td>
+                                            <td style={{ padding: '10px', borderRight: '1px solid #eee', textAlign: 'center', verticalAlign: 'middle' }}>{ann.sort_order}</td>
+                                            <td style={{ padding: '10px', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>
+                                                <button onClick={() => handleSelectAnnouncementForEditing(ann)} style={{ marginRight: '8px', padding: '6px 12px', backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>แก้ไข</button>
+                                                <button onClick={() => handleDeleteAnnouncement(ann.id, ann.message)} style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>ลบ</button>
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#777' }}>ไม่พบข้อมูลประกาศ</td></tr>
                                     )}
                                 </tbody>
                             </table>

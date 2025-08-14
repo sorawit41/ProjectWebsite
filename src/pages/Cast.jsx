@@ -43,33 +43,21 @@ const ImageCarousel = ({ images }) => {
     
     return (
         <div className="w-full h-full relative group overflow-hidden">
-            {/* Background glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20"></div>
-            
-            {/* Image Display */}
             <div
                 style={{ backgroundImage: `url(${images[currentIndex]})` }}
                 className="w-full h-full bg-center bg-cover duration-700 transition-all ease-in-out transform group-hover:scale-105"
             ></div>
-
-            {/* Overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-
-            {/* Left Arrow */}
             {hasMultipleImages && (
                 <div onClick={goToPrevious} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 left-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
                     <FaChevronLeft size={18} />
                 </div>
             )}
-            
-            {/* Right Arrow */}
             {hasMultipleImages && (
                 <div onClick={goToNext} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 right-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
                     <FaChevronRight size={18} />
                 </div>
             )}
-
-            {/* Dots Indicator */}
             {hasMultipleImages && (
                  <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex justify-center gap-2 bg-black/20 backdrop-blur-md rounded-full px-4 py-2">
                     {images.map((_, slideIndex) => (
@@ -317,43 +305,28 @@ const Cast = () => {
                     </div>
                 </div>
 
-                {/* Enhanced Cast Grid */}
+                {/* [UPDATED] Cast Grid with new card design */}
                 {filteredCast.length > 0 ? (
                     <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 transition-all duration-1000 ${isGridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {filteredCast.map((user, index) => (
-                            <div
+                             <button
                                 key={user.id}
                                 onClick={() => openUserModal(user)}
-                                className="group cursor-pointer bg-white rounded-3xl border border-slate-200 overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-purple-400 hover:-translate-y-2 hover:scale-105 relative"
+                                className="group cursor-pointer rounded-2xl bg-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left border border-slate-100 overflow-hidden"
                                 style={{
                                     transitionDelay: `${(index % 16) * 0.05}s`
                                 }}
                             >
-                                {/* Remove glow effect */}
-                                
-                                <div className="relative w-full aspect-[4/5] overflow-hidden rounded-t-3xl">
-                                    <img
-                                        src={user.image_url || "https://placekitten.com/400/500"}
-                                        alt={user.name}
-                                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
-                                        loading="lazy"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent group-hover:from-black/5 transition-all duration-500"></div>
-                                    <div className={`absolute top-4 right-4 text-xs font-black px-4 py-2 rounded-full shadow-lg text-white bg-gradient-to-r ${getRankGradient(user.rank)} border border-white/20`}>
-                                        {user.rank}
-                                    </div>
+                                <div
+                                  style={{ backgroundImage: `url(${user.image_url || 'https://placehold.co/400x533/e2e8f0/475569?text=No+Image'})` }}
+                                  className="w-full aspect-[3/4] bg-cover bg-center transition-transform duration-500 group-hover:scale-110 flex justify-end flex-col"
+                                >
+                                  <div className="p-4 rounded-b-2xl bg-gradient-to-t from-black/80 to-transparent">
+                                    <p className="text-lg font-bold text-white truncate" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>{user.name}</p>
+                                    {user.rank && <p className="mt-1 text-sm text-gray-200" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>{user.rank}</p>}
+                                  </div>
                                 </div>
-                                <div className="relative p-6 text-center bg-white">
-                                    <h3 className="text-xl font-black text-slate-800 truncate group-hover:text-purple-600 transition-colors duration-300">
-                                        {user.name}
-                                    </h3>
-                                    {user.type && (
-                                        <p className="text-sm text-slate-500 truncate mt-1 font-semibold">
-                                            {user.type}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
+                            </button>
                         ))}
                     </div>
                 ) : (
