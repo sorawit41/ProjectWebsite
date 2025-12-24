@@ -6,10 +6,11 @@ import { FaFacebookSquare, FaTiktok, FaPlayCircle } from 'react-icons/fa';
 // youtubeVideos constant is removed
 
 const facebookVideos = [
-    { id: 1, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/23886538187602003' },
-    { id: 2, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/1169781778090651' },
-    { id: 3, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/1182475980166817' },
-    { id: 4, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/2317442688620858' },
+    { id: 1, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/23947537461533464' },
+    { id: 2, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/693088210207129' },
+    { id: 3, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/24495457370057069' },
+    { id: 4, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/23886538187602003' },
+    { id: 5, url: 'https://www.facebook.com/BLACKNEKOMBK/videos/1169781778090651' },
 ];
 
 const tiktokVideos = [

@@ -11,12 +11,6 @@ import {
 
 // Import Supabase client ของคุณ
 import { supabase } from './supabaseClient'; // ตรวจสอบว่า Path ถูกต้อง
-
-// =================================================================
-// 🎨 SECTION 1: HELPER & REUSABLE COMPONENTS (ปรับปรุงใหม่)
-// =================================================================
-
-// --- NEW: Image Carousel Component for Modal ---
 const ImageCarousel = ({ images }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 

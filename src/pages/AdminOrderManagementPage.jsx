@@ -21,7 +21,7 @@ const BANNER_IMAGES_BUCKET_NAME = 'banner-images';
 const JOB_APP_RESUMES_BUCKET_NAME = 'job-app-resumes';
 const PRODUCT_IMAGES_BUCKET_NAME = 'product-images';
 
-const ALL_CASTRANKS_OPTIONS = ["Angel", "Litter Angel", "Fairy", "Trainee", "Legend", "Mythic", "รอ Audition"];
+const ALL_CASTRANKS_OPTIONS = ["Angel", "Litter Angel", "Fairy", "Trainee", "Legend", "Mythic","idol", "รอ Audition"];
 
 const VERIFICATION_OPTIONS = [
     { value: '', label: '-- เลือกผลการตรวจสอบ --' },

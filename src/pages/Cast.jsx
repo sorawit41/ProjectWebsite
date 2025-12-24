@@ -5,22 +5,23 @@ import { supabase } from './supabaseClient';
 import {
     FaCat, FaTimes, FaMapMarkerAlt, FaDumbbell, FaUtensils,
     FaHeart, FaPalette, FaSmile, FaFacebook, FaTiktok,
-    FaInstagram, FaSearch, FaFilter, FaChevronLeft, FaChevronRight
+    FaInstagram, FaChevronLeft, FaChevronRight
 } from 'react-icons/fa';
 
-// --- NEW: Image Carousel Component ---
+// --- Image Carousel Component (Unchanged) ---
 const ImageCarousel = ({ images }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-
     const hasMultipleImages = images && images.length > 1;
 
-    const goToPrevious = () => {
+    const goToPrevious = (e) => {
+        e.stopPropagation(); // Prevents modal from closing
         const isFirstSlide = currentIndex === 0;
         const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
         setCurrentIndex(newIndex);
     };
 
-    const goToNext = () => {
+    const goToNext = (e) => {
+        e.stopPropagation(); // Prevents modal from closing
         const isLastSlide = currentIndex === images.length - 1;
         const newIndex = isLastSlide ? 0 : currentIndex + 1;
         setCurrentIndex(newIndex);
@@ -32,11 +33,8 @@ const ImageCarousel = ({ images }) => {
 
     if (!images || images.length === 0) {
         return (
-            <div className="w-full h-full bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
-                    <FaCat className="relative text-purple-400 animate-bounce" size={60} />
-                </div>
+            <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
+                <FaCat className="text-slate-500" size={60} />
             </div>
         );
     }
@@ -45,26 +43,26 @@ const ImageCarousel = ({ images }) => {
         <div className="w-full h-full relative group overflow-hidden">
             <div
                 style={{ backgroundImage: `url(${images[currentIndex]})` }}
-                className="w-full h-full bg-center bg-cover duration-700 transition-all ease-in-out transform group-hover:scale-105"
+                className="w-full h-full bg-center bg-cover duration-500 ease-in-out"
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
             {hasMultipleImages && (
-                <div onClick={goToPrevious} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 left-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
-                    <FaChevronLeft size={18} />
+                <div onClick={goToPrevious} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 left-4 text-2xl rounded-full p-2 bg-black/30 backdrop-blur-sm text-white cursor-pointer transition-all duration-300 hover:bg-black/50 hover:scale-110">
+                    <FaChevronLeft size={20} />
                 </div>
             )}
             {hasMultipleImages && (
-                <div onClick={goToNext} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 right-4 text-2xl rounded-full p-3 bg-white/20 backdrop-blur-md text-white cursor-pointer transition-all duration-300 hover:bg-white/30 hover:scale-110 border border-white/20">
-                    <FaChevronRight size={18} />
+                <div onClick={goToNext} className="hidden group-hover:block absolute top-1/2 -translate-y-1/2 right-4 text-2xl rounded-full p-2 bg-black/30 backdrop-blur-sm text-white cursor-pointer transition-all duration-300 hover:bg-black/50 hover:scale-110">
+                    <FaChevronRight size={20} />
                 </div>
             )}
             {hasMultipleImages && (
-                 <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex justify-center gap-2 bg-black/20 backdrop-blur-md rounded-full px-4 py-2">
+                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-2">
                     {images.map((_, slideIndex) => (
                         <div
                             key={slideIndex}
                             onClick={() => goToSlide(slideIndex)}
-                            className={`cursor-pointer h-2.5 rounded-full transition-all duration-300 hover:scale-125 ${currentIndex === slideIndex ? 'bg-white w-8 shadow-lg' : 'bg-white/60 w-2.5 hover:bg-white/80'}`}
+                            className={`cursor-pointer h-2 rounded-full transition-all duration-500 ${currentIndex === slideIndex ? 'bg-white w-6' : 'bg-white/50 w-2 hover:bg-white/80'}`}
                         ></div>
                     ))}
                 </div>
@@ -73,36 +71,64 @@ const ImageCarousel = ({ images }) => {
     );
 };
 
-// Define the desired order of ranks for sorting
-const RANK_ORDER = ["Angel", "Litter Angel", "Fairy", "Trainee", "Legend", "Mythic", "รอ Audition"];
+// --- Helper Functions (Unchanged) ---
+const getRankGradient = (rank) => {
+    const gradients = {
+        'Angel': 'from-yellow-400 to-orange-500',
+        'Litter Angel': 'from-sky-400 to-blue-500',
+        'Fairy': 'from-pink-400 to-rose-500',
+        'Trainee': 'from-emerald-400 to-teal-500',
+        'Legend': 'from-purple-500 to-indigo-600',
+        'Mythic': 'from-slate-700 to-black',
+        'รอ Audition': 'from-slate-400 to-gray-500'
+    };
+    return gradients[rank] || 'from-gray-400 to-gray-500';
+};
 
+const DetailItem = ({ icon: Icon, label, value, iconColorClass = "text-slate-500", isLink = false }) => {
+    if (!value) return null;
+    return (
+        <div className="flex items-start gap-4">
+            {/* Changed background for better contrast on white page */}
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg">
+                <Icon className={iconColorClass} size={18} />
+            </div>
+            <div>
+                <p className="text-sm font-medium text-slate-500">{label}</p>
+                {isLink ? (
+                    <a
+                        href={value.startsWith('http') ? value : `https://${value}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-base font-semibold text-indigo-600 hover:text-indigo-700 break-all hover:underline"
+                    >
+                        {value}
+                    </a>
+                ) : (
+                    <p className="text-base font-semibold text-slate-800 break-words">{value}</p>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- SIMPLIFIED COMPONENT ---
 const Cast = () => {
     const [allCastsData, setAllCastsData] = useState([]);
-    const [filteredCast, setFilteredCast] = useState([]);
-    const [sortBy, setSortBy] = useState('id-asc');
-    const [searchTerm, setSearchTerm] = useState('');
-
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const [isGridVisible, setIsGridVisible] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
-    // Fetch cast data from Supabase
+    // --- Simplified Data Fetching Logic ---
     useEffect(() => {
         const fetchCasts = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const { data, error: fetchError } = await supabase
-                    .from('casts')
-                    .select('*')
-                    .order('id', { ascending: true });
-
+                // Data is fetched and sorted by ID ascending by default
+                const { data, error: fetchError } = await supabase.from('casts').select('*').order('id', { ascending: true });
                 if (fetchError) throw fetchError;
-                
                 setAllCastsData(data || []);
-
             } catch (err) {
                 console.error("Error fetching casts:", err);
                 setError("ไม่สามารถโหลดข้อมูลน้องแมวได้ กรุณาลองใหม่อีกครั้ง");
@@ -114,265 +140,91 @@ const Cast = () => {
         fetchCasts();
     }, []);
 
-    // Effect for filtering and sorting
-    useEffect(() => {
-        let newFilteredData = [...allCastsData];
-
-        if (searchTerm) {
-            newFilteredData = newFilteredData.filter(cast =>
-                cast.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                cast.rank.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (cast.type && cast.type.toLowerCase().includes(searchTerm.toLowerCase()))
-            );
-        }
-
-        switch (sortBy) {
-            case 'name-asc':
-                newFilteredData.sort((a, b) => a.name.localeCompare(b.name, 'th'));
-                break;
-            case 'name-desc':
-                newFilteredData.sort((a, b) => b.name.localeCompare(a.name, 'th'));
-                break;
-            case 'rank-asc':
-                newFilteredData.sort((a, b) => {
-                    const rankAIndex = RANK_ORDER.indexOf(a.rank);
-                    const rankBIndex = RANK_ORDER.indexOf(b.rank);
-                    if (rankAIndex === -1 && rankBIndex === -1) return a.rank.localeCompare(b.rank, 'th');
-                    if (rankAIndex === -1) return 1;
-                    if (rankBIndex === -1) return -1;
-                    return rankAIndex - rankBIndex;
-                });
-                break;
-            case 'id-asc':
-                newFilteredData.sort((a, b) => a.id - b.id);
-                break;
-            case 'id-desc':
-                newFilteredData.sort((a, b) => b.id - b.id);
-                break;
-            default:
-                newFilteredData.sort((a, b) => a.id - b.id);
-                break;
-        }
-        setFilteredCast(newFilteredData);
-        
-        // Trigger grid fade-in animation
-        if (newFilteredData.length > 0) {
-            const timer = setTimeout(() => setIsGridVisible(true), 100);
-            return () => clearTimeout(timer);
-        } else {
-            setIsGridVisible(false);
-        }
-
-    }, [allCastsData, sortBy, searchTerm]);
-
     const openUserModal = (user) => setSelectedUser(user);
     const closeUserModal = () => setSelectedUser(null);
 
-    // Enhanced gradient function for ranks
-    const getRankGradient = (rank) => {
-        const gradients = {
-            'Angel': 'from-yellow-300 via-amber-400 to-orange-500',
-            'Litter Angel': 'from-cyan-300 via-sky-400 to-blue-500',
-            'Fairy': 'from-pink-300 via-rose-400 to-purple-500',
-            'Trainee': 'from-emerald-300 via-teal-400 to-cyan-500',
-            'Legend': 'from-violet-400 via-purple-500 to-indigo-600',
-            'Mythic': 'from-slate-600 via-purple-700 to-black',
-            'รอ Audition': 'from-gray-300 via-slate-400 to-gray-500'
-        };
-        return gradients[rank] || 'from-gray-400 to-gray-500';
-    };
-    
-    // Enhanced Detail Item for Modal
-    const DetailItem = ({ icon: Icon, label, value, iconColorClass = "text-slate-500", isLink = false }) => {
-        if (!value) return null;
-        return (
-            <div className="group flex items-start p-5 bg-gradient-to-r from-white to-slate-50/50 rounded-xl border border-slate-200/50 hover:border-purple-300/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-                <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-sm border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
-                    <Icon className={iconColorClass} size={20} />
-                </div>
-                <div className="ml-4 flex-1">
-                    <p className="text-sm font-semibold text-slate-500 uppercase tracking-wide">{label}</p>
-                    {isLink ? (
-                        <a
-                            href={value.startsWith('http') ? value : `https://${value}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-purple-600 hover:text-purple-700 font-bold break-all transition-colors duration-200 hover:underline"
-                        >
-                            {value}
-                        </a>
-                    ) : (
-                        <p className="text-base font-bold text-slate-800 break-words mt-1">{value}</p>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
-    // --- RENDER STATES ---
-
+    // --- RENDER STATES (Slightly restyled for new design) ---
     if (isLoading) {
         return (
-            <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-                    <FaCat size={80} className="relative text-purple-500 animate-bounce"/>
-                </div>
-                <h2 className="mt-8 text-2xl font-bold text-slate-700 animate-pulse">กำลังโหลดข้อมูลน้องแมว...</h2>
-                <p className="mt-2 text-slate-500 animate-pulse">กรุณารอสักครู่</p>
-                <div className="mt-6 flex space-x-2">
-                    <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce"></div>
-                    <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
+            <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white p-4">
+                <FaCat size={60} className="text-slate-500 animate-bounce"/>
+                <h2 className="mt-6 text-xl font-bold text-slate-700">กำลังโหลดข้อมูล...</h2>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 p-4">
-                <div className="w-full max-w-md text-center bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-red-200/50">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
-                        <FaCat size={60} className="relative mx-auto text-red-500"/>
-                    </div>
-                    <h2 className="mt-8 text-2xl font-bold text-red-800">เกิดข้อผิดพลาด!</h2>
-                    <p className="mt-3 text-red-600 leading-relaxed">{error}</p>
+            <div className="min-h-screen w-full flex items-center justify-center bg-red-50 p-4">
+                <div className="w-full max-w-md text-center bg-white p-8 rounded-2xl shadow-lg border border-red-200">
+                    <FaCat size={50} className="mx-auto text-red-500"/>
+                    <h2 className="mt-6 text-xl font-bold text-red-800">เกิดข้อผิดพลาด!</h2>
+                    <p className="mt-2 text-red-600">{error}</p>
                 </div>
             </div>
         );
     }
 
-    // --- MAIN COMPONENT ---
-
+    // --- NEW MAIN COMPONENT RENDER ---
     return (
-        <div className="min-h-screen bg-white text-slate-800 py-16 sm:py-24 relative overflow-hidden">
-            
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="min-h-screen bg-white text-slate-800 font-sans">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
                 
-                {/* Enhanced Header */}
-                <div className="text-center mb-16">
-                    <div className="relative inline-block">
-                        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-800 tracking-tight hover:text-transparent hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 hover:bg-clip-text transition-all duration-500">
-                            ทำเนียบน้องแมว
-                        </h1>
-                    </div>
-                    <p className="mt-6 max-w-3xl mx-auto text-xl text-slate-600 leading-relaxed font-medium">
-                        พบกับความน่ารักสดใสของเหล่าสมาชิกเหมียวทุกคน ✨
+                {/* Header */}
+                <header className="text-center mb-12 md:mb-16">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight">
+                        ทำเนียบน้องแมว
+                    </h1>
+                    <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
+                        พบกับความน่ารักสดใสและข้อมูลของเหล่าสมาชิกเหมียวทุกคน
                     </p>
-                    <div className="mt-4 flex justify-center space-x-2">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                    </div>
-                </div>
+                </header>
+                
+                {/* Controls section has been removed */}
 
-                {/* Enhanced Controls */}
-                <div className="mb-16 p-6 bg-white border border-slate-200 rounded-3xl shadow-lg">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                        <div className="relative w-full sm:max-w-xs lg:max-w-sm group">
-                            <div className="relative">
-                                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
-                                <input
-                                    type="text"
-                                    placeholder="ค้นหาด้วยชื่อ, rank..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition-all duration-300 text-slate-700 font-medium placeholder-slate-400"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-3 text-sm font-bold text-slate-700 bg-white rounded-full px-4 py-2 border border-slate-200">
-                                <FaCat className="text-purple-500" />
-                                <span>พบ {filteredCast.length} ชีวิต</span>
-                            </div>
-                            <div className="relative group">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 text-slate-700"
-                                >
-                                    <option value="id-asc">ID (น้อยไปมาก)</option>
-                                    <option value="id-desc">ID (มากไปน้อย)</option>
-                                    <option value="name-asc">ชื่อ (ก → ฮ)</option>
-                                    <option value="name-desc">ชื่อ (ฮ → ก)</option>
-                                    <option value="rank-asc">จัดอันดับ Rank</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* [UPDATED] Cast Grid with new card design */}
-                {filteredCast.length > 0 ? (
-                    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 transition-all duration-1000 ${isGridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                        {filteredCast.map((user, index) => (
+                {/* Cast Grid */}
+                {allCastsData.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 md:gap-8">
+                        {allCastsData.map((user) => (
                              <button
                                 key={user.id}
                                 onClick={() => openUserModal(user)}
-                                className="group cursor-pointer rounded-2xl bg-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left border border-slate-100 overflow-hidden"
-                                style={{
-                                    transitionDelay: `${(index % 16) * 0.05}s`
-                                }}
+                                className="group cursor-pointer rounded-2xl bg-white shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 text-left border border-slate-200/50 overflow-hidden"
                             >
                                 <div
                                   style={{ backgroundImage: `url(${user.image_url || 'https://placehold.co/400x533/e2e8f0/475569?text=No+Image'})` }}
-                                  className="w-full aspect-[3/4] bg-cover bg-center transition-transform duration-500 group-hover:scale-110 flex justify-end flex-col"
+                                  className="w-full aspect-[3/4] bg-cover bg-center transition-transform duration-500 group-hover:scale-105 flex justify-end flex-col"
                                 >
-                                  <div className="p-4 rounded-b-2xl bg-gradient-to-t from-black/80 to-transparent">
-                                    <p className="text-lg font-bold text-white truncate" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>{user.name}</p>
-                                    {user.rank && <p className="mt-1 text-sm text-gray-200" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>{user.rank}</p>}
+                                  <div className="p-5 rounded-b-2xl bg-gradient-to-t from-black/80 to-transparent">
+                                    <p className="text-xl font-bold text-white truncate" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>{user.name}</p>
+                                    {user.rank && <p className="mt-0.5 text-sm font-medium text-gray-200" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>{user.rank}</p>}
                                   </div>
                                 </div>
                             </button>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-20 sm:py-32">
-                        <div className="bg-white border border-slate-200 rounded-3xl p-12 max-w-lg mx-auto shadow-lg">
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-                                <FaCat size={80} className="relative mx-auto text-slate-400"/>
-                            </div>
-                            <h3 className="mt-8 text-2xl font-black text-slate-700">
-                                ไม่พบน้องแมวที่ค้นหา
-                            </h3>
-                            <p className="mt-3 text-slate-500 leading-relaxed font-medium">
-                                {searchTerm ? `ไม่พบผลลัพธ์สำหรับ "${searchTerm}"` : 'อาจจะยังไม่มีน้องแมวในระบบ'}
-                            </p>
-                            {searchTerm && (
-                                <button
-                                    onClick={() => setSearchTerm('')}
-                                    className="mt-8 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-1"
-                                >
-                                    ล้างการค้นหา
-                                </button>
-                            )}
+                    <div className="text-center py-20">
+                        <div className="inline-block bg-white border border-slate-200 rounded-2xl p-10">
+                            <FaCat size={50} className="mx-auto text-slate-400"/>
+                            <h3 className="mt-6 text-xl font-bold text-slate-700">ไม่พบข้อมูลน้องแมว</h3>
+                            <p className="mt-2 text-slate-500">อาจจะยังไม่มีน้องแมวในระบบ</p>
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* Enhanced Modal */}
+            {/* REDESIGNED MODAL (Unchanged from previous version) */}
             {selectedUser && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-black/70 backdrop-blur-md"
-                        onClick={closeUserModal}
-                    ></div>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+                    {/* Backdrop */}
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeUserModal}></div>
                     
-                    <div className="relative bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 flex flex-col md:flex-row animate-in zoom-in-95 duration-300">
-                        <button
-                            onClick={closeUserModal}
-                            className="absolute top-6 right-6 z-20 w-12 h-12 bg-white/80 backdrop-blur-sm text-slate-600 hover:text-slate-900 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-90 border border-slate-200/50 shadow-lg"
-                        >
-                            <FaTimes size={18} />
-                        </button>
+                    {/* Modal Panel */}
+                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in zoom-in-95 duration-300">
                         
-                        {/* Enhanced Image Section */}
-                        <div className="w-full md:w-2/5 flex-shrink-0 relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 md:rounded-l-3xl rounded-t-3xl md:rounded-tr-none">
+                        {/* Image Panel */}
+                        <div className="w-full md:w-2/5 flex-shrink-0 bg-slate-200 h-64 md:h-auto">
                            <ImageCarousel 
                                 images={
                                     (selectedUser.image_urls && Array.isArray(selectedUser.image_urls) && selectedUser.image_urls.length > 0)
@@ -380,58 +232,67 @@ const Cast = () => {
                                     : [selectedUser.image_url]
                                 } 
                             />
-                            <div className={`absolute top-6 left-6 text-sm font-black px-5 py-2.5 rounded-full shadow-2xl text-white bg-gradient-to-r ${getRankGradient(selectedUser.rank)} border border-white/30 backdrop-blur-sm`}>
-                                {selectedUser.rank}
-                            </div>
                         </div>
 
-                        {/* Enhanced Modal Info Section */}
-                        <div className="p-8 md:p-10 flex-1 bg-white">
-                            <div className="mb-8">
-                                <h2 className="text-4xl sm:text-5xl font-black text-slate-800 hover:text-transparent hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:bg-clip-text transition-all duration-500 leading-tight">
-                                    {selectedUser.name}
-                                </h2>
-                                {selectedUser.type && (
-                                    <p className="mt-2 text-xl text-slate-500 font-bold">
-                                        {selectedUser.type}
-                                    </p>
-                                )}
-                            </div>
-
-                            {selectedUser.message_to_humans && (
-                                <blockquote className="p-6 mb-8 bg-slate-50 border-l-4 border-purple-400 rounded-r-2xl shadow-lg">
-                                    <p className="text-lg italic text-purple-800 font-semibold leading-relaxed">
-                                        "{selectedUser.message_to_humans}"
-                                    </p>
-                                </blockquote>
-                            )}
-
-                            <div className="space-y-6">
-                               <div className="border-b-2 border-gradient-to-r from-purple-200 to-pink-200 pb-3">
-                                   <h3 className="text-xl font-black text-slate-700">ข้อมูลส่วนตัว</h3>
-                               </div>
-                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                  <DetailItem icon={FaMapMarkerAlt} label="สถานที่เกิด" value={selectedUser.birth_place} iconColorClass="text-red-500" />
-                                  <DetailItem icon={FaDumbbell} label="ความสามารถ" value={selectedUser.strength} iconColorClass="text-blue-500" />
-                                  <DetailItem icon={FaUtensils} label="อาหารโปรด" value={selectedUser.favorite_food} iconColorClass="text-orange-500" />
-                                  <DetailItem icon={FaHeart} label="สิ่งที่รัก" value={selectedUser.love_thing} iconColorClass="text-rose-500" />
-                                  <DetailItem icon={FaSmile} label="งานอดิเรก" value={selectedUser.hobby} iconColorClass="text-yellow-500" />
-                                  <DetailItem icon={FaPalette} label="สีโปรด" value={selectedUser.favorite_color} iconColorClass="text-purple-500" />
-                               </div>
-                            </div>
-
-                            {(selectedUser.facebook_url || selectedUser.tiktok_url || selectedUser.instagram_url) && (
-                                <div className="mt-10">
-                                    <div className="border-b-2 border-gradient-to-r from-purple-200 to-pink-200 pb-3 mb-6">
-                                        <h3 className="text-xl font-black text-slate-700">ช่องทางติดตาม</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                        <DetailItem icon={FaFacebook} label="Facebook" value={selectedUser.facebook_url} iconColorClass="text-blue-600" isLink={true} />
-                                        <DetailItem icon={FaTiktok} label="TikTok" value={selectedUser.tiktok_url} iconColorClass="text-black" isLink={true} />
-                                        <DetailItem icon={FaInstagram} label="Instagram" value={selectedUser.instagram_url} iconColorClass="text-pink-600" isLink={true} />
-                                    </div>
+                        {/* Content Panel with Scrolling */}
+                        <div className="flex-1 overflow-y-auto">
+                            <div className="p-6 sm:p-8 md:p-10">
+                                <div className="absolute top-4 right-4 z-20">
+                                    <button
+                                        onClick={closeUserModal}
+                                        className="w-10 h-10 bg-white/80 backdrop-blur-sm text-slate-600 hover:text-slate-900 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-90 border border-slate-200/50 shadow-sm"
+                                    >
+                                        <FaTimes size={16} />
+                                    </button>
                                 </div>
-                            )}
+
+                                <div className="mb-6">
+                                    {selectedUser.rank && (
+                                        <div className={`inline-block text-sm font-bold px-4 py-1.5 rounded-full mb-3 text-white bg-gradient-to-r ${getRankGradient(selectedUser.rank)}`}>
+                                            {selectedUser.rank}
+                                        </div>
+                                    )}
+                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+                                        {selectedUser.name}
+                                    </h2>
+                                    {selectedUser.type && (
+                                        <p className="mt-1 text-lg text-slate-500 font-semibold">{selectedUser.type}</p>
+                                    )}
+                                </div>
+
+                                {selectedUser.message_to_humans && (
+                                    <blockquote className="p-4 mb-8 bg-slate-50 border-l-4 border-indigo-400 rounded-r-lg">
+                                        <p className="text-base italic text-slate-700 font-medium">
+                                            "{selectedUser.message_to_humans}"
+                                        </p>
+                                    </blockquote>
+                                )}
+
+                                <div className="space-y-8">
+                                    <div>
+                                       <h3 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">ข้อมูลส่วนตัว</h3>
+                                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                                          <DetailItem icon={FaMapMarkerAlt} label="สถานที่เกิด" value={selectedUser.birth_place} iconColorClass="text-red-500" />
+                                          <DetailItem icon={FaDumbbell} label="ความสามารถ" value={selectedUser.strength} iconColorClass="text-blue-500" />
+                                          <DetailItem icon={FaUtensils} label="อาหารโปรด" value={selectedUser.favorite_food} iconColorClass="text-orange-500" />
+                                          <DetailItem icon={FaHeart} label="สิ่งที่รัก" value={selectedUser.love_thing} iconColorClass="text-rose-500" />
+                                          <DetailItem icon={FaSmile} label="งานอดิเรก" value={selectedUser.hobby} iconColorClass="text-yellow-500" />
+                                          <DetailItem icon={FaPalette} label="สีโปรด" value={selectedUser.favorite_color} iconColorClass="text-purple-500" />
+                                       </div>
+                                    </div>
+
+                                    {(selectedUser.facebook_url || selectedUser.tiktok_url || selectedUser.instagram_url) && (
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">ช่องทางติดตาม</h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                                                <DetailItem icon={FaFacebook} label="Facebook" value={selectedUser.facebook_url} iconColorClass="text-blue-600" isLink={true} />
+                                                <DetailItem icon={FaTiktok} label="TikTok" value={selectedUser.tiktok_url} iconColorClass="text-black" isLink={true} />
+                                                <DetailItem icon={FaInstagram} label="Instagram" value={selectedUser.instagram_url} iconColorClass="text-pink-600" isLink={true} />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

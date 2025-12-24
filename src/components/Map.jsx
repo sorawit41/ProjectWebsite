@@ -1,11 +1,12 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
+import 'leaflet/dist/leaflet.css';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+// Import Icons
+import { FaMapMarkerAlt, FaClock, FaDirections, FaPhoneAlt, FaStore } from 'react-icons/fa';
 
-// Fix for default Leaflet marker icon issue with Webpack/CRA
-// (Optional, but often needed to display the default marker)
+// Fix for default Leaflet marker icon
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
@@ -18,134 +19,148 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const MapComponent = () => {
   const mapContainerRef = useRef(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Effect to detect dark mode changes from the <html> element
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
-    });
-
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-    // Initial check
-    setIsDarkMode(document.documentElement.classList.contains('dark'));
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Effect to initialize and clean up the Leaflet map
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
     let mapInstance = null;
 
     try {
-      // Initialize the map with a view centered on MBK
+      // Initialize map
       mapInstance = L.map(mapContainerRef.current).setView([13.7448, 100.5293], 17);
 
-      // Add OpenStreetMap tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
       }).addTo(mapInstance);
 
-      // Define a custom marker icon (using default for now, but easily replaceable)
-      const mbkMarkerIcon = L.icon({
-        iconUrl: markerIcon, // You can replace this with a custom SVG or PNG for MBK
-        shadowUrl: markerShadow,
-        iconSize: [38, 60], // Slightly larger icon
-        iconAnchor: [19, 60],
-        popupAnchor: [0, -55], // Adjust popup anchor
-        shadowSize: [60, 60],
-      });
+      // Custom Popup Design
+      const popupContent = `
+        <div class="text-center min-w-[200px] font-sans">
+           <div class="bg-blue-600 text-white p-2 rounded-t-md -mt-4 -mx-5 mb-3">
+             <h3 class="font-bold text-sm">BLACK NEKO</h3>
+           </div>
+           <p class="text-xs text-gray-700 font-bold">MBK Center ชั้น 7</p>
+           <p class="text-xs text-gray-500 mt-1">โซน IT และ Gadget</p>
+        </div>
+      `;
 
-      // Add the marker for MBK Center
-      L.marker([13.7448, 100.5293], { icon: mbkMarkerIcon })
+      L.marker([13.7448, 100.5293])
         .addTo(mapInstance)
-        .bindPopup(
-          `
-          <div class="p-4 rounded-lg shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-300 transform hover:scale-105">
-            <h3 class="text-lg font-bold mb-2 text-blue-600 dark:text-blue-400">MBK Center ชั้น 7</h3>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNZd9q4a66wWGgSBnPX1JFuGbxxduk_mWwOA&s" alt="MBK Center Logo" class="w-20 h-auto mx-auto my-3 rounded-full border-2 border-gray-200 dark:border-gray-700 shadow-sm">
-            <p class="text-sm">ศูนย์รวมสินค้าไอทีและอื่นๆ อีกมากมาย</p>
-            <a href="https://maps.app.goo.gl/YOUR_MBK_CENTER_Maps_LINK_HERE" target="_blank" rel="noopener noreferrer" class="mt-3 inline-block text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500 font-medium">
-              ดูเส้นทางบน Google Maps
-            </a>
-          </div>
-          `
-        )
+        .bindPopup(popupContent)
         .openPopup();
 
     } catch (error) {
-      console.error('Failed to load Leaflet map:', error);
-      // Potentially display a fallback message to the user
+      console.error('Map Error:', error);
     }
 
-    // Cleanup function: remove the map when the component unmounts
     return () => {
-      if (mapInstance) {
-        mapInstance.remove();
-      }
+      if (mapInstance) mapInstance.remove();
     };
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
   return (
-    <section className="py-16 px-4 sm:px-8 lg:px-16 bg-gradient-to-br  dark:from-gray-900 dark:to-gray-950 transition-colors duration-500">
-      {/* Title Section */}
-      <div className="text-center mb-12">
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight animate-fade-in-down">
-          📍 แผนที่ร้านของเรา
-        </h2>
-        <p className="mt-4 text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto animate-fade-in-up">
-          ค้นหาเส้นทางที่ง่ายที่สุดเพื่อมาเยี่ยมชมร้านเราที่เอ็มบีเค เซ็นเตอร์
-        </p>
-      </div>
+    // กำหนด bg-white และเอา overflow-hidden ออกถ้าไม่จำเป็น
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-white text-gray-900 font-sans">
+      
+      {/* เอา Background Decor (วงกลมสี) ออกทั้งหมด เพื่อให้ขาวล้วน */}
+      
+      <div className="relative max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Left Column: Information */}
+          <div className="space-y-10 animate-fade-in-up">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-6 border border-gray-200">
+                <FaStore />
+                <span>Visit Our Store</span>
+              </div>
+              <h2 className="text-5xl md:text-6xl font-black text-gray-900 leading-tight tracking-tight">
+                พบกับเราได้ที่ <br />
+                <span className="text-blue-600">
+                  MBK Center
+                </span>
+              </h2>
+              <p className="mt-6 text-lg text-gray-500 leading-relaxed max-w-lg">
+                เราตั้งอยู่ที่ใจกลางกรุงเทพฯ เดินทางสะดวกด้วยรถไฟฟ้า BTS สถานีสนามกีฬาแห่งชาติ พร้อมให้บริการสินค้าไอทีครบวงจร
+              </p>
+            </div>
 
-      {/* Map Container */}
-      <div className="w-full max-w-screen-xl mx-auto p-2 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl ring-4 ring-blue-500/50 dark:ring-blue-400/50 transform transition duration-500 hover:scale-[1.005] hover:shadow-3xl">
-        <div
-          ref={mapContainerRef}
-          className="w-full h-[550px] sm:h-[700px] rounded-2xl overflow-hidden"
-          aria-label="Interactive map showing the location of the store at MBK Center"
-        ></div>
-      </div>
+            {/* Info Cards */}
+            <div className="space-y-5">
+              {/* Address */}
+              <div className="flex items-start p-6 bg-white rounded-3xl shadow-sm border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all duration-300 group">
+                <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform duration-300">
+                  <FaMapMarkerAlt size={22} />
+                </div>
+                <div className="ml-5">
+                  <h4 className="text-xl font-bold text-gray-900">ที่อยู่ร้าน</h4>
+                  <p className="text-gray-500 mt-2 leading-relaxed">
+                    ชั้น 7 (โซน C) MBK Center, 444 ถ.พญาไท <br />
+                    แขวงวังใหม่ เขตปทุมวัน กทม. 10330
+                  </p>
+                </div>
+              </div>
 
-      {/* Store Information */}
-      <div className="text-center mt-12 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl max-w-xl mx-auto transform transition duration-500 hover:shadow-2xl">
-        <p className="text-2xl font-bold text-gray-800 dark:text-white mb-3 flex items-center justify-center">
-          <span className="text-red-600 dark:text-red-400 mr-2">🛍️</span>
-          ตั้งอยู่ใน: <span className="text-red-600 font-extrabold ml-2">MBK Center</span>
-        </p>
-        <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-2">
-          <b>ที่อยู่:</b> ชั้น 7 เอ็ม บี เค เซ็นเตอร์, แขวงวังใหม่, เขตปทุมวัน, กรุงเทพมหานคร 10330
-        </p>
-        <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-          <b>เวลาทำการ:</b>
-          <span className="font-medium text-green-600 dark:text-green-400 block sm:inline-block mt-1 sm:mt-0">
-            {' '}เปิดทุกวัน
-          </span>
-          <br className="sm:hidden" />
-          <span className="block sm:inline-block">
-            ⋅ <span className="font-semibold">จันทร์ - ศุกร์:</span> 10:00 - 22:00 น.
-          </span>
-          <br className="sm:hidden" />
-          <span className="block sm:inline-block">
-            ⋅ <span className="font-semibold">เสาร์ - อาทิตย์:</span> 11:00 - 22:00 น.
-          </span>
-        </p>
-        <div className="mt-6">
-          <a
-            href="https://www.google.com/maps?gs_lcrp=EgZjaHJvbWUqDggDEEUYJxg7GIAEGIoFMgYIABBFGDwyBggBEEUYPDIGCAIQRRg5Mg4IAxBFGCcYOxiABBiKBTIGCAQQIxgnMgoIBRAuGLEDGIAEMg0IBhAuGIMBGLEDGIAEMgYIBxBFGDzSAQg1NjA0ajBqNKgCALACAA&um=1&ie=UTF-8&fb=1&gl=th&sa=X&geocode=Kam3GEgAn-IwMdln3SBqwkmY&daddr=7th+floor,+MBK+Center,+Khwaeng+Wang+Mai,+Pathum+Wan,+Bangkok+10330" // **IMPORTANT: Replace with your actual Google Maps link**
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 102 0V8a1 1 0 00-1.445-.832l-3-2A1 1 0 005 6V4a1 1 0 00-1.555-.832l-3 2A1 1 0 000 6v4a1 1 0 002 0V8a1 1 0 00-1.445-.832l-3-2z" clipRule="evenodd" />
-            </svg>
-            เปิดใน Google Maps
-          </a>
+              {/* Hours */}
+              <div className="flex items-start p-6 bg-white rounded-3xl shadow-sm border border-gray-200 hover:border-green-200 hover:shadow-md transition-all duration-300 group">
+                <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform duration-300">
+                  <FaClock size={22} />
+                </div>
+                <div className="ml-5">
+                  <h4 className="text-xl font-bold text-gray-900">เวลาทำการ</h4>
+                  <p className="text-gray-500 mt-2">
+                    เปิดบริการทุกวัน: <span className="font-semibold text-green-600">10:00 - 22:00 น.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-wrap gap-4 pt-4">
+              <a
+                href="https://goo.gl/maps/YOUR_REAL_LINK_HERE" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 sm:flex-none inline-flex justify-center items-center px-8 py-4 text-base font-bold text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300"
+              >
+                <FaDirections className="mr-2.5" />
+                นำทาง Google Maps
+              </a>
+              <a
+                href="tel:021234567" 
+                className="flex-1 sm:flex-none inline-flex justify-center items-center px-8 py-4 text-base font-bold text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-300"
+              >
+                <FaPhoneAlt className="mr-2.5 text-gray-400" />
+                โทรสอบถาม
+              </a>
+            </div>
+          </div>
+
+          {/* Right Column: Map */}
+          <div className="relative h-[550px] w-full">
+            {/* กรอบแผนที่สีขาว */}
+            <div className="absolute inset-0 bg-white rounded-[3rem] shadow-xl p-3 border border-gray-100">
+               <div 
+                 ref={mapContainerRef} 
+                 className="w-full h-full rounded-[2.5rem] overflow-hidden z-10 relative"
+               ></div>
+            </div>
+            
+            {/* Badge ตกแต่ง (Open Now) */}
+            <div className="absolute -bottom-8 -left-4 bg-white px-6 py-4 rounded-3xl shadow-lg border border-gray-100 hidden md:block animate-bounce-slow">
+               <div className="flex items-center gap-3">
+                 <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                 </span>
+                 <div>
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Status</p>
+                    <p className="text-sm font-black text-gray-900">Open Now</p>
+                 </div>
+               </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

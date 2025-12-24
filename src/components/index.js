@@ -10,4 +10,6 @@ import ShowCast from "./ShowCast";
 import Test from "./test";
 import Member from "./Member";
 import LoginPage from "./LoginPage";
-export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Message,Map,Navbar2,ShowCast,Test,Member,LoginPage };
+import Media from "./Media";
+export { Header, Footer, HeroBanner,Featured,BackToTopBtn,Media
+    ,Message,Map,Navbar2,ShowCast,Test,Member,LoginPage };

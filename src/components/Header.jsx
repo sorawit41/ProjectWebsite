@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { 
+import {
     Bars3Icon, BellIcon, XMarkIcon, UserCircleIcon, ChevronDownIcon, EnvelopeIcon, Cog6ToothIcon,
-    UserIcon, PuzzlePieceIcon, ShoppingBagIcon, TruckIcon, ArrowRightOnRectangleIcon 
+    UserIcon, PuzzlePieceIcon, ShoppingBagIcon, TruckIcon, ArrowRightOnRectangleIcon, AcademicCapIcon 
 } from '@heroicons/react/24/outline';
 import { supabase } from '../pages/supabaseClient';
 
@@ -13,32 +13,44 @@ import logoLightMode from '/src/assets/logo/logo.png';
 
 const ADMIN_USER_ID = '96c80823-7af5-4a2b-a0de-ac35231db4a9';
 
+// Main navigation links for all pages
 const mainTextNavLinks = [
-  { name: "คอนเซปร้าน", href: "/about" },
-  { name: "อีเว้นท์ต่างๆ", href: "/NewsAndEvent" },
+  {
+    name: "คอนเซปร้าน",
+    href: "#",
+    children: [
+      { id: 1, name: "เกี่ยวกับคอนเซปร้าน", href: "/about" },
+      { id: 2, name: "อีเว้นท์ต่างๆ", href: "/NewsAndEvent" },
+      { id: 3, name: "กฎระเบียบการใช้บริการ", href: "/rules" },
+      { id: 4, name: "เกม", href: "/game" , icon: PuzzlePieceIcon  },
+    ]
+  },
   { name: "ตารางกะน้องแมว", href: "/schedule" },
-  { name: "กฎระเบียบการใช้บริการ", href: "/rules" },
-  { 
-    name: "เมนู & ไอเทม", 
-    href: "#", 
+  {
+    name: "เมนู & ไอเทม",
+    href: "#",
     children: [
       { id: 12, name: "เมนูเครื่องดื่ม", href: "/DrinkMenu" },
       { id: 13, name: "เมนูอาหาร", href: "/MainMenu" },
     ]
   },
-  { name: "รายชื่อน้องแมว", href: "/cast" },
+  { name: "รายชื่อน้องแมว", href: "#",
+    children: [
+      { id: 12, name: "รายชื่อน้องแมว", href: "/Cast" },
+      { id: 13, name: "รายชื่อน้องไอดอล", href: "/Bio" },
+    ] },
   { name: "รับสมัครน้องแมว", href: "/receive" },
 ];
 
 const userAuthenticatedBaseNavigation = [
   { name: 'โปรไฟล์ของคุณ', href: '/ProfilePage', icon: UserIcon },
-  { name: "เกม", href: "/game", icon: PuzzlePieceIcon },
+  
   { name: "สั่งซื้อสินค้า", href: "/ProductListPage", icon: ShoppingBagIcon },
   { name: "ติดตามสินค้า", href: "/OrderTrackingPage", icon: TruckIcon }
 ];
 
 const navBarBaseClasses = "bg-white/80 backdrop-blur-md fixed top-0 left-0 right-0 w-full z-30 border-b border-slate-200 transition-transform duration-300 ease-in-out";
-const navLinkBaseClasses = "rounded-lg px-2.5 py-2 text-[14px] font-medium transition-all duration-300 ease-in-out"; 
+const navLinkBaseClasses = "rounded-lg px-2.5 py-2 text-[14px] font-medium transition-all duration-300 ease-in-out";
 const navLinkInactiveClasses = "text-slate-600 hover:bg-slate-100 hover:text-indigo-600";
 const navLinkActiveClasses = "bg-indigo-50 text-indigo-700 font-semibold";
 
@@ -50,9 +62,9 @@ function classNames(...classes) {
 
 /** Renders a single navigation link for the desktop view */
 const DesktopNavLink = ({ item, current }) => (
-  <Link 
-    to={item.href} 
-    aria-current={current ? 'page' : undefined} 
+  <Link
+    to={item.href}
+    aria-current={current ? 'page' : undefined}
     className={classNames(navLinkBaseClasses, current ? navLinkActiveClasses : navLinkInactiveClasses)}
   >
     {item.name}
@@ -68,11 +80,11 @@ const DesktopDropdown = ({ item, current, location }) => (
     </MenuButton>
     <MenuItems transition className="absolute left-0 z-20 mt-2 w-56 origin-top-left rounded-xl bg-white py-2 shadow-xl ring-1 ring-black ring-opacity-5 data-[closed]:scale-90 data-[closed]:opacity-0 data-[enter]:duration-150 data-[enter]:ease-out data-[leave]:duration-100 data-[leave]:ease-in">
       {item.children.map((child) => (
-        <MenuItem key={child.id}>
+        <MenuItem key={child.id || child.name}>
           {({ focus, close }) => (
-            <Link 
-              to={child.href} 
-              onClick={close} 
+            <Link
+              to={child.href}
+              onClick={close}
               className={classNames(
                 focus ? 'bg-indigo-50 text-indigo-700' : 'text-slate-700',
                 location.pathname === child.href ? 'bg-indigo-100 text-indigo-800 font-medium' : '',
@@ -146,7 +158,7 @@ const MobileDropdownSection = ({ item, location, closeMobileMenu }) => (
       const childCurrent = location.pathname === child.href;
       return (
         <DisclosureButton
-          key={child.id}
+          key={child.id || child.name}
           as={Link}
           to={child.href}
           onClick={closeMobileMenu}
@@ -202,8 +214,6 @@ export default function Header() {
   const navbarHeight = 80;
 
   // --- Effects ---
-
-  // Effect for handling auth state changes
   useEffect(() => {
     const fetchInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -218,7 +228,6 @@ export default function Header() {
     return () => authListener?.subscription.unsubscribe();
   }, []);
 
-  // Effect for fetching user avatar
   useEffect(() => {
     if (!user?.id) {
       setAvatarUrl(null);
@@ -233,7 +242,7 @@ export default function Header() {
           .select('avatar_url')
           .eq('id', user.id)
           .single();
-        
+
         if (isSubscribed) {
           if (error && error.code !== 'PGRST116') throw error;
           setAvatarUrl(profileData?.avatar_url || null);
@@ -248,33 +257,32 @@ export default function Header() {
 
     fetchAvatar();
     
-    // Cleanup function to prevent state updates on unmounted component
     return () => { isSubscribed = false; };
   }, [user]);
 
-  // --- Handlers & Dynamic Data ---
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
   };
-
+  
   const loggedInProfileNavItems = user ? (() => {
-    const items = [...userAuthenticatedBaseNavigation];
-    if (user.id === ADMIN_USER_ID) {
-      items.splice(1, 0, { name: 'หน้าจัดการ (Admin)', href: '/AdminOrderManagementPage', icon: Cog6ToothIcon });
-    }
-    items.push({ name: 'ออกจากระบบ', onClick: handleSignOut, icon: ArrowRightOnRectangleIcon });
-    return items;
+      const items = [...userAuthenticatedBaseNavigation];
+      if (user.id === ADMIN_USER_ID) {
+          items.splice(1, 0, { name: 'หน้าจัดการ (Admin)', href: '/AdminOrderManagementPage', icon: Cog6ToothIcon });
+          items.splice(2, 0, { name: 'จัดการข้อมูลไอดอล', href: '/AdminIdol', icon: AcademicCapIcon });
+          items.splice(3, 0, { name: 'Idol', href: '/Idol_Blackneko', icon: AcademicCapIcon });
+      }
+      items.push({ name: 'ออกจากระบบ', onClick: handleSignOut, icon: ArrowRightOnRectangleIcon });
+      return items;
   })() : [];
 
   // --- Render ---
-  
+
   return (
     <Disclosure as="nav" className={classNames(navBarBaseClasses, dynamicNavClasses)}>
       {({ open: mobileMenuIsOpen, close: closeMobileMenu }) => {
-        
-        // Effect for controlling navbar visibility on scroll
+
         const controlNavbar = useCallback(() => {
           const currentScrollY = window.scrollY;
           if (currentScrollY > navbarHeight) {
@@ -286,8 +294,8 @@ export default function Header() {
           } else {
             setDynamicNavClasses("translate-y-0");
           }
-          setLastScrollY(currentScrollY <= 0 ? 0 : currentScrollY); 
-        }, [lastScrollY, mobileMenuIsOpen]); // navbarHeight is constant, no need to include
+          setLastScrollY(currentScrollY <= 0 ? 0 : currentScrollY);
+        }, [lastScrollY, mobileMenuIsOpen]);
 
         useEffect(() => {
           window.addEventListener("scroll", controlNavbar);
@@ -300,7 +308,7 @@ export default function Header() {
           <>
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
               <div className="relative flex h-20 items-center justify-between">
-                
+
                 {/* Mobile menu button */}
                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                   <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
@@ -313,7 +321,7 @@ export default function Header() {
                 <div className="flex flex-1 items-center justify-center sm:items-center sm:justify-start">
                   <div className="flex shrink-0 items-center">
                     <Link to="/">
-                      <img alt="Your Company Logo" src={logoLightMode} className="h-12 md:h-16 w-auto transition-transform duration-300 hover:scale-105" />
+                      <img alt="Your Company Logo" src={logoLightMode} className="h-12 w-auto transition-transform duration-300 hover:scale-105 md:h-16" />
                     </Link>
                   </div>
                   <nav className="hidden sm:ml-6 sm:block">
@@ -332,38 +340,38 @@ export default function Header() {
 
                 {/* Right side icons and Profile Menu */}
                 <div className="absolute inset-y-0 right-0 flex items-center space-x-3 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                  <Link to="/Contact" title="ติดต่อเรา" className="p-1 text-slate-500 hover:text-indigo-600 transition-colors duration-300">
+                  <Link to="/Contact" title="ติดต่อเรา" className="p-1 text-slate-500 transition-colors duration-300 hover:text-indigo-600">
                     <span className="sr-only">ติดต่อเรา</span>
                     <EnvelopeIcon aria-hidden="true" className="size-6" />
                   </Link>
 
                   {user && (
-                    <button type="button" title="การแจ้งเตือน" className="relative rounded-full bg-white p-1 text-slate-500 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-300">
+                    <button type="button" title="การแจ้งเตือน" className="relative rounded-full bg-white p-1 text-slate-500 transition-colors duration-300 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                       <span className="sr-only">View notifications</span>
                       <BellIcon aria-hidden="true" className="size-6" />
                     </button>
                   )}
 
                   <Menu as="div" className="relative">
-                    <MenuButton className="relative flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:scale-105 transition-transform duration-300">
+                    <MenuButton className="relative flex rounded-full bg-white text-sm transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
                       {user && avatarUrl ? (
                         <img className="size-9 rounded-full object-cover" src={avatarUrl} alt="User profile" onError={() => setAvatarUrl(null)} />
                       ) : (
-                        <UserCircleIcon className="size-9 text-slate-400 hover:text-indigo-500 transition-colors" aria-hidden="true" />
+                        <UserCircleIcon className="size-9 text-slate-400 transition-colors hover:text-indigo-500" aria-hidden="true" />
                       )}
                     </MenuButton>
                     <MenuItems transition className="absolute right-0 z-20 mt-2.5 w-60 origin-top-right rounded-xl bg-white py-2 shadow-xl ring-1 ring-black ring-opacity-5 data-[closed]:scale-90 data-[closed]:opacity-0 data-[enter]:duration-150 data-[enter]:ease-out data-[leave]:duration-100 data-[leave]:ease-in">
                       {!user ? (
                         <>
-                          <MenuItem>{({ focus, close }) => <Link to="/LoginPage" onClick={close} className={classNames('block px-4 py-2.5 text-[14px] w-full text-left text-slate-700 transition-colors', focus && 'bg-slate-100')}>เข้าสู่ระบบ</Link>}</MenuItem>
-                          <MenuItem>{({ focus, close }) => <Link to="/RegisterPage" onClick={close} className={classNames('block px-4 py-2.5 text-[14px] w-full text-left text-slate-700 transition-colors', focus && 'bg-slate-100')}>สมัครสมาชิก</Link>}</MenuItem>
+                          <MenuItem>{({ focus, close }) => <Link to="/LoginPage" onClick={close} className={classNames('block w-full px-4 py-2.5 text-left text-[14px] text-slate-700 transition-colors', focus && 'bg-slate-100')}>เข้าสู่ระบบ</Link>}</MenuItem>
+                          <MenuItem>{({ focus, close }) => <Link to="/RegisterPage" onClick={close} className={classNames('block w-full px-4 py-2.5 text-left text-[14px] text-slate-700 transition-colors', focus && 'bg-slate-100')}>สมัครสมาชิก</Link>}</MenuItem>
                         </>
                       ) : (
                         <>
-                          <div className="px-4 py-3 border-b border-slate-200">
+                          <div className="border-b border-slate-200 px-4 py-3">
                             <p className="text-xs text-slate-500">ลงชื่อเข้าใช้ในฐานะ</p>
-                            <p className="text-[14px] font-medium text-slate-900 truncate">{user.email}</p>
+                            <p className="truncate text-[14px] font-medium text-slate-900">{user.email}</p>
                           </div>
                           {loggedInProfileNavItems.map((item) => (
                             <ProfileMenuItem key={item.name} item={item} close={closeMobileMenu} />
@@ -375,12 +383,12 @@ export default function Header() {
                 </div>
               </div>
             </div>
-            
+
             {/* Mobile menu panel */}
-            <DisclosurePanel className="sm:hidden border-t border-slate-200 bg-white/95 backdrop-blur-sm overflow-y-auto transition-all duration-300 ease-in-out data-[closed]:max-h-0 data-[closed]:opacity-0 data-[closed]:-translate-y-4 data-[open]:max-h-[90vh] data-[open]:opacity-100 data-[open]:translate-y-0">
-              <nav className="space-y-1 px-2 pt-2 pb-3">
+            <DisclosurePanel className="overflow-y-auto border-t border-slate-200 bg-white/95 backdrop-blur-sm transition-all duration-300 ease-in-out data-[closed]:-translate-y-4 data-[closed]:opacity-0 data-[open]:translate-y-0 data-[open]:opacity-100 data-[closed]:max-h-0 data-[open]:max-h-[90vh] sm:hidden">
+              <nav className="space-y-1 px-2 pb-3 pt-2">
                 {mainTextNavLinks.map((item) => {
-                  const current = location.pathname === item.href;
+                  const current = location.pathname === item.href || (item.children && item.children.some(child => location.pathname === child.href));
                   return item.children ? (
                     <MobileDropdownSection key={item.name} item={item} location={location} closeMobileMenu={handleMobileLinkClick} />
                   ) : (
@@ -388,17 +396,17 @@ export default function Header() {
                   );
                 })}
               </nav>
-            
-              <div className="pt-4 pb-3 border-t border-slate-200">
+
+              <div className="border-t border-slate-200 pb-3 pt-4">
                 <div className="flex items-center px-5">
                   {user && avatarUrl ? (
-                    <img className="size-10 rounded-full object-cover border" src={avatarUrl} alt="User profile" />
+                    <img className="size-10 rounded-full border object-cover" src={avatarUrl} alt="User profile" />
                   ) : (
                     <UserCircleIcon className="size-10 text-slate-400" aria-hidden="true" />
                   )}
                   <div className="ml-3">
                     {user?.email ? (
-                      <p className="text-sm font-medium text-slate-800 truncate">{user.email}</p>
+                      <p className="truncate text-sm font-medium text-slate-800">{user.email}</p>
                     ) : (
                       <p className="text-base font-medium text-slate-700">บัญชี</p>
                     )}

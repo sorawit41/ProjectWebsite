@@ -3,16 +3,14 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import DefaultLayout from './layout/DefaultLayout';
 import GameBoard from './components/game/GameBoard';
-// สมมติว่าคุณมี page components เหล่านี้ (คุณต้องสร้างไฟล์ .jsx สำหรับแต่ละ Page)
-// ตัวอย่าง: import Home from './pages/Home';
-// คุณต้อง import page components อื่นๆ ที่คุณกำหนดใน router ที่นี่
-// เช่น Home, NewsAndEvent, Menu, ...
+
 import {
     Home, DashboardPage, UpdatePasswordPage, AdminOrderManagementPage,
     ProfilePage, AddProductForm, ProductListPage, CheckoutPage, OrderTrackingPage,
     ForgotPasswordPage, About, Access, Cast, Media, NewsAndEvent, Menu, Contact, Rules,
-    Schedule, Idol, Receive, Privacy, Member, MainMenu, DrinkMenu, LoginPage, RegisterPage
-  } from "./pages"; // ตรวจสอบให้แน่ใจว่า path นี้ถูกต้อง และมีไฟล์ export components เหล่านี้จาก src/pages/index.js หรือแต่ละไฟล์
+    Schedule, Idol, Receive, Privacy, Member, MainMenu, DrinkMenu, LoginPage, RegisterPage,
+    Idol_Blackneko, MemberIdol, AdminIdol, Bio
+} from "./pages"; // ตรวจสอบให้แน่ใจว่า path นี้ถูกต้อง
 
 const Layout = () => {
   return (
@@ -26,8 +24,7 @@ const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      { path: "/", element: <Home /> }, // คุณต้องสร้าง Home component
-      // ... (routes อื่นๆ ที่คุณกำหนดไว้) ...
+      { path: "/", element: <Home /> }, 
       { path: "/NewsAndEvent", element: <NewsAndEvent /> },
       { path: "/game", element: <GameBoard /> },
       { path: "/Menu", element: <Menu /> },
@@ -55,7 +52,13 @@ const router = createBrowserRouter([
       { path: "/CheckoutPage", element: <CheckoutPage /> },
       { path: "/OrderTrackingPage", element: <OrderTrackingPage /> },
       { path: "/AdminOrderManagementPage", element: <AdminOrderManagementPage /> },
-
+      { path: "/Idol_Blackneko", element: <Idol_Blackneko /> }, 
+      { path: "/Idol_Blackneko/MemberIdol", element: <MemberIdol /> }, 
+      { path: "/AdminIdol", element: <AdminIdol /> },
+      
+      // --- ส่วนของ Bio Link ---
+      { path: "/Bio", element: <Bio /> },      // เข้าแบบปกติ (แสดงหน้าร้าน)
+      { path: "/Bio/:id", element: <Bio /> },  // เข้าแบบระบุชื่อคน (เช่น /Bio/mind)
     ]
   },
 ]);

@@ -11,10 +11,15 @@ module.exports = {
         // kanit: ['Kanit', 'sans-serif'], // เพื่อใช้คลาส font-kanit โดยตรง
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        'text-gradient': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '100% 50%' },
         },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        
         scaleIn: {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
@@ -58,6 +63,8 @@ module.exports = {
         'collectible-shine': 'collectibleShine 1.5s infinite ease-in-out',
         'obstacle-appear': 'obstacleAppear 0.5s ease-out forwards',
         'screen-shake': 'screenShake 0.3s linear',
+        'text-gradient': 'text-gradient 3s linear infinite',
+        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
       },
     },
   },

@@ -26,9 +26,13 @@ import ProductListPage from "./ProductListPage";
 import CheckoutPage from "./CheckoutPage";
 import OrderTrackingPage from "./OrderTrackingPage";
 import AdminOrderManagementPage from "./AdminOrderManagementPage";
+import Idol_Blackneko from "./Idol_Blackneko";
+import MemberIdol from "./MemberIdol";
+import AdminIdol from "./AdminIdol";
+import Bio from "./Bio";
 export { Home, UpdatePasswordPage,ForgotPasswordPage,ProfilePage,AdminOrderManagementPage,
     AddProductForm,ProductListPage,CheckoutPage,OrderTrackingPage,
     About, Access, Cast, Media, NewsAndEvent,
      Rules, Menu, Contact,Schedule, Receive, 
      Shop,Idol,Privacy,Member,MainMenu,DrinkMenu
-     ,LoginPage,RegisterPage,DashboardPage };
+     ,LoginPage,RegisterPage,DashboardPage,Idol_Blackneko,MemberIdol,AdminIdol,Bio};
